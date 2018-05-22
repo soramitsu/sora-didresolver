@@ -1,20 +1,19 @@
-package jp.co.soramitsu.sora.didresolver.DAO;
+package jp.co.soramitsu.sora.didresolver.DTO;
 
 import lombok.Data;
-import org.springframework.data.annotation.Id;
 
-import javax.persistence.Entity;
+import javax.validation.constraints.NotBlank;
 
 /**
  * @author rogachevsn
  */
 @Data
-@Entity
 public class PublicKey {
 
-    @Id
+    @NotBlank
     private String id;
 
+    @NotBlank
     private String type;
 
     private String owner;
@@ -22,4 +21,6 @@ public class PublicKey {
     private String publicKeyPem;
 
     private String publicKeyBase58;
+
+    private String publicKeyHex;
 }
