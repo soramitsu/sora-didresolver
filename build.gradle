@@ -20,6 +20,7 @@ lombok {
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
+apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
@@ -31,10 +32,14 @@ repositories {
 	mavenCentral()
 }
 
+def springSwaggerVersion = '2.8.0'
+
 dependencies {
 	//compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	compile('org.springframework.boot:spring-boot-starter-validation')
 	compile('org.springframework.boot:spring-boot-starter-web')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+    compile("io.springfox:springfox-swagger2:${springSwaggerVersion}")
+    compile("io.springfox:springfox-swagger-ui:${springSwaggerVersion}")
     runtime('org.postgresql:postgresql:42.1.4')
 }
