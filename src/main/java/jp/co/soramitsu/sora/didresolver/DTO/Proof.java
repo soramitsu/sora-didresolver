@@ -1,6 +1,8 @@
 package jp.co.soramitsu.sora.didresolver.DTO;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
@@ -9,6 +11,8 @@ import java.util.Date;
  * @author rogachevsn
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Proof {
 
     @NotBlank

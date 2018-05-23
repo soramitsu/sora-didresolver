@@ -1,0 +1,34 @@
+{
+  "id": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV",
+
+  "publicKey": [{
+    "id": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV#keys-1",
+    "type": "RsaVerificationKey2018",
+    "owner": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV",
+    "publicKeyPem": "-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\r\n"
+  }, {
+    "id": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV#keys-2",
+    "type": "RsaEncryptionKey2018",
+    "owner": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV",
+    "publicKeyPem": "-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\r\n"
+  }, {
+    "id": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV#keys-3",
+    "type": "Ed25519VerificationKey2018",
+    "owner": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV",
+    "publicKeyBase58": "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"
+  }],
+
+  "authentication": [{
+    "type": "RsaSignatureAuthentication2018",
+    "publicKey": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV#keys-1"
+  }],
+
+  "created": "2002-10-10T17:00:00Z",
+
+  "proof": {
+    "type": "Ed25519Signature2018",
+    "created": "2002-10-10T17:00:00Z",
+    "creator": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV#keys-3",
+    "signatureValue": "QNB13Y7Q9...1tzjn4w=="
+  }
+}

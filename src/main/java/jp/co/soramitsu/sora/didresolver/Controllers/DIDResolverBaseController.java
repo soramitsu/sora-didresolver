@@ -1,6 +1,7 @@
 package jp.co.soramitsu.sora.didresolver.Controllers;
 
 import jp.co.soramitsu.sora.didresolver.DTO.DDO;
+import jp.co.soramitsu.sora.didresolver.Services.StorageService;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,15 +18,14 @@ public class DIDResolverBaseController {
 
     public static final String PATH = "/did";
 
-    /*protected final ValidateService validateService;
+    protected StorageService storageService;
 
-    @Autowired
-    public DIDResolverBaseController(ValidateService validateService) {
-        this.validateService = validateService;
-    }*/
+    DIDResolverBaseController(StorageService storageService){
+        this.storageService = storageService;
+    }
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
     public void createDDO(@Validated @RequestBody DDO ddo){
-
+        storageService.createOrUpdate(ddo.getId(),ddo);
     }
 }

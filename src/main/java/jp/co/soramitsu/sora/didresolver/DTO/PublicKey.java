@@ -1,6 +1,8 @@
 package jp.co.soramitsu.sora.didresolver.DTO;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 
@@ -8,6 +10,8 @@ import javax.validation.constraints.NotBlank;
  * @author rogachevsn
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class PublicKey {
 
     @NotBlank
