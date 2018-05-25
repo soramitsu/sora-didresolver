@@ -1,7 +1,7 @@
-package jp.co.soramitsu.sora.didresolver.Services.Impl;
+package jp.co.soramitsu.sora.didresolver.services.impl;
 
-import jp.co.soramitsu.sora.didresolver.DTO.DDO;
-import jp.co.soramitsu.sora.didresolver.Services.StorageService;
+import jp.co.soramitsu.sora.didresolver.dto.DDO;
+import jp.co.soramitsu.sora.didresolver.services.StorageService;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +29,6 @@ public class MockStorageServiceImpl implements StorageService{
 
     @Override
     public void delete(String did) {
-
+        mockStorage.remove(did);
     }
 }

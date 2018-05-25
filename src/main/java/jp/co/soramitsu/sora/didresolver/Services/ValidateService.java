@@ -1,4 +1,4 @@
-package jp.co.soramitsu.sora.didresolver.Services;
+package jp.co.soramitsu.sora.didresolver.services;
 
 /**
  * @author rogachevsn

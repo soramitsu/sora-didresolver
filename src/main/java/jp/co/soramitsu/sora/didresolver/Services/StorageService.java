@@ -1,6 +1,6 @@
-package jp.co.soramitsu.sora.didresolver.Services;
+package jp.co.soramitsu.sora.didresolver.services;
 
-import jp.co.soramitsu.sora.didresolver.DTO.DDO;
+import jp.co.soramitsu.sora.didresolver.dto.DDO;
 
 /**
  * @author rogachevsn

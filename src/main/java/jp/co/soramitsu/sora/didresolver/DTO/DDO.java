@@ -1,4 +1,4 @@
-package jp.co.soramitsu.sora.didresolver.DTO;
+package jp.co.soramitsu.sora.didresolver.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -34,9 +34,6 @@ public class DDO {
 
     private Date updated;
 
-    private Proof proof;
-
-    public String getId(){
-        return id;
-    }
+    @NotNull
+    private Proof[] proof;
 }

@@ -1,4 +1,4 @@
-package jp.co.soramitsu.sora.didresolver.DTO;
+package jp.co.soramitsu.sora.didresolver.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
