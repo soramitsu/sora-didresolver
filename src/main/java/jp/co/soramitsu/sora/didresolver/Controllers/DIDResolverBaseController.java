@@ -1,15 +1,19 @@
-package jp.co.soramitsu.sora.didresolver.Controllers;
+package jp.co.soramitsu.sora.didresolver.controllers;
 
+import jp.co.soramitsu.sora.didresolver.dto.DDO;
+import jp.co.soramitsu.sora.didresolver.exceptions.DIDDuplicateException;
+import jp.co.soramitsu.sora.didresolver.services.StorageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import jp.co.soramitsu.sora.didresolver.DTO.DDO;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Optional;
 
 /**
  * @author rogachevsn
@@ -19,18 +23,25 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(value = DIDResolverBaseController.PATH, description = "CRUD operations on DID documents")
 public class DIDResolverBaseController {
 
-    public static final String PATH = "/did";
+    static final String PATH = "/did";
+    static final String ID_PARAM = "/{did}";
 
-    /*protected final ValidateService validateService;
+    StorageService storageService;
 
-    @Autowired
-    public DIDResolverBaseController(ValidateService validateService) {
-        this.validateService = validateService;
-    }*/
+    DIDResolverBaseController(StorageService storageService) {
+        this.storageService = storageService;
+    }
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
     @ApiOperation("This operation is used to register new DID-DDO pair in Identity System")
-    public void createDDO(@ApiParam(value = "url encoded DID", required = true) @Validated @RequestBody DDO ddo){
+    public void createDDO(@ApiParam(value = "url encoded DID", required = true) @Validated @RequestBody DDO ddo) {
+        if (checkDDOByDidAtStorage(ddo.getId())){
+            throw new DIDDuplicateException(ddo.getId());
+        }
+        storageService.createOrUpdate(ddo.getId(), ddo);
+    }
 
+    boolean checkDDOByDidAtStorage(String did) {
+        return Optional.ofNullable(storageService.read(did)).isPresent();
     }
 }
