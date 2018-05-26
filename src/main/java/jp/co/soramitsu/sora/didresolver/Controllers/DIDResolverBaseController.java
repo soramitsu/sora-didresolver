@@ -3,6 +3,9 @@ package jp.co.soramitsu.sora.didresolver.controllers;
 import jp.co.soramitsu.sora.didresolver.dto.DDO;
 import jp.co.soramitsu.sora.didresolver.exceptions.DIDDuplicateException;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +20,7 @@ import java.util.Optional;
  */
 @RestController
 @RequestMapping(DIDResolverBaseController.PATH)
+@Api(value = DIDResolverBaseController.PATH, description = "CRUD operations on DID documents")
 public class DIDResolverBaseController {
 
     static final String PATH = "/did";
@@ -29,7 +33,8 @@ public class DIDResolverBaseController {
     }
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public void createDDO(@Validated @RequestBody DDO ddo) {
+    @ApiOperation("This operation is used to register new DID-DDO pair in Identity System")
+    public void createDDO(@ApiParam(value = "url encoded DID", required = true) @Validated @RequestBody DDO ddo) {
         if (checkDDOByDidAtStorage(ddo.getId())){
             throw new DIDDuplicateException(ddo.getId());
         }
