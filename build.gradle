@@ -41,5 +41,6 @@ dependencies {
 	testCompile('org.springframework.boot:spring-boot-starter-test')
     compile("io.springfox:springfox-swagger2:${springSwaggerVersion}")
     compile("io.springfox:springfox-swagger-ui:${springSwaggerVersion}")
-    runtime('org.postgresql:postgresql:42.1.4')
+    compile("org.apache.commons:commons-lang3:3.7")
+    //runtime('org.postgresql:postgresql:42.1.4')
 }
