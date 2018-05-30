@@ -34,6 +34,8 @@ public class DDO {
     @DIDConstraint(isNullable = true)
     private String owner;
 
+    private Service[] service;
+
     @DIDConstraint(isNullable = true)
     private String guardian;
 
