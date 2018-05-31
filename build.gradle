@@ -12,6 +12,20 @@ buildscript {
 
 plugins {
     id 'io.franzbecker.gradle-lombok' version '1.11'
+	id "org.sonarqube" version "2.6"
+	id 'com.novoda.static-analysis' version '0.5.2'
+}
+
+staticAnalysis {
+	penalty {
+		maxErrors = 0
+		maxWarnings = 0
+	}
+	checkstyle { }
+	pmd { }
+	findbugs { }
+	detekt { }
+	lintOptions { }
 }
 
 lombok {
