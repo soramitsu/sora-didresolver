@@ -9,6 +9,7 @@ pipeline {
         script {
           docker.image('gradle:jdk9').inside {
             sh "gradle clean build"
+            sh "gradle test"
           }
         }
       }
