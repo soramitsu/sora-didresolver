@@ -12,11 +12,11 @@ pipeline {
           }
         }
       }
-    }
-    post {
-      cleanup {
-        script {
-          cleanWs()
+      post {
+        cleanup {
+          script {
+            cleanWs()
+          }
         }
       }
     }
