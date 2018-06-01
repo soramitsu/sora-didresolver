@@ -25,11 +25,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class CryptoTest {
+  private final String created = "2010-01-01T19:43:24Z";
+  private final String signatureSuiteName = "Ed25519Sha3SignatureMock";
 
   private final RawDigestStrategy digest = mock(RawDigestStrategy.class);
   private final RawSignatureStrategy signatureStrategy = mock(RawSignatureStrategy.class);
   private final Crypto crypto = new Crypto(digest);
-  private final String created = "2010-01-01T19:43:24Z";
 
   private VerifiableJson json = mock(VerifiableJson.class);
   private ProofProxy proofProxy = mock(ProofProxy.class);
@@ -41,7 +42,6 @@ class CryptoTest {
   private final PrivateKey privateKey = mock(PrivateKey.class);
   private final KeyPair keyPair = new KeyPair(publicKey, privateKey);
 
-  private final String signatureSuiteName = "Ed25519Sha3SignatureMock";
 
   private List<ProofProxy> proofs = new LinkedList<>();
 
@@ -86,7 +86,7 @@ class CryptoTest {
         jsonSignature,
         publicKey
         )
-    ).thenReturn(true);
+    ).thenReturn(Boolean.TRUE);
 
   }
 

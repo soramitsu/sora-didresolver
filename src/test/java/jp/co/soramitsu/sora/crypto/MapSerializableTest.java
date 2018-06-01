@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import jp.co.soramitsu.sora.util.AllTypesPojo;
 import jp.co.soramitsu.sora.util.Bencoder;
+import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,8 +20,6 @@ import org.junit.jupiter.api.Test;
 class MapSerializableTest {
 
   private AllTypesPojo pojo;
-  private Map<String, Object> expected;
-  private Map<String, Object> actual;
 
   private List<String> expectedListOfStrings = Arrays.asList("hello", "world");
   private Map<String, Object> expectedMap = ImmutableMap.of("a", 1, "b", 2, "c", 3);
@@ -29,7 +28,7 @@ class MapSerializableTest {
   @BeforeEach
   public void setUp() {
     pojo = AllTypesPojo.builder()
-        .bool(true)
+        .bool(Boolean.TRUE)
         .integer(42)
         .string("42?")
         .listOfStrings(expectedListOfStrings)
@@ -40,7 +39,7 @@ class MapSerializableTest {
 
   @Test
   public void serializeAsMapInOrder() throws IOException {
-    expected = new TreeMap<String, Object>() {{
+    val expected = new TreeMap<String, Object>() {{
       put("bool", Boolean.TRUE);
       put("integer", 42);
       put("string", "42?");
@@ -49,7 +48,7 @@ class MapSerializableTest {
       put("time", expectedTime.toString());
     }};
 
-    actual = pojo.serializeAsMap();
+    val actual = pojo.serializeAsMap();
 
     assertEquals(
         Bencoder.immediate(expected, UTF_8),

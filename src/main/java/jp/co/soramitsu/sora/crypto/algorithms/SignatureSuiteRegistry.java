@@ -14,6 +14,10 @@ public class SignatureSuiteRegistry {
     algorithms.put(key, val);
   }
 
+  public static void deregister(String key) {
+    algorithms.remove(key);
+  }
+
   public static RawSignatureStrategy get(String key) {
     return algorithms.get(key);
   }
