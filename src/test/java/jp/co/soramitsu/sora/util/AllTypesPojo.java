@@ -11,17 +11,17 @@ import lombok.Getter;
 public class AllTypesPojo implements MapSerializable {
 
   @Getter
-  Object nullable;
+  public Object nullable;
   @Getter
-  String string;
+  public String string;
   @Getter
-  Integer integer;
+  public Integer integer;
   @Getter
-  Boolean bool;
+  public Boolean bool;
   @Getter
-  List<String> listOfStrings;
+  public List<String> listOfStrings;
   @Getter
-  Map<String, Object> map;
+  public Map<String, Object> map;
   @Getter
-  Instant time;
+  public Instant time;
 }

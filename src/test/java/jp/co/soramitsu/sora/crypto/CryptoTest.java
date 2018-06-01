@@ -26,30 +26,30 @@ import org.junit.jupiter.api.Test;
 
 class CryptoTest {
 
-  final RawDigestStrategy digest = mock(RawDigestStrategy.class);
-  final RawSignatureStrategy signatureStrategy = mock(RawSignatureStrategy.class);
-  final Crypto crypto = new Crypto(digest);
-  final String created = "2010-01-01T19:43:24Z";
+  private final RawDigestStrategy digest = mock(RawDigestStrategy.class);
+  private final RawSignatureStrategy signatureStrategy = mock(RawSignatureStrategy.class);
+  private final Crypto crypto = new Crypto(digest);
+  private final String created = "2010-01-01T19:43:24Z";
 
-  VerifiableJson json = mock(VerifiableJson.class);
-  ProofProxy proofProxy = mock(ProofProxy.class);
+  private VerifiableJson json = mock(VerifiableJson.class);
+  private ProofProxy proofProxy = mock(ProofProxy.class);
 
-  final byte[] jsonHash = new byte[]{1, 1, 1};
-  final byte[] jsonSignature = new byte[]{2, 2, 2};
+  private final byte[] jsonHash = new byte[]{1, 1, 1};
+  private final byte[] jsonSignature = new byte[]{2, 2, 2};
 
-  final PublicKey publicKey = mock(PublicKey.class);
-  final PrivateKey privateKey = mock(PrivateKey.class);
-  final KeyPair keyPair = new KeyPair(publicKey, privateKey);
+  private final PublicKey publicKey = mock(PublicKey.class);
+  private final PrivateKey privateKey = mock(PrivateKey.class);
+  private final KeyPair keyPair = new KeyPair(publicKey, privateKey);
 
-  final String signatureSuiteName = "Ed25519Sha3SignatureMock";
+  private final String signatureSuiteName = "Ed25519Sha3SignatureMock";
 
-  List<ProofProxy> proofs = new LinkedList<>();
+  private List<ProofProxy> proofs = new LinkedList<>();
 
-  CryptoTest() {
+  public CryptoTest() {
   }
 
   @BeforeEach
-  void setUp() throws SignatureSuiteException {
+  public void setUp() throws SignatureSuiteException {
     when(proofProxy.getCreated())
         .thenReturn(Instant.parse(created));
 
@@ -95,7 +95,7 @@ class CryptoTest {
    * Sign then verify predefined data.
    */
   @Test
-  void signThenVerify()
+  public void signThenVerify()
       throws InvalidAlgorithmException, CreateVerifyHashException, SignatureSuiteException {
 
     when(json.serializeAsMap())

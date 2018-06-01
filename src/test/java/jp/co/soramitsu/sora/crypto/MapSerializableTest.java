@@ -18,16 +18,16 @@ import org.junit.jupiter.api.Test;
 
 class MapSerializableTest {
 
-  AllTypesPojo pojo;
-  Map<String, Object> expected;
-  Map<String, Object> actual;
+  private AllTypesPojo pojo;
+  private Map<String, Object> expected;
+  private Map<String, Object> actual;
 
-  List<String> expectedListOfStrings = Arrays.asList("hello", "world");
-  Map<String, Object> expectedMap = ImmutableMap.of("a", 1, "b", 2, "c", 3);
-  Instant expectedTime = Instant.now();
+  private List<String> expectedListOfStrings = Arrays.asList("hello", "world");
+  private Map<String, Object> expectedMap = ImmutableMap.of("a", 1, "b", 2, "c", 3);
+  private Instant expectedTime = Instant.now();
 
   @BeforeEach
-  void setUp() {
+  public void setUp() {
     pojo = AllTypesPojo.builder()
         .bool(true)
         .integer(42)
@@ -39,7 +39,7 @@ class MapSerializableTest {
   }
 
   @Test
-  void serializeAsMapInOrder() throws IOException {
+  public void serializeAsMapInOrder() throws IOException {
     expected = new TreeMap<String, Object>() {{
       put("bool", Boolean.TRUE);
       put("integer", 42);

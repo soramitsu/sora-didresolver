@@ -5,9 +5,10 @@ import java.util.Map;
 
 public class SignatureSuiteRegistry {
 
-  private SignatureSuiteRegistry(){}
-
   private static Map<String, RawSignatureStrategy> algorithms = new HashMap<>();
+
+  private SignatureSuiteRegistry() {
+  }
 
   public static void register(String key, RawSignatureStrategy val) {
     algorithms.put(key, val);
