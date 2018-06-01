@@ -1,13 +1,13 @@
 buildscript {
-	ext {
-		springBootVersion = '2.0.2.RELEASE'
-	}
-	repositories {
-		mavenCentral()
-	}
-	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-	}
+    ext {
+        springBootVersion = '2.0.2.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
 }
 
 plugins {
@@ -29,34 +29,34 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 def springSwaggerVersion = '2.8.0'
 
 dependencies {
-	//compile('org.springframework.boot:spring-boot-starter-data-jpa')
-	compile('org.springframework.boot:spring-boot-starter-validation')
-	compile('org.springframework.boot:spring-boot-starter-web')
+    //compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile('org.springframework.boot:spring-boot-starter-validation')
+    compile('org.springframework.boot:spring-boot-starter-web')
 	testCompile('org.springframework.boot:spring-boot-starter-test')
     compile("io.springfox:springfox-swagger2:${springSwaggerVersion}")
     compile("io.springfox:springfox-swagger-ui:${springSwaggerVersion}")
     compile("org.apache.commons:commons-lang3:3.7")
     //runtime('org.postgresql:postgresql:42.1.4')
 
-	// for crypto
+    // for crypto
     compile("com.madgag.spongycastle:core:1.58.0.0")
     compile("com.madgag.spongycastle:bcpkix-jdk15on:1.58.0.0")
 
-	testCompile("org.mockito:mockito-core:2.+")
+    testCompile("org.mockito:mockito-core:2.+")
 
-	testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('org.springframework.boot:spring-boot-starter-test')
 
-	testCompile("junit:junit:4.12")
-	testRuntime("org.junit.vintage:junit-vintage-engine:4.12.0-M4")
-	testCompile("org.junit.jupiter:junit-jupiter-api:5.0.0-M4")
-	testRuntime("org.junit.jupiter:junit-jupiter-engine:5.0.0-M4")
-	testCompile("org.junit.platform:junit-platform-runner:1.0.0-M4")
+    testCompile("junit:junit:4.12")
+    testRuntime("org.junit.vintage:junit-vintage-engine:4.12.0-M4")
+    testCompile("org.junit.jupiter:junit-jupiter-api:5.0.0-M4")
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:5.0.0-M4")
+    testCompile("org.junit.platform:junit-platform-runner:1.0.0-M4")
 
     //runtime('org.postgresql:postgresql:42.1.4')
 }
