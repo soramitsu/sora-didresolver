@@ -34,21 +34,6 @@ import javax.validation.constraints.NotNull;
 public class Bencoder {
 
   /**
-   * Bencode object immediately
-   *
-   * @param charset charset used to encode characters
-   * @param object object to Bencode
-   * @return Bencoded string
-   * @throws IOException if an I/O error occurs
-   */
-  public static String immediate(final Object object, final Charset charset) throws IOException {
-    OutputStream os = new ByteArrayOutputStream();
-    Bencoder bencoder = new Bencoder(charset, os);
-    bencoder.encodeObject(object);
-    return os.toString();
-  }
-
-  /**
    * Used to encode {@code String}s.
    *
    * Bencode markers and numbers are ASCII-encoded.
@@ -69,6 +54,21 @@ public class Bencoder {
   public Bencoder(@NotNull final Charset charset, final OutputStream outputStream) {
     this.charset = charset;
     this.outputStream = outputStream;
+  }
+
+  /**
+   * Bencode object immediately
+   *
+   * @param charset charset used to encode characters
+   * @param object object to Bencode
+   * @return Bencoded string
+   * @throws IOException if an I/O error occurs
+   */
+  public static String immediate(final Object object, final Charset charset) throws IOException {
+    OutputStream os = new ByteArrayOutputStream();
+    Bencoder bencoder = new Bencoder(charset, os);
+    bencoder.encodeObject(object);
+    return os.toString();
   }
 
   /**

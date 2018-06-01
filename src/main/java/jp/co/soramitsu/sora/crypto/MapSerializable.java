@@ -11,7 +11,7 @@ public interface MapSerializable {
 
   abstract class MapSerializableDetail {
 
-    static ObjectMapper mapper = new ObjectMapper();
+    public static ObjectMapper mapper = new ObjectMapper();
 
     static {
       mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);

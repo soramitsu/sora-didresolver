@@ -14,9 +14,8 @@ import org.junit.jupiter.api.Test;
 
 class BencoderTest {
 
-
   @Test
-  void encodingIsCorrect() throws IOException {
+  public void encodingIsCorrect() throws IOException {
     AllTypesPojo pojo = AllTypesPojo.builder()
         .bool(true)
         .integer(42)
@@ -39,7 +38,7 @@ class BencoderTest {
    * bencoding.
    */
   @Test
-  void encodingIsStable() throws IOException {
+  public void encodingIsStable() throws IOException {
     val m1 = new TreeMap<String, Object>() {{
       put("a", 1);
       put("Ω", 2);
