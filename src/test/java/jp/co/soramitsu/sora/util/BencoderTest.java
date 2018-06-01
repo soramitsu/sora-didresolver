@@ -17,7 +17,7 @@ class BencoderTest {
   @Test
   public void encodingIsCorrect() throws IOException {
     AllTypesPojo pojo = AllTypesPojo.builder()
-        .bool(true)
+        .bool(Boolean.TRUE)
         .integer(42)
         .string("42?")
         .listOfStrings(Arrays.asList("hello", "world"))

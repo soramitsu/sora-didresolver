@@ -11,7 +11,7 @@ public interface MapSerializable {
 
   abstract class MapSerializableDetail {
 
-    public static ObjectMapper mapper = new ObjectMapper();
+    public static final ObjectMapper mapper = new ObjectMapper();
 
     static {
       mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
@@ -23,7 +23,7 @@ public interface MapSerializable {
 
   default Map<String, Object> serializeAsMap() {
     return MapSerializableDetail.mapper
-        .convertValue(this, new TypeReference<TreeMap<String, Object>>() {
+        .convertValue(this, new TypeReference<Map<String, Object>>() {
         });
   }
 }
