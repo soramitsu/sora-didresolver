@@ -73,19 +73,14 @@ jacocoTestReport {
 		xml.enabled true
 		xml.destination "${buildDir}/reports/jacoco/report.xml"
 		csv.enabled false
-		html.enabled false
+		html.enabled true
 	}
 }
 
-//task codeCoverageReport(type: JacocoReport) {
-//	executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
-//
-//	subprojects.each {
-//		sourceSets it.sourceSets.main
-//	}
-//
-//}
-//
-//codeCoverageReport.dependsOn {
-//	subprojects*.test
-//}
+test {
+    jacoco {
+        append = false
+        destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
+        classDumpDir = file("$buildDir/jacoco/classpathdumps")
+    }
+}
