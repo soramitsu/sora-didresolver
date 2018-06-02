@@ -8,9 +8,6 @@ import org.springframework.stereotype.Service;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * @author rogachevsn
- */
 @Service
 @NoArgsConstructor
 public class MockStorageServiceImpl implements StorageService{

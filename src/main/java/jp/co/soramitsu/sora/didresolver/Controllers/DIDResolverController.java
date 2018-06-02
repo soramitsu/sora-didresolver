@@ -17,9 +17,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.Set;
 
-/**
- * @author rogachevsn
- */
 @RestController
 @RequestMapping(DIDResolverBaseController.PATH + DIDResolverBaseController.ID_PARAM)
 @Validated

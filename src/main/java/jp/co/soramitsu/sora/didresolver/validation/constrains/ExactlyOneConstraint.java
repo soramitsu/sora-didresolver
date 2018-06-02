@@ -6,9 +6,6 @@ import javax.validation.Constraint;
 import javax.validation.Payload;
 import java.lang.annotation.*;
 
-/**
- * @author rogachevsn
- */
 @Documented
 @Constraint(validatedBy = ExactlyOneValidator.class)
 @Target({ElementType.TYPE})

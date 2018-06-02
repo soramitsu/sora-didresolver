@@ -15,9 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
-/**
- * @author rogachevsn
- */
 @RestController
 @RequestMapping(DIDResolverBaseController.PATH)
 @Api(value = DIDResolverBaseController.PATH, description = "CRUD operations on DID documents")

@@ -7,9 +7,6 @@ import org.apache.commons.lang3.StringUtils;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-/**
- * @author rogachevsn
- */
 public class DIDValidator implements ConstraintValidator<DIDConstraint, String> {
 
     //TODO move to application properties

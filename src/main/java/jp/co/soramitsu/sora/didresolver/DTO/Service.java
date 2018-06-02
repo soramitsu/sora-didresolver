@@ -8,12 +8,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 
-/**
- * @author sbt-rogachev-sn
- * @ created 29.05.2018
- * @ $Author$
- * @ $Revision$
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
