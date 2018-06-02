@@ -22,7 +22,7 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 
 ext {
-    lombokVersion = '1.16.20'
+    lombokVersion = '1.16.22'
     springSwaggerVersion = '2.8.0'
     commonsLangVersion = '3.7'
 }
