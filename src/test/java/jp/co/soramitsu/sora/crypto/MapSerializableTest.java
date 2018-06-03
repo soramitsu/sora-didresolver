@@ -13,11 +13,13 @@ import java.util.TreeMap;
 import jp.co.soramitsu.sora.util.AllTypesPojo;
 import jp.co.soramitsu.sora.util.Bencoder;
 import lombok.val;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.junit4.SpringRunner;
 
-
-class MapSerializableTest {
+@RunWith(SpringRunner.class)
+public class MapSerializableTest {
 
   private AllTypesPojo pojo;
 
@@ -25,7 +27,7 @@ class MapSerializableTest {
   private Map<String, Object> expectedMap = ImmutableMap.of("a", 1, "b", 2, "c", 3);
   private Instant expectedTime = Instant.now();
 
-  @BeforeEach
+  @Before
   public void setUp() {
     pojo = AllTypesPojo.builder()
         .bool(Boolean.TRUE)

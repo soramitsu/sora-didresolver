@@ -21,10 +21,14 @@ import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy;
 import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy.SignatureSuiteException;
 import jp.co.soramitsu.sora.crypto.algorithms.SignatureSuiteRegistry;
 import jp.co.soramitsu.sora.crypto.hash.RawDigestStrategy;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.junit4.SpringRunner;
 
-class CryptoTest {
+@RunWith(SpringRunner.class)
+public class CryptoTest {
+
   private final String created = "2010-01-01T19:43:24Z";
   private final String signatureSuiteName = "Ed25519Sha3SignatureMock";
 
@@ -45,10 +49,7 @@ class CryptoTest {
 
   private List<ProofProxy> proofs = new LinkedList<>();
 
-  public CryptoTest() {
-  }
-
-  @BeforeEach
+  @Before
   public void setUp() throws SignatureSuiteException {
     when(proofProxy.getCreated())
         .thenReturn(Instant.parse(created));

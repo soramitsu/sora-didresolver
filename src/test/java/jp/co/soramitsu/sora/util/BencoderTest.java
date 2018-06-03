@@ -10,9 +10,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.TreeMap;
 import lombok.val;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.junit4.SpringRunner;
 
-class BencoderTest {
+@RunWith(SpringRunner.class)
+public class BencoderTest {
 
   @Test
   public void encodingIsCorrect() throws IOException {
