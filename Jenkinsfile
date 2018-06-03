@@ -1,4 +1,7 @@
 pipeline {
+  environment {
+    CODECOV_TOKEN = credentials('CODECOV_TOKEN')
+  }
   options {
     buildDiscarder(logRotator(numToKeepStr: '20'))
   }
@@ -9,7 +12,9 @@ pipeline {
         script {
           docker.image('gradle:jdk9').inside {
             sh "gradle clean build"
-            sh "gradle test"
+            sh "gradle check"
+            sh "gradle jacocoTestReport"
+            sh "bash <(curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN}"
           }
         }
       }

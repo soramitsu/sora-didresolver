@@ -31,11 +31,17 @@ jacoco {
 }
 
 jacocoTestReport {
+    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+
     reports {
-        xml.enabled false
+        xml.enabled true
+        xml.destination file("${buildDir}/reports/coverage.xml")
         csv.enabled false
-        html.destination file("${buildDir}/jacocoHtml")
+        html.enabled false
+        html.destination file("${buildDir}/reports/html")
     }
+
+    dependsOn(test)
 }
 
 group = 'jp.co.soramitsu.sora'
