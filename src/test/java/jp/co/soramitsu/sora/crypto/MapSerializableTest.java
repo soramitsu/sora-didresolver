@@ -1,7 +1,7 @@
 package jp.co.soramitsu.sora.crypto;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 import com.google.common.collect.ImmutableMap;
 import java.io.IOException;
