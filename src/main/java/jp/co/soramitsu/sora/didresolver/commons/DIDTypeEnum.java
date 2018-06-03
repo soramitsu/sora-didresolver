@@ -4,9 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-/**
- * @author rogachevsn
- */
 @AllArgsConstructor
 public enum DIDTypeEnum {
     IROHA("\\w*@\\w*\\..*"),

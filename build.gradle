@@ -1,21 +1,14 @@
 buildscript {
-	ext {
-		springBootVersion = '2.0.2.RELEASE'
-	}
+    ext {
+        springBootVersion = '2.0.2.RELEASE'
+    }
+
 	repositories {
 		mavenCentral()
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
 	}
-}
-
-plugins {
-    id 'io.franzbecker.gradle-lombok' version '1.11'
-}
-
-lombok {
-    version = "1.16.20"
 }
 
 apply plugin: 'java'
@@ -28,11 +21,15 @@ group = 'jp.co.soramitsu.sora'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 
+ext {
+    lombokVersion = '1.16.22'
+    springSwaggerVersion = '2.8.0'
+    commonsLangVersion = '3.7'
+}
+
 repositories {
 	mavenCentral()
 }
-
-def springSwaggerVersion = '2.8.0'
 
 dependencies {
 	//compile('org.springframework.boot:spring-boot-starter-data-jpa')
@@ -41,6 +38,7 @@ dependencies {
 	testCompile('org.springframework.boot:spring-boot-starter-test')
     compile("io.springfox:springfox-swagger2:${springSwaggerVersion}")
     compile("io.springfox:springfox-swagger-ui:${springSwaggerVersion}")
-    compile("org.apache.commons:commons-lang3:3.7")
+    compile("org.apache.commons:commons-lang3:${commonsLangVersion}")
+    compile("org.projectlombok:lombok:${lombokVersion}")
     //runtime('org.postgresql:postgresql:42.1.4')
 }

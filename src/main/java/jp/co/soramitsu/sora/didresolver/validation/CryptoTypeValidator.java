@@ -6,9 +6,6 @@ import jp.co.soramitsu.sora.didresolver.validation.constrains.CryptoTypeConstrai
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-/**
- * @author rogachevsn
- */
 public class CryptoTypeValidator implements ConstraintValidator<CryptoTypeConstraint, String> {
 
     public boolean isValid(String value, ConstraintValidatorContext context) {

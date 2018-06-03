@@ -3,9 +3,6 @@ package jp.co.soramitsu.sora.didresolver.exceptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-/**
- * @author rogachevsn
- */
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class DIDNotFoundException extends RuntimeException{
 

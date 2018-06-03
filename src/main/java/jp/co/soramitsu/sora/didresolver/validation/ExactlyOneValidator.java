@@ -8,9 +8,6 @@ import javax.validation.ConstraintValidatorContext;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author rogachevsn
- */
 public class ExactlyOneValidator implements ConstraintValidator<ExactlyOneConstraint, Object> {
 
     private String[] group;

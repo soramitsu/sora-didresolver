@@ -25,10 +25,10 @@
 
   "created": "2002-10-10T17:00:00Z",
 
-  "proof": {
+  "proof": [{
     "type": "Ed25519Signature2018",
     "created": "2002-10-10T17:00:00Z",
     "creator": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV#keys-3",
     "signatureValue": "QNB13Y7Q9...1tzjn4w=="
-  }
+  }]
 }
