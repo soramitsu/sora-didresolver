@@ -31,6 +31,7 @@ public class MapSerializableTest {
   public void setUp() {
     pojo = AllTypesPojo.builder()
         .bool(Boolean.TRUE)
+        .floating(1.337d)
         .integer(42)
         .string("42?")
         .listOfStrings(expectedListOfStrings)
@@ -43,6 +44,7 @@ public class MapSerializableTest {
   public void serializeAsMapInOrder() throws IOException {
     val expected = new TreeMap<String, Object>() {{
       put("bool", Boolean.TRUE);
+      put("floating", 1.337d);
       put("integer", 42);
       put("string", "42?");
       put("listOfStrings", expectedListOfStrings);

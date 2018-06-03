@@ -21,6 +21,7 @@ public class BencoderTest {
   public void encodingIsCorrect() throws IOException {
     AllTypesPojo pojo = AllTypesPojo.builder()
         .bool(Boolean.TRUE)
+        .floating(1.2d)
         .integer(42)
         .string("42?")
         .listOfStrings(Arrays.asList("hello", "world"))
@@ -30,8 +31,13 @@ public class BencoderTest {
 
     val bencoded = Bencoder.immediate(pojo.serializeAsMap(), UTF_8);
 
+    val expected =
+        "d4:boolB8:floatingf1.2e7:integeri42e13:listOfStringsl"
+            + "5:hello5:worlde3:mapd1:ai1e1:bi2e1:ci3ee6:string3:42?"
+            + "4:time20:2002-10-10T17:00:00Ze";
+
     assertEquals(
-        "d4:boolB7:integeri42e13:listOfStringsl5:hello5:worlde3:mapd1:ai1e1:bi2e1:ci3ee6:string3:42?4:time20:2002-10-10T17:00:00Ze",
+        expected,
         bencoded
     );
   }

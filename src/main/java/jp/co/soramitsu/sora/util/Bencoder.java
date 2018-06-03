@@ -19,13 +19,14 @@ import javax.validation.constraints.NotNull;
  *
  * This is bencode, except this:
  * <ul>
- * <li> This version can encode Boolean, while original can not. "true" is 'B', "false" is 'b' </li>
+ * <li> This version can encode Boolean, while original can not. "true" is 'B', "false" is 'b'
+ * </li>
  * <li> If `null` is present in the map as KEY, then it is encoded as STRING "null". </li>
  * <li> If `null` is present in the map as VALUE, then (key,value) is ignored. </li>
  * <li> If `null` is present in the list, it is encoded as N. </li>
+ * <li> Double is encoded as f1337.1e; e.g. f followed by a floating point number (with dot),
+ * followed by e</li>
  * </ul>
- *
- * spec for boolean: "true" is B, "false" is b
  */
 
 /**
@@ -81,6 +82,20 @@ public class Bencoder {
   public Bencoder encode(final long integer) throws IOException {
     write('i');
     write(integer);
+    write('e');
+    return this;
+  }
+
+  /**
+   * Encodes double value to Bencode.
+   *
+   * @param floating floating point number to encode
+   * @return this Bencoder instance
+   * @throws IOException if an I/O error occurs
+   */
+  public Bencoder encode(final double floating) throws IOException {
+    write('f');
+    write(floating);
     write('e');
     return this;
   }
@@ -195,6 +210,10 @@ public class Bencoder {
       encode(((Number) object).longValue());
     } else if (object instanceof String) {
       encode((String) object);
+    } else if (object instanceof Double) {
+      encode((Double) object);
+    } else if (object instanceof Float) {
+      encode(((Float) object).doubleValue());
     } else if (object instanceof Boolean) {
       encode((Boolean) object);
     } else if (object.getClass().equals(byte[].class)) {

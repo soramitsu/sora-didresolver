@@ -15,6 +15,8 @@ public class AllTypesPojo implements MapSerializable {
   @Getter
   public String string;
   @Getter
+  public Double floating;
+  @Getter
   public Integer integer;
   @Getter
   public Boolean bool;

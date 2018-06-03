@@ -1,6 +1,9 @@
 package jp.co.soramitsu.sora.crypto;
 
-public class Consts {
+public final class Consts {
+
+  private Consts() {
+  }
 
   public static final String PROOF_KEY = "proof";
   public static final String SIGNATURE_KEY = "signature";
