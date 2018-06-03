@@ -1,26 +1,25 @@
 package jp.co.soramitsu.sora.didresolver.dto;
 
+import javax.validation.constraints.NotBlank;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.CryptoTypeConstraint;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.DIDConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-class Authentication {
+public class Authentication {
 
-    @NotBlank
-    @CryptoTypeConstraint
-    private String type;
+  @NotBlank
+  @CryptoTypeConstraint
+  private String type;
 
-    private String publicKey;
+  private String publicKey;
 
-    @DIDConstraint(isNullable = true)
-    private String owner;
+  @DIDConstraint(isNullable = true)
+  private String owner;
 
-    private String publicKeyHex;
+  private String publicKeyHex;
 }
