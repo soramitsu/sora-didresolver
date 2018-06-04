@@ -3,24 +3,21 @@ package jp.co.soramitsu.sora.util;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.experimental.FieldDefaults;
 
 @Builder
 @Getter
-@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
-class AllTypesPojo {
+public class AllTypesPojo {
 
-  int primitiveInt;
-  double primitiveDouble;
-  Object nullable;
-  String string;
-  Double floating;
-  Integer integer;
-  Boolean bool;
-  List<String> listOfStrings;
-  Map<String, Object> map;
-  Instant time;
+  private int primitiveInt;
+  private double primitiveDouble;
+  private Object nullable;
+  private String string;
+  private Double floating;
+  private Integer integer;
+  private Boolean bool;
+  private List<String> listOfStrings;
+  private Map<String, Object> map;
+  private Instant time;
 }
