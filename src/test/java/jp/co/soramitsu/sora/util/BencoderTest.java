@@ -79,7 +79,7 @@ public class BencoderTest {
   }
 
   @Test
-  public void UTF8EncodingWorks() throws JsonProcessingException {
+  public void utf8EncodingWorks() throws JsonProcessingException {
     val m1 = new HashMap<String, Object>();
     m1.put("привет мир", "こんにちは世界");
     // utf-16 will be printed as bytes since we treat all strings as utf-8 strings
