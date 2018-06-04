@@ -19,7 +19,7 @@ import jp.co.soramitsu.sora.crypto.Crypto.CreateVerifyHashException;
 import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy;
 import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy.SignatureSuiteException;
 import jp.co.soramitsu.sora.crypto.algorithms.SignatureSuiteRegistry;
-import jp.co.soramitsu.sora.crypto.algorithms.SignatureSuiteRegistry.InvalidAlgorithmException;
+import jp.co.soramitsu.sora.crypto.algorithms.SignatureSuiteRegistry.NoSuchStrategy;
 import jp.co.soramitsu.sora.crypto.hash.RawDigestStrategy;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +55,7 @@ public class CryptoTest {
     when(proofProxy.getCreated())
         .thenReturn(Instant.parse(created));
 
-    SignatureSuiteRegistry
+    SignatureSuiteRegistry.INSTANCE
         .register(signatureSuiteName, signatureStrategy);
     when(proofProxy.getType())
         .thenReturn(signatureSuiteName);
@@ -98,7 +98,7 @@ public class CryptoTest {
    */
   @Test
   public void signThenVerify()
-      throws InvalidAlgorithmException, CreateVerifyHashException, SignatureSuiteException {
+      throws CreateVerifyHashException, SignatureSuiteException, NoSuchStrategy {
     // Do the actual signing. This line modifies `json`.
     crypto.sign(json, keyPair, proofProxy);
 

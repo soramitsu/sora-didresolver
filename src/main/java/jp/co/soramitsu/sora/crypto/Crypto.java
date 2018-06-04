@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy;
 import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy.SignatureSuiteException;
 import jp.co.soramitsu.sora.crypto.algorithms.SignatureSuiteRegistry;
-import jp.co.soramitsu.sora.crypto.algorithms.SignatureSuiteRegistry.InvalidAlgorithmException;
+import jp.co.soramitsu.sora.crypto.algorithms.SignatureSuiteRegistry.NoSuchStrategy;
 import jp.co.soramitsu.sora.crypto.hash.RawDigestStrategy;
 import jp.co.soramitsu.sora.util.bencoder.BencodeMapper;
 import lombok.Getter;
@@ -72,8 +72,8 @@ public class Crypto {
   }
 
   public void sign(VerifiableJson document, KeyPair keypair, ProofProxy proof)
-      throws CreateVerifyHashException, SignatureSuiteException, InvalidAlgorithmException {
-    RawSignatureStrategy signer = SignatureSuiteRegistry.get(proof.getType());
+      throws CreateVerifyHashException, SignatureSuiteException, NoSuchStrategy {
+    RawSignatureStrategy signer = SignatureSuiteRegistry.INSTANCE.get(proof.getType());
 
     // backup proofs
     List<ProofProxy> proofs = document.getProof();
@@ -99,8 +99,8 @@ public class Crypto {
    * @return true if proof is valid, false otherwise
    */
   public boolean verify(VerifiableJson document, PublicKey publicKey, ProofProxy proof)
-      throws CreateVerifyHashException, SignatureSuiteException, InvalidAlgorithmException {
-    RawSignatureStrategy verifier = SignatureSuiteRegistry.get(proof.getType());
+      throws CreateVerifyHashException, SignatureSuiteException, NoSuchStrategy {
+    RawSignatureStrategy verifier = SignatureSuiteRegistry.INSTANCE.get(proof.getType());
 
     byte[] hash = createVerifyHash(document, proof);
     byte[] signature = proof.getSignatureValue();
@@ -114,7 +114,7 @@ public class Crypto {
    * @return true if all proofs are valid, false otherwise
    */
   public boolean verifyAll(VerifiableJson document, PublicKey publicKey)
-      throws CreateVerifyHashException, SignatureSuiteException, InvalidAlgorithmException {
+      throws CreateVerifyHashException, SignatureSuiteException, NoSuchStrategy {
     final List<ProofProxy> proofs = document.getProof();
     if (proofs == null || proofs.isEmpty()) {
       throw new SignatureSuiteException("document has no verifiable proofs");

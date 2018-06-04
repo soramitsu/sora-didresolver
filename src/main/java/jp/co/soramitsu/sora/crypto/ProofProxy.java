@@ -6,12 +6,14 @@ public interface ProofProxy {
 
   Instant getCreated();
 
+  byte[] getSignatureValue();
+
+  String getType();
+
   void setCreated(Instant dateTime);
 
   void setSignatureValue(byte[] o);
 
-  byte[] getSignatureValue();
-
-  String getType();
+  void setType(String type);
 
 }

@@ -3,42 +3,41 @@ package jp.co.soramitsu.sora.crypto.algorithms;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SignatureSuiteRegistry {
 
-  private static Map<String, RawSignatureStrategy> algorithms = new HashMap<>();
+public enum SignatureSuiteRegistry {
+  INSTANCE;
 
-  private SignatureSuiteRegistry() {
-  }
+  private Map<String, RawSignatureStrategy> algorithms = new HashMap<>();
 
-  public static void register(String key, RawSignatureStrategy val) {
+  public void register(String key, RawSignatureStrategy val) {
     algorithms.put(key, val);
   }
 
-  public static void deregister(String key) {
+  public void deregister(String key) {
     algorithms.remove(key);
   }
 
-  public static RawSignatureStrategy get(String key) throws InvalidAlgorithmException {
+  public RawSignatureStrategy get(String key) throws NoSuchStrategy {
     // find appropriate digital signature algorithm
-    if (!SignatureSuiteRegistry.has(key)) {
-      throw new InvalidAlgorithmException(key + " signature suite is not implemented");
+    if (!has(key)) {
+      throw new NoSuchStrategy(key);
     }
 
     return algorithms.get(key);
   }
 
-  public static boolean has(String key) {
+  public boolean has(String key) {
     return algorithms.containsKey(key);
   }
 
-  public static void clear() {
+  public void clear() {
     algorithms.clear();
   }
 
-  public static class InvalidAlgorithmException extends Exception {
+  public static class NoSuchStrategy extends Exception {
 
-    public InvalidAlgorithmException(String message) {
-      super(message);
+    public NoSuchStrategy(String key) {
+      super(key + "signature suite is not implemented");
     }
   }
 
