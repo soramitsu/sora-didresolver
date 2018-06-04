@@ -99,17 +99,6 @@ public class CryptoTest {
   @Test
   public void signThenVerify()
       throws InvalidAlgorithmException, CreateVerifyHashException, SignatureSuiteException {
-
-//    when(json.serializeAsMap())
-//        .thenReturn(ImmutableMap.of(
-//            "keyInsideDocument", "321"
-//        ));
-//
-//    when(proofProxy.serializeAsMap())
-//        .thenReturn(ImmutableMap.of(
-//            "keyInsideProof", "123"
-//        ));
-
     // Do the actual signing. This line modifies `json`.
     crypto.sign(json, keyPair, proofProxy);
 
