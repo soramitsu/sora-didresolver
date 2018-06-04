@@ -8,6 +8,7 @@ import java.io.DataOutput;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 
@@ -31,8 +32,8 @@ class BencodeFactory extends JsonFactory {
 
   @Override
   public BencodeGenerator createGenerator(OutputStream out, JsonEncoding enc) {
-    throw new UnsupportedOperationException(
-        "bencoder: unsupported createGenerator(OutputStream, JsonEncoding)");
+    Writer w = new OutputStreamWriter(out, DEFAULT_CHARSET);
+    return new BencodeGenerator(w, DEFAULT_CHARSET);
   }
 
   @Override
