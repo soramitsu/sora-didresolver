@@ -10,7 +10,7 @@ pipeline {
     stage('Build') {
       steps {
         script {
-          docker.image('gradle:jdk9').inside {
+          docker.image('gradle:jdk8').inside {
             sh "gradle clean build"
             sh "gradle check"
             sh "gradle jacocoTestReport"
