@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.ObjectCodec;
 import java.io.DataOutput;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -31,13 +32,13 @@ class BencodeFactory extends JsonFactory {
   }
 
   @Override
-  public BencodeGenerator createGenerator(OutputStream out) throws IOException {
-    Writer w = new OutputStreamWriter(out);
+  public BencodeGenerator createGenerator(OutputStream out) {
+    Writer w = new OutputStreamWriter(out, DEFAULT_CHARSET);
     return new BencodeGenerator(w, DEFAULT_CHARSET);
   }
 
   @Override
-  public BencodeGenerator createGenerator(File f, JsonEncoding enc) throws IOException {
+  public BencodeGenerator createGenerator(File f, JsonEncoding enc) throws FileNotFoundException {
     OutputStream out = new FileOutputStream(f);
     Charset charset = Charset.forName(enc.getJavaName());
     Writer w = new OutputStreamWriter(out, charset);
@@ -45,19 +46,19 @@ class BencodeFactory extends JsonFactory {
   }
 
   @Override
-  public BencodeGenerator createGenerator(OutputStream out, JsonEncoding enc) throws IOException {
+  public BencodeGenerator createGenerator(OutputStream out, JsonEncoding enc) {
     Charset charset = Charset.forName(enc.getJavaName());
     Writer w = new OutputStreamWriter(out, charset);
     return new BencodeGenerator(w, DEFAULT_CHARSET);
   }
 
   @Override
-  public BencodeGenerator createGenerator(Writer w) throws IOException {
+  public BencodeGenerator createGenerator(Writer w) {
     return new BencodeGenerator(w, DEFAULT_CHARSET);
   }
 
   @Override
-  public BencodeGenerator createGenerator(DataOutput out) throws IOException {
+  public BencodeGenerator createGenerator(DataOutput out) {
     throw new UnsupportedOperationException("can not create generator from DataOutput");
   }
 

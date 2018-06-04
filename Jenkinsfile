@@ -19,6 +19,9 @@ pipeline {
         }
       }
       post {
+        always {
+          junit 'build/test-results/**/*.xml'
+        }
         cleanup {
           script {
             cleanWs()
