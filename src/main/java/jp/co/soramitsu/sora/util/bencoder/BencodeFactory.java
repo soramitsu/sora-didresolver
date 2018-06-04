@@ -45,7 +45,6 @@ class BencodeFactory extends JsonFactory {
   }
 
   @Override
-  @Deprecated
   public BencodeGenerator createGenerator(OutputStream out, JsonEncoding enc) throws IOException {
     Charset charset = Charset.forName(enc.getJavaName());
     Writer w = new OutputStreamWriter(out, charset);
@@ -53,7 +52,6 @@ class BencodeFactory extends JsonFactory {
   }
 
   @Override
-  @Deprecated
   public BencodeGenerator createGenerator(Writer w) throws IOException {
     return new BencodeGenerator(w, DEFAULT_CHARSET);
   }
