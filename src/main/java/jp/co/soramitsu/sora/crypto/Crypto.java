@@ -3,7 +3,6 @@ package jp.co.soramitsu.sora.crypto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.security.KeyPair;
 import java.security.PublicKey;
 import java.time.Instant;

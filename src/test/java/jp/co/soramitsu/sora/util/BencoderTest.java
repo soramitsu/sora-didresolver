@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.TreeMap;
 import javax.xml.bind.DatatypeConverter;
 import jp.co.soramitsu.sora.util.bencoder.BencodeMapper;
@@ -24,16 +25,17 @@ public class BencoderTest {
 
   @Test
   public void encodingIsCorrect() throws IOException {
+    Map<String, Object> map = new HashMap<>();
+    map.put("a", 1);
+    map.put("nullkey", null);
+
     AllTypesPojo pojo = AllTypesPojo.builder()
         .bool(Boolean.TRUE)
         .floating(1.2d)
         .integer(42)
         .string("42?")
         .listOfStrings(Arrays.asList("hello", "world"))
-        .map(new HashMap<String, Object>() {{
-          put("a", 1);
-          put("nullkey", null);
-        }})
+        .map(map)
         .time(Instant.parse("2002-10-10T17:00:00Z"))
         .build();
 
@@ -54,21 +56,19 @@ public class BencoderTest {
    */
   @Test
   public void encodingIsStable() throws IOException {
-    val m1 = new TreeMap<String, Object>() {{
-      put("a", 1);
-      put("Ω", 2);
-      put("c", 3);
-      put("1", 4);
-      put("2", 5);
-    }};
+    val m1 = new TreeMap<String, Object>();
+    m1.put("a", 1);
+    m1.put("Ω", 2);
+    m1.put("c", 3);
+    m1.put("1", 4);
+    m1.put("2", 5);
 
-    val m2 = new HashMap<String, Object>() {{
-      put("Ω", 2);
-      put("a", 1);
-      put("c", 3);
-      put("2", 5);
-      put("1", 4);
-    }};
+    val m2 = new HashMap<String, Object>();
+    m2.put("Ω", 2);
+    m2.put("a", 1);
+    m2.put("c", 3);
+    m2.put("2", 5);
+    m2.put("1", 4);
 
     ObjectMapper mapper = new BencodeMapper();
 
@@ -80,12 +80,11 @@ public class BencoderTest {
 
   @Test
   public void UTF8EncodingWorks() throws JsonProcessingException {
-    val m1 = new HashMap<String, Object>() {{
-      put("привет мир", "こんにちは世界");
-      // utf-16 will be printed as bytes since we treat all strings as utf-8 strings
-      put("utf-16", new String("фить-ха".getBytes(UTF_8), UTF_16));
-      put("hello", 1337);
-    }};
+    val m1 = new HashMap<String, Object>();
+    m1.put("привет мир", "こんにちは世界");
+    // utf-16 will be printed as bytes since we treat all strings as utf-8 strings
+    m1.put("utf-16", new String("фить-ха".getBytes(UTF_8), UTF_16));
+    m1.put("hello", 1337);
 
     ObjectMapper mapper = new BencodeMapper();
 
