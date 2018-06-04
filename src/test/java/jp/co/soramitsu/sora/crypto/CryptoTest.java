@@ -8,7 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.google.common.collect.ImmutableMap;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -16,10 +16,10 @@ import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 import jp.co.soramitsu.sora.crypto.Crypto.CreateVerifyHashException;
-import jp.co.soramitsu.sora.crypto.Crypto.InvalidAlgorithmException;
 import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy;
 import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy.SignatureSuiteException;
 import jp.co.soramitsu.sora.crypto.algorithms.SignatureSuiteRegistry;
+import jp.co.soramitsu.sora.crypto.algorithms.SignatureSuiteRegistry.InvalidAlgorithmException;
 import jp.co.soramitsu.sora.crypto.hash.RawDigestStrategy;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,7 +34,8 @@ public class CryptoTest {
 
   private final RawDigestStrategy digest = mock(RawDigestStrategy.class);
   private final RawSignatureStrategy signatureStrategy = mock(RawSignatureStrategy.class);
-  private final Crypto crypto = new Crypto(digest);
+  private final ObjectMapper mapper = mock(ObjectMapper.class);
+  private final Crypto crypto = new Crypto(digest, mapper);
 
   private VerifiableJson json = mock(VerifiableJson.class);
   private ProofProxy proofProxy = mock(ProofProxy.class);
@@ -99,15 +100,15 @@ public class CryptoTest {
   public void signThenVerify()
       throws InvalidAlgorithmException, CreateVerifyHashException, SignatureSuiteException {
 
-    when(json.serializeAsMap())
-        .thenReturn(ImmutableMap.of(
-            "keyInsideDocument", "321"
-        ));
-
-    when(proofProxy.serializeAsMap())
-        .thenReturn(ImmutableMap.of(
-            "keyInsideProof", "123"
-        ));
+//    when(json.serializeAsMap())
+//        .thenReturn(ImmutableMap.of(
+//            "keyInsideDocument", "321"
+//        ));
+//
+//    when(proofProxy.serializeAsMap())
+//        .thenReturn(ImmutableMap.of(
+//            "keyInsideProof", "123"
+//        ));
 
     // Do the actual signing. This line modifies `json`.
     crypto.sign(json, keyPair, proofProxy);

@@ -1,20 +1,21 @@
 package jp.co.soramitsu.sora.crypto;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.security.KeyPair;
 import java.security.PublicKey;
 import java.time.Instant;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy;
 import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy.SignatureSuiteException;
 import jp.co.soramitsu.sora.crypto.algorithms.SignatureSuiteRegistry;
+import jp.co.soramitsu.sora.crypto.algorithms.SignatureSuiteRegistry.InvalidAlgorithmException;
 import jp.co.soramitsu.sora.crypto.hash.RawDigestStrategy;
-import jp.co.soramitsu.sora.util.Bencoder;
+import jp.co.soramitsu.sora.util.bencoder.BencodeMapper;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,28 +26,37 @@ public class Crypto {
   @Getter
   private RawDigestStrategy digestStrategy;
 
+  @Getter
+  @Setter
+  private ObjectMapper mapper;
+
   public Crypto(@NotNull RawDigestStrategy digestStrategy) {
+    this(digestStrategy, new BencodeMapper());
+  }
+
+  public Crypto(@NotNull RawDigestStrategy digestStrategy, @NotNull ObjectMapper mapper) {
     this.digestStrategy = digestStrategy;
+    this.mapper = mapper;
   }
 
   private byte[] createVerifyHash(VerifiableJson document, ProofProxy proof)
       throws CreateVerifyHashException {
-    ByteArrayOutputStream os = new ByteArrayOutputStream();
-    Bencoder bencoder = new Bencoder(UTF_8, os);
-
     // sanitize inputs
-    this.sanitizeDocument(document);
-    this.sanitizeProof(proof);
+    sanitizeDocument(document);
+    sanitizeProof(proof);
 
     // encode input into a string
     try {
-      bencoder.encode(document.serializeAsMap());
-      bencoder.encode(proof.serializeAsMap());
+      ByteArrayOutputStream stream = new ByteArrayOutputStream();
+      mapper.writeValue(stream, document);
+      mapper.writeValue(stream, proof);
+
+      // calculate digest(document + proof)
+      return digestStrategy.digest(stream.toByteArray());
     } catch (IOException e) {
       throw new CreateVerifyHashException(e);
     }
 
-    return digestStrategy.digest(os.toByteArray());
   }
 
   private void sanitizeDocument(VerifiableJson document) {
@@ -62,18 +72,9 @@ public class Crypto {
     proof.setSignatureValue(null);
   }
 
-  private RawSignatureStrategy getSuite(String type) throws InvalidAlgorithmException {
-    // find appropriate digital signature algorithm
-    if (!SignatureSuiteRegistry.has(type)) {
-      throw new InvalidAlgorithmException(type + " signature suite is not implemented");
-    }
-
-    return SignatureSuiteRegistry.get(type);
-  }
-
   public void sign(VerifiableJson document, KeyPair keypair, ProofProxy proof)
-      throws InvalidAlgorithmException, CreateVerifyHashException, SignatureSuiteException {
-    RawSignatureStrategy signer = getSuite(proof.getType());
+      throws CreateVerifyHashException, SignatureSuiteException, InvalidAlgorithmException {
+    RawSignatureStrategy signer = SignatureSuiteRegistry.get(proof.getType());
 
     // backup proofs
     List<ProofProxy> proofs = document.getProof();
@@ -85,7 +86,7 @@ public class Crypto {
     // include signature into a proof, add it to saved proofs
     proof.setSignatureValue(signature);
     if (proofs == null) {
-      proofs = new LinkedList<>();
+      proofs = new ArrayList<>();
     }
     proofs.add(proof);
 
@@ -99,8 +100,8 @@ public class Crypto {
    * @return true if proof is valid, false otherwise
    */
   public boolean verify(VerifiableJson document, PublicKey publicKey, ProofProxy proof)
-      throws InvalidAlgorithmException, CreateVerifyHashException, SignatureSuiteException {
-    RawSignatureStrategy verifier = getSuite(proof.getType());
+      throws CreateVerifyHashException, SignatureSuiteException, InvalidAlgorithmException {
+    RawSignatureStrategy verifier = SignatureSuiteRegistry.get(proof.getType());
 
     byte[] hash = createVerifyHash(document, proof);
     byte[] signature = proof.getSignatureValue();
@@ -114,14 +115,14 @@ public class Crypto {
    * @return true if all proofs are valid, false otherwise
    */
   public boolean verifyAll(VerifiableJson document, PublicKey publicKey)
-      throws CreateVerifyHashException, InvalidAlgorithmException, SignatureSuiteException {
+      throws CreateVerifyHashException, SignatureSuiteException, InvalidAlgorithmException {
     final List<ProofProxy> proofs = document.getProof();
     if (proofs == null || proofs.isEmpty()) {
       throw new SignatureSuiteException("document has no verifiable proofs");
     }
 
     for (ProofProxy proof : proofs) {
-      if (!this.verify(document, publicKey, proof)) {
+      if (!verify(document, publicKey, proof)) {
         return false;
       }
     }
@@ -129,12 +130,6 @@ public class Crypto {
     return true;
   }
 
-  public static class InvalidAlgorithmException extends Exception {
-
-    public InvalidAlgorithmException(String message) {
-      super(message);
-    }
-  }
 
   public static class CreateVerifyHashException extends IOException {
 

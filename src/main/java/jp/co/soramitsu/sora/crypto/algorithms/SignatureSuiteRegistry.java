@@ -18,11 +18,28 @@ public class SignatureSuiteRegistry {
     algorithms.remove(key);
   }
 
-  public static RawSignatureStrategy get(String key) {
+  public static RawSignatureStrategy get(String key) throws InvalidAlgorithmException {
+    // find appropriate digital signature algorithm
+    if (!SignatureSuiteRegistry.has(key)) {
+      throw new InvalidAlgorithmException(key + " signature suite is not implemented");
+    }
+
     return algorithms.get(key);
   }
 
   public static boolean has(String key) {
     return algorithms.containsKey(key);
   }
+
+  public static void clear() {
+    algorithms.clear();
+  }
+
+  public static class InvalidAlgorithmException extends Exception {
+
+    public InvalidAlgorithmException(String message) {
+      super(message);
+    }
+  }
+
 }

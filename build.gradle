@@ -72,8 +72,9 @@ dependencies {
     //runtime('org.postgresql:postgresql:42.1.4')
 
     // for crypto
-    compile("com.madgag.spongycastle:core:${spongycastleVersion}")
-    compile("com.madgag.spongycastle:bcpkix-jdk15on:${spongycastleVersion}")
+//    TODO: temporarily commented, until needed
+//    compile("com.madgag.spongycastle:core:${spongycastleVersion}")
+//    compile("com.madgag.spongycastle:bcpkix-jdk15on:${spongycastleVersion}")
 
     testCompile("org.mockito:mockito-core:${mockitoCoreVersion}")
     testCompile('org.springframework.boot:spring-boot-starter-test')

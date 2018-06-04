@@ -2,7 +2,7 @@ package jp.co.soramitsu.sora.crypto;
 
 import java.time.Instant;
 
-public interface ProofProxy extends MapSerializable {
+public interface ProofProxy {
 
   Instant getCreated();
 
