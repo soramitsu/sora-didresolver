@@ -53,23 +53,29 @@ repositories {
 }
 
 ext {
-    lombokVersion = '1.16.22'
+    lombokVersion = lombok.version
     springSwaggerVersion = '2.8.0'
     commonsLangVersion = '3.7'
     spongycastleVersion = '1.58.0.0'
     mockitoCoreVersion = '2.18.3'
     junitVersion = '4.12'
+    embeddedPg = "0.12.0"
+    hibernateTypesVersion = "2.2.2"
 }
 
 dependencies {
-    //compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
     compile('org.springframework.boot:spring-boot-starter-validation')
     compile('org.springframework.boot:spring-boot-starter-web')
     compile("io.springfox:springfox-swagger2:${springSwaggerVersion}")
     compile("io.springfox:springfox-swagger-ui:${springSwaggerVersion}")
     compile("org.apache.commons:commons-lang3:${commonsLangVersion}")
-    compile("org.projectlombok:lombok:${lombokVersion}")
-    //runtime('org.postgresql:postgresql:42.1.4')
+    // Handy library which allows to map json/jsonb columns to java type on in entity column!!
+    // https://github.com/vladmihalcea/hibernate-types
+    compile("com.vladmihalcea:hibernate-types-52:${hibernateTypesVersion}")
+    compile('org.postgresql:postgresql:42.1.4')
+
+    compileOnly "org.springframework.boot:spring-boot-configuration-processor"
 
     // for crypto
 //    TODO: temporarily commented, until needed
@@ -79,4 +85,7 @@ dependencies {
     testCompile("org.mockito:mockito-core:${mockitoCoreVersion}")
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile("junit:junit:${junitVersion}")
+    // Allows using embedded postgres in Unit tests
+    // https://github.com/opentable/otj-pg-embedded
+    testCompile("com.opentable.components:otj-pg-embedded:$embeddedPg")
 }

@@ -6,11 +6,11 @@ import lombok.RequiredArgsConstructor;
 
 @AllArgsConstructor
 public enum DIDTypeEnum {
-    IROHA("\\w*@\\w*\\..*"),
-    UUID("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"),
-    ED("\\w*");
+  IROHA("(?<ACCOUNT>\\w+)@(?<DOMAIN>\\w+[\\w|.]*)"),
+  UUID("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"),
+  ED("\\w+");
 
-    @Getter
-    private String regexp;
+  @Getter
+  private String regexp;
 
 }
