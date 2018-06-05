@@ -1,16 +1,20 @@
 package jp.co.soramitsu.sora.didresolver.services.impl;
 
+import java.util.Optional;
 import jp.co.soramitsu.sora.didresolver.dto.DDO;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
 import lombok.NoArgsConstructor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
+@Profile("mocked")
 @NoArgsConstructor
-public class MockStorageServiceImpl implements StorageService{
+public class
+MockStorageServiceImpl implements StorageService{
 
     private static final Map<String,DDO> mockStorage = new ConcurrentHashMap<>();
 
@@ -20,8 +24,8 @@ public class MockStorageServiceImpl implements StorageService{
     }
 
     @Override
-    public DDO read(String did) {
-        return mockStorage.get(did);
+    public Optional<DDO> read(String did) {
+        return Optional.ofNullable(mockStorage.get(did));
     }
 
     @Override
