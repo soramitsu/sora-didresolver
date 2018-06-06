@@ -53,7 +53,7 @@ repositories {
 }
 
 ext {
-    lombokVersion = '1.16.22'
+    lombokVersion = '1.18.0'
     springSwaggerVersion = '2.8.0'
     commonsLangVersion = '3.7'
     spongycastleVersion = '1.58.0.0'
