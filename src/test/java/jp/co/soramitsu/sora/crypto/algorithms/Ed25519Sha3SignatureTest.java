@@ -6,10 +6,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.security.KeyPair;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
-import javax.xml.bind.DatatypeConverter;
-import jp.co.soramitsu.crypto.ed25519.EdDSAPublicKey;
 import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy.SignatureSuiteException;
 import org.junit.Test;
 

@@ -28,17 +28,17 @@ public class Ed25519Sha3Signature implements RawSignatureStrategy {
   private EdDSAParameterSpec spec;
   private Signature sgr;
   private KeyPairGenerator keyGen;
-  private MessageDigest digest;
-  private SecureRandom random;
 
 
   public Ed25519Sha3Signature() throws SignatureSuiteException {
     try {
       this.spec = EdDSANamedCurveTable.getByName(ED_25519);
-      this.digest = MessageDigest.getInstance(spec.getHashAlgorithm());
       this.keyGen = new KeyPairGenerator();
-      this.sgr = new EdDSAEngine(digest);
-      this.random = new SecureRandom();
+      this.sgr = new EdDSAEngine(
+          MessageDigest.getInstance(
+              spec.getHashAlgorithm()
+          )
+      );
     } catch (Exception e) {
       throw new SignatureSuiteException(e);
     }
