@@ -15,7 +15,7 @@ plugins {
 }
 
 lombok {
-    version = "1.16.22"
+    version = "1.18.0"
 }
 
 apply plugin: 'java'
