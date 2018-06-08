@@ -11,6 +11,6 @@ import org.springframework.stereotype.Repository;
 public interface AccountRepository extends CrudRepository<Account, String> {
 
   @Query(value = "select a.data#>>array['ddos', :did] d from account a where a.data is not null and a.data#>array['ddos', :did] is not null", nativeQuery = true)
-  Optional<String> findDDOByAccountIdAndDid(@Param("did") String did);
+  Optional<String> findDDOByDid(@Param("did") String did);
 
 }

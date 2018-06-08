@@ -85,7 +85,7 @@ public class DIDServiceImplTest {
     ddo.setCreated(Timestamp.from(Instant.now()));
     val ddoString = JacksonUtil.toString(ddo);
 
-    when(accountRepository.findDDOByAccountIdAndDid(did)).thenReturn(Optional.of(ddoString));
+    when(accountRepository.findDDOByDid(did)).thenReturn(Optional.of(ddoString));
 
     val result = storageService.read(did);
 

@@ -20,18 +20,14 @@ import lombok.val;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.init.Jackson2RepositoryPopulatorFactoryBean;
-import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 /**
@@ -101,7 +97,7 @@ public class AccountRepositoryTest {
   public void given_repository_when_called_findByAccountIdAndDid_assert_string_returned_and_mapped_to_DDO()
       throws IOException {
     val ddoString = repository
-        .findDDOByAccountIdAndDid("did:sora:iroha:bogdan@soramitsu.co.jp");
+        .findDDOByDid("did:sora:iroha:bogdan@soramitsu.co.jp");
 
     assertThat(ddoString.isPresent(), is(true));
 
