@@ -94,6 +94,11 @@ public class Ed25519Sha3SignatureTest {
 
   public static class TestTuple {
 
+    private byte[] seed;
+    private byte[] pk;
+    private byte[] message;
+    private byte[] sig;
+
     public TestTuple(String line) {
       String[] x = line.split(":");
       seed = Utils.hexToBytes(x[0].substring(0, 64)); // private key
@@ -101,10 +106,5 @@ public class Ed25519Sha3SignatureTest {
       message = Utils.hexToBytes(x[2]);
       sig = Utils.hexToBytes(x[3].substring(0, 128)); // signature
     }
-
-    private byte[] seed;
-    private byte[] pk;
-    private byte[] message;
-    private byte[] sig;
   }
 }

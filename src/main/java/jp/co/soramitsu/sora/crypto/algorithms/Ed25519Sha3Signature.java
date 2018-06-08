@@ -5,7 +5,6 @@ import static jp.co.soramitsu.crypto.ed25519.spec.EdDSANamedCurveTable.ED_25519;
 import java.security.KeyPair;
 import java.security.MessageDigest;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
 import jp.co.soramitsu.crypto.ed25519.EdDSAEngine;
