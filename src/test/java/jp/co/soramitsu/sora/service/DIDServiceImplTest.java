@@ -68,7 +68,7 @@ public class DIDServiceImplTest {
   }
 
   @Theory
-  public void given_incorrectDids_when_called_read_assert_exception_thrown(String did)
+  public void givenIncorrectDidsWhenCalledReadAssertExceptionThrown(String did)
       throws UnparseableException {
     expectedException.expect(UnparseableException.class);
     val didObject = new DID(did);
@@ -77,7 +77,7 @@ public class DIDServiceImplTest {
   }
 
   @Test
-  public void given_correct_iroha_id_when_called_read_assert_account_entity_returned()
+  public void givenCorrectIrohaIdWhenCalledReadAssertAccountEntityReturned()
       throws UnparseableException {
     val did = "did:sora:iroha:vasya@home.ru";
     val ddo = new DDO();

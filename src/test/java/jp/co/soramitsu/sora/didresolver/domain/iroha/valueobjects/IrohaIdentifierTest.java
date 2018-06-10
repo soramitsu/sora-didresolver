@@ -23,21 +23,21 @@ public class IrohaIdentifierTest {
   public ExpectedException expectedException = ExpectedException.none();
 
   @Test
-  public void given_correct_uuid_identifier_assert_iroha_identifier_throws()
+  public void givenCorrectUuidIdentifierAssertIrohaIdentifierThrows()
       throws IrohaIdentifierUnparseableException {
     expectedException.expect(IrohaIdentifierUnparseableException.class);
     new IrohaIdentifier(uuid);
   }
 
   @Test
-  public void given_correct_ed_identifier_assert_iroha_identifier_throws()
+  public void givenCorrectEdIdentifierAssertIrohaIdentifierThrows()
       throws IrohaIdentifierUnparseableException {
     expectedException.expect(IrohaIdentifierUnparseableException.class);
     new IrohaIdentifier(ed);
   }
 
   @Test
-  public void given_correct_iroha_identifier_with_domain_assert_iroha_identifier_created()
+  public void givenCorrectIrohaIdentifierWithDomainAssertIrohaIdentifierCreated()
       throws IrohaIdentifierUnparseableException {
     val identifier = new IrohaIdentifier(accountWithDomain);
 
@@ -47,11 +47,10 @@ public class IrohaIdentifierTest {
   }
 
   @Test
-  public void given_correct_iroha_identifier_without_domain_assert_iroha_identifier_throws()
+  public void givenCorrectIrohaIdentifierWithoutDomainAssertIrohaIdentifierThrows()
       throws IrohaIdentifierUnparseableException {
     expectedException.expect(IrohaIdentifierUnparseableException.class);
-    val identifier = new IrohaIdentifier(accountWithoutDomain);
-
+    new IrohaIdentifier(accountWithoutDomain);
   }
 
 }

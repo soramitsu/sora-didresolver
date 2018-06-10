@@ -22,7 +22,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
@@ -41,10 +40,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class AccountRepositoryTest {
 
   @Autowired
-  AccountRepository repository;
-
-  @Autowired
-  TestEntityManager entityManager;
+  private AccountRepository repository;
 
   private ObjectMapper mapper = new ObjectMapper();
 
@@ -76,7 +72,7 @@ public class AccountRepositoryTest {
   }
 
   @Test
-  public void given_persisted_entity__when_found_by_id_assert_it_is_same() {
+  public void givenPersistedEntityWhenFoundByIdAssertItIsSame() {
     val account = new Account();
     account.setAccountId("Vasya");
     val vault = new AccountVault();
@@ -94,7 +90,7 @@ public class AccountRepositoryTest {
   }
 
   @Test
-  public void given_repository_when_called_findByAccountIdAndDid_assert_string_returned_and_mapped_to_DDO()
+  public void givenRepositoryWhenCalledFindByAccountIdAndDidAssertStringReturnedAndMappedToDDO()
       throws IOException {
     val ddoString = repository
         .findDDOByDid("did:sora:iroha:bogdan@soramitsu.co.jp");

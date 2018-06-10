@@ -27,9 +27,9 @@ public class DID {
       .compile("did:sora:ed:(?<IDENTIFIER>" + ED_REGEX + ")");
 
 
-  DIDTypeEnum type;
-  String identifier;
-  String didString;
+  private DIDTypeEnum type;
+  private String identifier;
+  private String didString;
 
   @Override
   public String toString() {
@@ -66,7 +66,7 @@ public class DID {
 
       this.didString = did;
     } else {
-      throw new NullPointerException(
+      throw new IllegalArgumentException(
           "Null is not permitted for " + DID.class.getName() + " constructor");
     }
   }

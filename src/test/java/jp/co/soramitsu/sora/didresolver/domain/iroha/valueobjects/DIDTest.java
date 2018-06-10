@@ -33,7 +33,7 @@ public class DIDTest {
   public ExpectedException expectedException = ExpectedException.none();
 
   @BeforeClass
-  public static void setup() {
+  public static void setUp() {
     String[] invalidDidsStringArr = {
         "plainly incorrect did",
         "did:sorar:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf",
@@ -48,7 +48,7 @@ public class DIDTest {
   }
 
   @Test
-  public void given_correctUUIDDid_assert_that_DID_created_successfully()
+  public void givenCorrectUUIDDidAssertThatDIDCreatedSuccessfully()
       throws DIDUnparseableException {
     val did = new DID(uuidDid);
     assertThat(did.getType(), equalTo(DIDTypeEnum.UUID));
@@ -56,7 +56,7 @@ public class DIDTest {
   }
 
   @Test
-  public void given_correctEdDid_assert_that_DID_created_successfully()
+  public void givenCorrectEdDidAssertThatDIDCreatedSuccessfully()
       throws DIDUnparseableException {
     val did = new DID(edDid);
     assertThat(did.getType(), equalTo(ED));
@@ -64,7 +64,7 @@ public class DIDTest {
   }
 
   @Test
-  public void given_correctIrohaDid_assert_that_DID_created_successfully()
+  public void givenCorrectIrohaDidAssertThatDIDCreatedSuccessfully()
       throws DIDUnparseableException {
     val did = new DID(didIrohaWithDomain);
     assertThat(did.getType(), equalTo(IROHA));
@@ -72,15 +72,15 @@ public class DIDTest {
   }
 
   @Theory
-  public void given_incorrect_dids_expect_exceptions(String did)
+  public void givenIncorrectDidsExpectExceptions(String did)
       throws DIDUnparseableException {
     expectedException.expect(DIDUnparseableException.class);
     new DID(did);
   }
 
   @Test
-  public void given_null_expect_exception() throws DIDUnparseableException {
-    expectedException.expect(NullPointerException.class);
+  public void givenNullExpectException() throws DIDUnparseableException {
+    expectedException.expect(IllegalArgumentException.class);
     new DID(null);
   }
 
