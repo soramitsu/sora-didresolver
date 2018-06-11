@@ -48,7 +48,7 @@ repositories {
 
 ext {
     lombokVersion = '1.18.0'
-    springSwaggerVersion = '2.8.0'
+    springSwaggerVersion = '2.9.0'
     commonsLangVersion = '3.7'
     spongycastleVersion = '1.58.0.0'
     mockitoCoreVersion = '2.18.3'
