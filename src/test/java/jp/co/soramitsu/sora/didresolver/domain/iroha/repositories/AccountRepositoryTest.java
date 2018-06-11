@@ -6,7 +6,8 @@ import static org.junit.Assert.assertThat;
 import static org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace.NONE;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.opentable.db.postgres.embedded.EmbeddedPostgres;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -17,6 +18,7 @@ import jp.co.soramitsu.sora.didresolver.domain.iroha.entities.AccountVault;
 import jp.co.soramitsu.sora.didresolver.dto.DDO;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.repository.init.Jackson2RepositoryPopulatorFactoryBean;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 /**
  * TODO: resolve why can't properly shut down EntityManagerFactory (probably resource closing
@@ -42,19 +45,22 @@ public class AccountRepositoryTest {
   @Autowired
   private AccountRepository repository;
 
+  @ClassRule
+  public static PostgreSQLContainer pgContainer = new PostgreSQLContainer();
+
   private ObjectMapper mapper = new ObjectMapper();
 
   @TestConfiguration
   public static class TestConfig {
 
-    @Bean(destroyMethod = "close")
-    public EmbeddedPostgres embeddedPostgres() throws IOException {
-      return EmbeddedPostgres.start();
-    }
-
     @Bean
-    public DataSource irohaDS(EmbeddedPostgres embeddedPostgres) {
-      return embeddedPostgres.getPostgresDatabase();
+    public DataSource irohaDS() {
+      HikariConfig hikariConfig = new HikariConfig();
+      hikariConfig.setUsername(pgContainer.getUsername());
+      hikariConfig.setPassword(pgContainer.getPassword());
+      hikariConfig.setJdbcUrl(pgContainer.getJdbcUrl());
+
+      return new HikariDataSource(hikariConfig);
     }
 
     /**

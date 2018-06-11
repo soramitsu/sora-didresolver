@@ -90,7 +90,8 @@ dependencies {
     testCompile("junit:junit:${junitVersion}")
     // Allows using embedded postgres in Unit tests
     // https://github.com/opentable/otj-pg-embedded
-    testCompile("com.opentable.components:otj-pg-embedded:$embeddedPg")
+    testCompile 'org.testcontainers:testcontainers:1.7.3'
+    testCompile 'org.testcontainers:postgresql:1.7.3'
 }
 
 task wrapper(type: Wrapper) {
