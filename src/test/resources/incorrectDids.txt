@@ -1,0 +1,8 @@
+plainly incorrect did
+did:sorar:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf
+did:sora:iroha:someUser@
+did:sora:iroha:@domain
+did:sora:ed:5Lk$#@qENiDNdFpXiji8wPoVTWvRq2Q11vpKfNmufa6owUn
+did:sora:uuid:
+did:sora:iroha:someUser
+did:sora:iroha:5LkqENiDNdFpXiji8wPoVTWvRq2Q11vpKfNmufa6owUn
