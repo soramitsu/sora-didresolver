@@ -6,22 +6,21 @@ pipeline {
   options {
     buildDiscarder(logRotator(numToKeepStr: '20'))
   }
-  agent { label 'x86_64' }
+  agent {
+    docker {
+      image 'warchantua/did-resolver-dev:1'
+      args '-v /var/run/docker.sock:/var/run/docker.sock'
+    }
+  }
   stages {
     stage('Build') {
       steps {
         script {
-          docker.image('gradle:jdk8').inside {
-            sh """
-              wget -q -nv https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.1/codacy-coverage-reporter-4.0.1-assembly.jar &
-              gradle clean build
-              gradle check
-              gradle jacocoTestReport
-              bash <(curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN}
-              wait
-              java -jar codacy-coverage-reporter-4.0.1-assembly.jar report -l Java -r build/reports/coverage.xml
-            """
-          }
+          sh "gradle clean build -x test"
+          sh "gradle check"
+          sh "gradle jacocoTestReport"
+          sh "bash <(curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN}"
+          sh "java -jar /opt/codacy.jar report -l Java -r build/reports/coverage.xml"
         }
       }
       post {
