@@ -12,6 +12,8 @@ public interface RawSignatureStrategy {
 
   KeyPair generateKeypair() throws SignatureSuiteException;
 
+  KeyPair generateKeypair(byte[] seed) throws SignatureSuiteException;
+
   String getType();
 
 
