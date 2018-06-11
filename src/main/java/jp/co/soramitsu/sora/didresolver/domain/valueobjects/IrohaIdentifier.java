@@ -1,8 +1,10 @@
-package jp.co.soramitsu.sora.didresolver.domain.iroha.valueobjects;
+package jp.co.soramitsu.sora.didresolver.domain.valueobjects;
+
+import static java.util.regex.Pattern.compile;
+import static jp.co.soramitsu.sora.didresolver.commons.DIDTypeEnum.IROHA;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import jp.co.soramitsu.sora.didresolver.commons.DIDTypeEnum;
 import jp.co.soramitsu.sora.didresolver.exceptions.IrohaIdentifierUnparseableException;
 import lombok.Value;
 
@@ -13,8 +15,9 @@ import lombok.Value;
 @Value
 public class IrohaIdentifier {
 
-  private static final Pattern patternBothAccountAndDomain = Pattern
-      .compile(DIDTypeEnum.IROHA.getRegexp());
+  private static final Pattern irohaPattern = compile(IROHA.getRegexp());
+  public static final String ACCOUNT = "ACCOUNT";
+  public static final String DOMAIN = "DOMAIN";
 
   private String accountId;
   private String domainId;
@@ -26,12 +29,12 @@ public class IrohaIdentifier {
   }
 
   public IrohaIdentifier(String identifier) throws IrohaIdentifierUnparseableException {
-    Matcher bothAccountAndDomainMatcher = patternBothAccountAndDomain.matcher(identifier);
+    Matcher bothAccountAndDomainMatcher = irohaPattern.matcher(identifier);
     if (!bothAccountAndDomainMatcher.matches()) {
       throw new IrohaIdentifierUnparseableException(identifier);
     } else {
-      accountId = bothAccountAndDomainMatcher.group("ACCOUNT");
-      domainId = bothAccountAndDomainMatcher.group("DOMAIN");
+      accountId = bothAccountAndDomainMatcher.group(ACCOUNT);
+      domainId = bothAccountAndDomainMatcher.group(DOMAIN);
     }
 
     this.identifier = identifier;

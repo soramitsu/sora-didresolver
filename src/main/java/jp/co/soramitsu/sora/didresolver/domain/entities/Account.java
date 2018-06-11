@@ -1,4 +1,4 @@
-package jp.co.soramitsu.sora.didresolver.domain.iroha.entities;
+package jp.co.soramitsu.sora.didresolver.domain.entities;
 
 import static javax.persistence.FetchType.LAZY;
 
@@ -17,7 +17,7 @@ import org.hibernate.annotations.TypeDefs;
  * This is an entity to which will be mapped a single row from table 'account' in Iroha's Postgres
  * database Fields are defined lazy explicitly, as usually not every single one of them is required
  * at the moment For such cases when multiple fields required there should be declared query in
- * {@link jp.co.soramitsu.sora.didresolver.domain.iroha.repositories.AccountRepository} which will return
+ * {@link jp.co.soramitsu.sora.didresolver.domain.repositories.AccountRepository} which will return
  * projection of this entity with all required fields defined in {@link
  * javax.persistence.EntityGraph}
  *

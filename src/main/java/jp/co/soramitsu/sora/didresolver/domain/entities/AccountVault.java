@@ -1,4 +1,4 @@
-package jp.co.soramitsu.sora.didresolver.domain.iroha.entities;
+package jp.co.soramitsu.sora.didresolver.domain.entities;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

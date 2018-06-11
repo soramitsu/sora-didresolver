@@ -1,7 +1,7 @@
-package jp.co.soramitsu.sora.didresolver.domain.iroha.repositories;
+package jp.co.soramitsu.sora.didresolver.domain.repositories;
 
 import java.util.Optional;
-import jp.co.soramitsu.sora.didresolver.domain.iroha.entities.Account;
+import jp.co.soramitsu.sora.didresolver.domain.entities.Account;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;

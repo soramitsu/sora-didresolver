@@ -6,15 +6,16 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Mockito.when;
 
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import jp.co.soramitsu.sora.didresolver.domain.iroha.repositories.AccountRepository;
-import jp.co.soramitsu.sora.didresolver.domain.iroha.valueobjects.DID;
+import jp.co.soramitsu.sora.didresolver.domain.repositories.AccountRepository;
+import jp.co.soramitsu.sora.didresolver.domain.valueobjects.DID;
 import jp.co.soramitsu.sora.didresolver.dto.DDO;
 import jp.co.soramitsu.sora.didresolver.exceptions.UnparseableException;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
@@ -51,18 +52,13 @@ public class DIDServiceImplTest {
 
   @Before
   public void setUp() {
-    String[] invalidDidsStringArr = {
-        "plainly incorrect did",
-        "did:sorar:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf",
-        "did:sora:iroha:someUser@",
-        "did:sora:iroha:@domain",
-        "did:sora:ed:5LkqENi#OI!2_)9DNdFpXiji8wPoVTWvRq2Q11vpKfNmufa6owUn",
-        "did:sora:uuid:",
-        "did:sora:iroha:someUser",
-        "did:sora:iroha:5LkqENiDNdFpXiji8wPoVTWvRq2Q11vpKfNmufa6owUn"
-    };
-
-    incorrectDids = Arrays.stream(invalidDidsStringArr).collect(Collectors.toList());
+    incorrectDids = new BufferedReader(
+        new InputStreamReader(
+            getClass()
+                .getClassLoader()
+                .getResourceAsStream("incorrectDids.txt")
+        )
+    ).lines().collect(Collectors.toList());
 
     storageService = new DIDServiceViaRepository(accountRepository);
   }

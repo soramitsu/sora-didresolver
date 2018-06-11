@@ -1,4 +1,4 @@
-package jp.co.soramitsu.sora.didresolver.domain.iroha.repositories;
+package jp.co.soramitsu.sora.didresolver.domain.repositories;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -13,10 +13,9 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.Collections;
 import javax.sql.DataSource;
-import jp.co.soramitsu.sora.didresolver.domain.iroha.entities.Account;
-import jp.co.soramitsu.sora.didresolver.domain.iroha.entities.AccountVault;
+import jp.co.soramitsu.sora.didresolver.domain.entities.Account;
+import jp.co.soramitsu.sora.didresolver.domain.entities.AccountVault;
 import jp.co.soramitsu.sora.didresolver.dto.DDO;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -39,7 +38,6 @@ import org.testcontainers.containers.PostgreSQLContainer;
 @RunWith(SpringRunner.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = NONE)
-@Slf4j
 public class AccountRepositoryTest {
 
   @Autowired
@@ -54,7 +52,7 @@ public class AccountRepositoryTest {
   public static class TestConfig {
 
     @Bean
-    public DataSource irohaDS() {
+    public DataSource dataSource() {
       HikariConfig hikariConfig = new HikariConfig();
       hikariConfig.setUsername(pgContainer.getUsername());
       hikariConfig.setPassword(pgContainer.getPassword());
@@ -96,7 +94,7 @@ public class AccountRepositoryTest {
   }
 
   @Test
-  public void givenRepositoryWhenCalledFindByAccountIdAndDidAssertStringReturnedAndMappedToDDO()
+  public void whenCalledFindDDOByDidThenReturnStringAndMapToDDO()
       throws IOException {
     val ddoString = repository
         .findDDOByDid("did:sora:iroha:bogdan@soramitsu.co.jp");

@@ -1,12 +1,12 @@
-package jp.co.soramitsu.sora.didresolver.domain.iroha.valueobjects;
+package jp.co.soramitsu.sora.didresolver.domain.valueobjects;
 
-import static jp.co.soramitsu.sora.didresolver.commons.DIDTypeEnum.ED;
 import static jp.co.soramitsu.sora.didresolver.commons.DIDTypeEnum.IROHA;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import jp.co.soramitsu.sora.didresolver.commons.DIDTypeEnum;
@@ -25,7 +25,6 @@ import org.junit.runner.RunWith;
 public class DIDTest {
 
   private static String uuidDid = "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf";
-  private static String edDid = "did:sora:ed:5LkqENiDNdFpXiji8wPoVTWvRq2Q11vpKfNmufa6owUn";
   private static String didIrohaWithDomain = "did:sora:iroha:bogdan@soramitsu.co.jp";
   @DataPoints
   public static List<String> invalidDids = new ArrayList<>();
@@ -34,17 +33,13 @@ public class DIDTest {
 
   @BeforeClass
   public static void setUp() {
-    String[] invalidDidsStringArr = {
-        "plainly incorrect did",
-        "did:sorar:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf",
-        "did:sora:iroha:someUser@",
-        "did:sora:iroha:@domain",
-        "did:sora:ed:5Lk$#@qENiDNdFpXiji8wPoVTWvRq2Q11vpKfNmufa6owUn",
-        "did:sora:uuid:",
-        "did:sora:iroha:someUser"
-    };
-
-    invalidDids = Arrays.stream(invalidDidsStringArr).collect(Collectors.toList());
+    invalidDids =
+        new BufferedReader(
+            new InputStreamReader(
+                DIDTest.class.getClassLoader()
+                    .getResourceAsStream("incorrectDids.txt")
+            )
+        ).lines().collect(Collectors.toList());
   }
 
   @Test
@@ -53,14 +48,6 @@ public class DIDTest {
     val did = new DID(uuidDid);
     assertThat(did.getType(), equalTo(DIDTypeEnum.UUID));
     assertThat(did.getIdentifier(), equalTo("caab4570-5f3f-4050-8d61-15306dea4bcf"));
-  }
-
-  @Test
-  public void givenCorrectEdDidAssertThatDIDCreatedSuccessfully()
-      throws DIDUnparseableException {
-    val did = new DID(edDid);
-    assertThat(did.getType(), equalTo(ED));
-    assertThat(did.getIdentifier(), equalTo("5LkqENiDNdFpXiji8wPoVTWvRq2Q11vpKfNmufa6owUn"));
   }
 
   @Test

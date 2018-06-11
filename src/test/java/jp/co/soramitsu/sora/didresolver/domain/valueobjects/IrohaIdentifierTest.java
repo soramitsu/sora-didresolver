@@ -1,17 +1,15 @@
-package jp.co.soramitsu.sora.didresolver.domain.iroha.valueobjects;
+package jp.co.soramitsu.sora.didresolver.domain.valueobjects;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.assertThat;
 
 import jp.co.soramitsu.sora.didresolver.exceptions.IrohaIdentifierUnparseableException;
-import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-@Slf4j
 public class IrohaIdentifierTest {
 
   private static String uuid = "caab4570-5f3f-4050-8d61-15306dea4bcf";
