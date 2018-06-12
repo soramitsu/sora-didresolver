@@ -55,7 +55,7 @@ ext {
     junitVersion = '4.12'
     hibernateTypesVersion = '2.2.2'
     testContainersVersion = '1.7.3'
-    postgresVersion = '42.1.4'
+    postgresVersion = '42.2.2'
 }
 
 repositories {
