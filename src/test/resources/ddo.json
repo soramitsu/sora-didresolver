@@ -1,34 +1,34 @@
 {
-  "id": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV",
+  "id": "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf",
 
   "publicKey": [{
-    "id": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV#keys-1",
-    "type": "RsaVerificationKey2018",
-    "owner": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV",
+    "id": "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf#keys-1",
+    "type": "Ed25519Sha3Signature",
+    "owner": "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf",
     "publicKeyPem": "-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\r\n"
   }, {
-    "id": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV#keys-2",
-    "type": "RsaEncryptionKey2018",
-    "owner": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV",
+    "id": "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf#keys-2",
+    "type": "Ed25519Sha3Signature",
+    "owner": "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf",
     "publicKeyPem": "-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\r\n"
   }, {
-    "id": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV#keys-3",
-    "type": "Ed25519VerificationKey2018",
-    "owner": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV",
+    "id": "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf#keys-3",
+    "type": "Ed25519Sha3Signature",
+    "owner": "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf",
     "publicKeyBase58": "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"
   }],
 
   "authentication": [{
-    "type": "RsaSignatureAuthentication2018",
-    "publicKey": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV#keys-1"
+    "type": "Ed25519Sha3Signature",
+    "publicKey": "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf#keys-1"
   }],
 
   "created": "2002-10-10T17:00:00Z",
 
   "proof": [{
-    "type": "Ed25519Signature2018",
+    "type": "Ed25519Sha3Signature",
     "created": "2002-10-10T17:00:00Z",
-    "creator": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV#keys-3",
-    "signatureValue": "QNB13Y7Q9...1tzjn4w=="
+    "creator": "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf#keys-3",
+    "signatureValueBase58": "QNB13Y7Q9...1tzjn4w=="
   }]
 }
