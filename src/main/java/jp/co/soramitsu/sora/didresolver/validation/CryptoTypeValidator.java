@@ -10,14 +10,14 @@ import lombok.extern.slf4j.Slf4j;
 public class CryptoTypeValidator implements ConstraintValidator<CryptoTypeConstraint, String> {
 
   public boolean isValid(String value, ConstraintValidatorContext context) {
-    log.debug("validation of crypto type - " + value);
+    log.debug("validation of crypto type - {}", value);
     boolean isValid = false;
     try {
       CryptoTypeEnum.valueOf(value);
       isValid = true;
     } catch (NullPointerException | IllegalArgumentException ignored) {
     }
-    log.debug("result of validation crypto type - " + value + " is " + isValid);
+    log.debug("result of validation crypto type - {} is {}", value, isValid);
     return isValid;
   }
 }

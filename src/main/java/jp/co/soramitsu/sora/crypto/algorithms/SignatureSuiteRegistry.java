@@ -11,23 +11,23 @@ public enum SignatureSuiteRegistry {
   private Map<String, RawSignatureStrategy> algorithms = new HashMap<>();
 
   public void register(String key, RawSignatureStrategy val) {
-    log.debug("register signature strategy with key - " + key + " and value - " + val.toString());
+    log.debug("register signature strategy with key - {} and value - {}", key, val.toString());
     algorithms.put(key, val);
   }
 
   public void deregister(String key) {
-    log.debug("remove signature strategy with key - " + key);
+    log.debug("remove signature strategy with key - {}", key);
     algorithms.remove(key);
   }
 
   public RawSignatureStrategy get(String key) throws NoSuchStrategy {
-    log.debug("find appropriate digital signature algorithm by key - " + key);
+    log.debug("find appropriate digital signature algorithm by key - {}", key);
     // find appropriate digital signature algorithm
     if (!has(key)) {
-      log.error(key + "signature suite is not implemented");
+      log.warn("{} signature suite is not implemented", key);
       throw new NoSuchStrategy(key);
     }
-    log.debug("get raw signature startegy - " + algorithms.get(key) + " by key - " + key);
+    log.debug("get raw signature startegy - {} by key - {}", algorithms.get(key), key);
     return algorithms.get(key);
   }
 

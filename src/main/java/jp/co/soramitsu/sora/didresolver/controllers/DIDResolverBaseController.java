@@ -36,12 +36,12 @@ public class DIDResolverBaseController {
   public void createDDO(
       @ApiParam(value = "url encoded DID", required = true) @Validated @RequestBody DDO ddo)
       throws UnparseableException {
-    log.info("start execution of method createDDO for DID - " + ddo.getId());
+    log.info("start execution of method createDDO for DID - {}", ddo.getId());
     val optionalDDO = storageService.read(ddo.getId());
     if (optionalDDO.isPresent()) {
       throw new DIDDuplicateException(ddo.getId());
     }
-    log.info("write to storage DDO with DID - " + ddo.getId());
+    log.info("write to storage DDO with DID - {}", ddo.getId());
     storageService.createOrUpdate(ddo.getId(), ddo);
   }
 

@@ -27,13 +27,13 @@ public class ExactlyOneValidator implements ConstraintValidator<ExactlyOneConstr
       for (String element : group) {
         Object propValue = new BeanWrapperImpl(value).getPropertyValue(element);
         if (propValue != null) {
-          log.debug("ExactlyOneValidator: element - " + element + "; value - " + propValue);
+          log.debug("ExactlyOneValidator: element - {}; value - {}", element, propValue);
           fieldValues.add(propValue);
         }
       }
       isValid = fieldValues.size() == 1;
     }
-    log.debug("result of ExactlyOneValidator is " + isValid);
+    log.debug("result of ExactlyOneValidator is {}", isValid);
     return isValid;
   }
 }

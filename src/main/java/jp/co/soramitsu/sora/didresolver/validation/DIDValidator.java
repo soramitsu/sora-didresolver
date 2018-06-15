@@ -23,13 +23,13 @@ public class DIDValidator implements ConstraintValidator<DIDConstraint, String> 
 
   @Override
   public boolean isValid(String did, ConstraintValidatorContext context) {
-    log.debug("validation format of DID - " + did);
+    log.debug("validation format of DID - {}", did);
     boolean isValid = isNullable;
     if (StringUtils.isNotBlank(did) && did.matches(DID_STRUCT_REGEXP)) {
       String[] didParts = StringUtils.split(did, DELIMETER);
       isValid = didParts.length > 3 && checkTypeAndIdentifier(didParts[2], didParts[3]);
     }
-    log.debug("result of validation format of DID - " + did + " is " + isValid);
+    log.debug("result of validation format of DID - {} is {}", did, isValid);
     return isValid;
   }
 

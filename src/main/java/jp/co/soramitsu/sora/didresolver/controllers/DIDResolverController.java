@@ -43,7 +43,7 @@ public class DIDResolverController extends DIDResolverBaseController {
   public ResponseEntity<DDO> getDDO(
       @ApiParam(value = "url encoded DID", required = true) @DIDConstraint(isNullable = false) @PathVariable String did)
       throws UnparseableException {
-    log.info("Recieve DDO by DID - " + did);
+    log.info("Recieve DDO by DID - {}", did);
     val ddo = storageService.read(did).orElseThrow(() -> new DIDNotFoundException(did));
     return new ResponseEntity<>(ddo, HttpStatus.OK);
   }
@@ -53,7 +53,7 @@ public class DIDResolverController extends DIDResolverBaseController {
   public void deleteDDO(
       @ApiParam(value = "url encoded DID", required = true) @DIDConstraint(isNullable = false) @PathVariable String did)
       throws UnparseableException {
-    log.info("Delete DDO by DID - " + did);
+    log.info("Delete DDO by DID - {}", did);
     storageService.read(did).orElseThrow(() -> new DIDNotFoundException(did));
     storageService.delete(did);
   }
@@ -64,7 +64,7 @@ public class DIDResolverController extends DIDResolverBaseController {
       @ApiParam(value = "url encoded DID", required = true) @DIDConstraint(isNullable = false) @PathVariable String did,
       @ApiParam(value = "New DDO MUST contain updated property with time > created", required = true) @Validated @RequestBody DDO ddo)
       throws UnparseableException {
-    log.info("Update DDO by DID - " + did);
+    log.info("Update DDO by DID - {}", did);
     storageService.read(did).orElseThrow(() -> new DIDNotFoundException(did));
     storageService.createOrUpdate(did, ddo);
   }

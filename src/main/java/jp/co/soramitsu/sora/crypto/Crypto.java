@@ -37,7 +37,7 @@ public class Crypto {
   public Crypto(@NotNull RawDigestStrategy digestStrategy, @NotNull ObjectMapper mapper) {
     this.digestStrategy = digestStrategy;
     this.mapper = mapper;
-    log.debug("create new Crypto object with digest strategy - " + digestStrategy);
+    log.debug("created new Crypto object with digest strategy - {}", digestStrategy);
   }
 
   private byte[] createVerifyHash(VerifiableJson document, ProofProxy proof)
@@ -54,7 +54,7 @@ public class Crypto {
       mapper.writeValue(stream, proof);
       // calculate digest(document + proof)
       byte[] hash = digestStrategy.digest(stream.toByteArray());
-      log.debug("calculate digest(document + proof) - " + new String(hash));
+      log.debug("calculate digest(document + proof) - {}", new String(hash));
       return hash;
     } catch (IOException e) {
       throw new CreateVerifyHashException(e);
@@ -68,10 +68,10 @@ public class Crypto {
   }
 
   private void sanitizeProof(ProofProxy proof) {
-    log.debug("sanitize document for verify hash");
+    log.debug("sanitize proof for verify hash");
     // if "created" is empty, then set current time as "created"
     if (proof.getCreated() == null) {
-      log.debug("set current time " + Instant.now() + " as \"created\"");
+      log.debug("set current time {} as \"created\"",Instant.now());
       proof.setCreated(Instant.now());
     }
 
@@ -82,7 +82,7 @@ public class Crypto {
       throws CreateVerifyHashException, SignatureSuiteException, NoSuchStrategy {
     log.info("sign document");
     RawSignatureStrategy signer = SignatureSuiteRegistry.INSTANCE.get(proof.getType());
-    log.debug("recieved signature strategy for sign document - " + signer);
+    log.debug("recieved signature strategy for sign document - {}", signer);
     // backup proofs
     List<ProofProxy> proofs = document.getProof();
 
@@ -96,7 +96,7 @@ public class Crypto {
       proofs = new ArrayList<>();
     }
     proofs.add(proof);
-    log.debug("add all " + proofs.size() + " proofs to the document");
+    log.debug("add all {} proofs to the document", proofs.size());
     // add all proofs to the document
     document.setProof(proofs);
   }
@@ -110,7 +110,7 @@ public class Crypto {
       throws CreateVerifyHashException, SignatureSuiteException, NoSuchStrategy {
     log.info("verify specific proof");
     RawSignatureStrategy verifier = SignatureSuiteRegistry.INSTANCE.get(proof.getType());
-    log.debug("recieved verify strategy for document - " + verifier);
+    log.debug("recieved verify strategy for document - {}", verifier);
     byte[] hash = createVerifyHash(document, proof);
     byte[] signature = proof.getSignatureValue();
 
