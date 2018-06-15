@@ -31,17 +31,18 @@ public class DIDResolverBaseController {
     this.storageService = storageService;
   }
 
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE})
-    @ApiOperation("This operation is used to register new DID-DDO pair in Identity System")
-    public void createDDO(@ApiParam(value = "url encoded DID", required = true) @Validated @RequestBody DDO ddo)
-        throws UnparseableException {
-        log.info("start execution of method createDDO for DID - " + ddo.getId());
-        val optionalDDO = storageService.read(ddo.getId());
-        if (optionalDDO.isPresent()) {
-            throw new DIDDuplicateException(ddo.getId());
-        }
-        log.info("write to storage DDO with DID - " + ddo.getId());
-        storageService.createOrUpdate(ddo.getId(), ddo);
+  @PostMapping(consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE})
+  @ApiOperation("This operation is used to register new DID-DDO pair in Identity System")
+  public void createDDO(
+      @ApiParam(value = "url encoded DID", required = true) @Validated @RequestBody DDO ddo)
+      throws UnparseableException {
+    log.info("start execution of method createDDO for DID - " + ddo.getId());
+    val optionalDDO = storageService.read(ddo.getId());
+    if (optionalDDO.isPresent()) {
+      throw new DIDDuplicateException(ddo.getId());
     }
+    log.info("write to storage DDO with DID - " + ddo.getId());
+    storageService.createOrUpdate(ddo.getId(), ddo);
+  }
 
 }

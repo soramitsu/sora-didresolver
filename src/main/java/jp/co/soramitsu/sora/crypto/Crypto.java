@@ -52,9 +52,10 @@ public class Crypto {
       ByteArrayOutputStream stream = new ByteArrayOutputStream();
       mapper.writeValue(stream, document);
       mapper.writeValue(stream, proof);
-      log.debug("calculate digest(document + proof)");
       // calculate digest(document + proof)
-      return digestStrategy.digest(stream.toByteArray());
+      byte[] hash = digestStrategy.digest(stream.toByteArray());
+      log.debug("calculate digest(document + proof) - " + new String(hash));
+      return hash;
     } catch (IOException e) {
       throw new CreateVerifyHashException(e);
     }
@@ -70,7 +71,7 @@ public class Crypto {
     log.debug("sanitize document for verify hash");
     // if "created" is empty, then set current time as "created"
     if (proof.getCreated() == null) {
-      log.debug("set current time as \"created\"");
+      log.debug("set current time " + Instant.now() + " as \"created\"");
       proof.setCreated(Instant.now());
     }
 
@@ -95,7 +96,7 @@ public class Crypto {
       proofs = new ArrayList<>();
     }
     proofs.add(proof);
-    log.debug("add all proofs to the document");
+    log.debug("add all " + proofs.size() + " proofs to the document");
     // add all proofs to the document
     document.setProof(proofs);
   }

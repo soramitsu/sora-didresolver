@@ -27,7 +27,7 @@ public class DIDValidator implements ConstraintValidator<DIDConstraint, String> 
     boolean isValid = isNullable;
     if (StringUtils.isNotBlank(did) && did.matches(DID_STRUCT_REGEXP)) {
       String[] didParts = StringUtils.split(did, DELIMETER);
-      isValid = checkTypeAndIdentifier(didParts[2], didParts[3]);
+      isValid = didParts.length > 3 && checkTypeAndIdentifier(didParts[2], didParts[3]);
     }
     log.debug("result of validation format of DID - " + did + " is " + isValid);
     return isValid;
