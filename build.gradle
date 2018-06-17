@@ -10,14 +10,12 @@ buildscript {
     }
 }
 
-
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: "jacoco"
-
 
 jacoco {
     toolVersion = "0.8.1"
@@ -28,7 +26,7 @@ jacocoTestReport {
     executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
 
     reports {
-        xml.enabled  true
+        xml.enabled true
         xml.destination file("${buildDir}/reports/coverage.xml")
         csv.enabled false
         html.enabled false
@@ -42,20 +40,22 @@ group = 'jp.co.soramitsu.sora'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 
-repositories {
-    mavenCentral()
-}
-
 ext {
     lombokVersion = '1.18.0'
     springSwaggerVersion = '2.9.0'
     commonsLangVersion = '3.7'
+//    log4jVersion = '2.11.0'
+//    slf4jVersion = '1.7.25'
+    aspectjVersion = '1.9.1'
     spongycastleVersion = '1.58.0.0'
     mockitoCoreVersion = '2.18.3'
-    junitVersion = '4.12'
     hibernateTypesVersion = '2.2.2'
     testContainersVersion = '1.8.0'
     postgresVersion = '42.2.2'
+    liquibaseVersion = '3.6.1'
+    c3p0Version = '0.9.5.2'
+    jUnitVersion = '5.2.0'
+    jacksonVersion = '2.9.5'
 }
 
 repositories {
@@ -64,6 +64,19 @@ repositories {
 }
 
 dependencies {
+    // log4j case
+    /*[
+            "org.springframework:spring-context",
+            "org.springframework.boot:spring-boot-starter-web",
+            "org.springframework.boot:spring-boot-starter-validation",
+            "org.springframework.boot:spring-boot-starter-data-jpa"
+    ].each { dep ->
+        compile(dep) {
+            exclude module: "spring-boot-starter-logging"
+            exclude module: "logback-classic"
+        }
+    }*/
+
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
     compile 'com.github.warchant:ed25519-sha3-java:1.0'
 
@@ -71,22 +84,55 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
     compile("io.springfox:springfox-swagger2:${springSwaggerVersion}")
     compile("io.springfox:springfox-swagger-ui:${springSwaggerVersion}")
+
+    //commons
     compile("org.apache.commons:commons-lang3:${commonsLangVersion}")
+
+    //DB
     // Handy library which allows to map json/jsonb columns to java type on in entity column!!
     // https://github.com/vladmihalcea/hibernate-types
     compile("com.vladmihalcea:hibernate-types-52:${hibernateTypesVersion}")
     compile("org.postgresql:postgresql:$postgresVersion")
+    compile("org.liquibase:liquibase-core:$liquibaseVersion")
+
+    //logging
+//    compile("org.apache.logging.log4j:log4j-api:${log4jVersion}")
+//    compile("org.apache.logging.log4j:log4j-core:${log4jVersion}")
+//    compile("org.slf4j:slf4j-api:${slf4jVersion}")
+    implementation("org.aspectj:aspectjrt:$aspectjVersion")
+    implementation("org.aspectj:aspectjweaver:$aspectjVersion")
+    compile("com.mchange:c3p0:$c3p0Version")
 
     compileOnly "org.springframework.boot:spring-boot-configuration-processor"
 
+    //tests
     testCompile("org.mockito:mockito-core:${mockitoCoreVersion}")
     testCompile('org.springframework.boot:spring-boot-starter-test')
-    testCompile("junit:junit:${junitVersion}")
+    // log4j case
+    /*testCompile('org.springframework.boot:spring-boot-starter-test'){
+        exclude module: "spring-boot-starter-logging"
+        exclude module: "logback-classic"
+    }*/
     // Allows using docker containers in tests
     testCompile("org.testcontainers:testcontainers:$testContainersVersion")
     testCompile("org.testcontainers:postgresql:$testContainersVersion")
+    testCompile("org.junit.jupiter:junit-jupiter-api:$jUnitVersion")
+    testCompile("org.junit.jupiter:junit-jupiter-params:$jUnitVersion")
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:$jUnitVersion")
+    testCompile("org.junit.vintage:junit-vintage-engine:$jUnitVersion")
+    testCompile("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
 
     compile("org.projectlombok:lombok:${lombokVersion}")
+}
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+    reports {
+        html.enabled = true
+    }
 }
 
 task wrapper(type: Wrapper) {

@@ -8,9 +8,11 @@ import jp.co.soramitsu.sora.didresolver.dto.DDO;
 import jp.co.soramitsu.sora.didresolver.exceptions.UnparseableException;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
 import lombok.val;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 @Service
+@Profile("prod")
 public class DIDServiceViaRepository implements StorageService {
 
   private AccountRepository accountRepository;

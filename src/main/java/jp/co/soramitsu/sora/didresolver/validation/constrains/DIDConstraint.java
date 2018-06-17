@@ -1,21 +1,28 @@
 package jp.co.soramitsu.sora.didresolver.validation.constrains;
 
-import jp.co.soramitsu.sora.didresolver.validation.DIDValidator;
-
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
-import java.lang.annotation.*;
+import jp.co.soramitsu.sora.didresolver.validation.DIDValidator;
 
 @Documented
 @Constraint(validatedBy = DIDValidator.class)
-@Target({ElementType.FIELD,ElementType.PARAMETER})
+@Target({ElementType.FIELD, ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
+/**
+ * Constraint for validation DID format
+ */
 public @interface DIDConstraint {
-    String message() default "Invalid DID format";
 
-    boolean isNullable();
+  String message() default "Invalid DID format";
 
-    Class<?>[] groups() default {};
+  boolean isNullable();
 
-    Class<? extends Payload>[] payload() default {};
+  Class<?>[] groups() default {};
+
+  Class<? extends Payload>[] payload() default {};
 }

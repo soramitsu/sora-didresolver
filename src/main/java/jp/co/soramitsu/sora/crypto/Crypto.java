@@ -17,8 +17,9 @@ import jp.co.soramitsu.sora.crypto.hash.RawDigestStrategy;
 import jp.co.soramitsu.sora.util.bencoder.BencodeMapper;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
-
+@Slf4j
 public class Crypto {
 
   @Setter
@@ -36,22 +37,25 @@ public class Crypto {
   public Crypto(@NotNull RawDigestStrategy digestStrategy, @NotNull ObjectMapper mapper) {
     this.digestStrategy = digestStrategy;
     this.mapper = mapper;
+    log.debug("created new Crypto object with digest strategy - {}", digestStrategy);
   }
 
   private byte[] createVerifyHash(VerifiableJson document, ProofProxy proof)
       throws CreateVerifyHashException {
+    log.info("verify hash for document");
     // sanitize inputs
     sanitizeDocument(document);
     sanitizeProof(proof);
-
+    log.debug("encode input into a string");
     // encode input into a string
     try {
       ByteArrayOutputStream stream = new ByteArrayOutputStream();
       mapper.writeValue(stream, document);
       mapper.writeValue(stream, proof);
-
       // calculate digest(document + proof)
-      return digestStrategy.digest(stream.toByteArray());
+      byte[] hash = digestStrategy.digest(stream.toByteArray());
+      log.debug("calculate digest(document + proof) - {}", new String(hash));
+      return hash;
     } catch (IOException e) {
       throw new CreateVerifyHashException(e);
     }
@@ -59,12 +63,15 @@ public class Crypto {
   }
 
   private void sanitizeDocument(VerifiableJson document) {
+    log.debug("sanitize document for verify hash");
     document.setProof(null);
   }
 
   private void sanitizeProof(ProofProxy proof) {
+    log.debug("sanitize proof for verify hash");
     // if "created" is empty, then set current time as "created"
     if (proof.getCreated() == null) {
+      log.debug("set current time {} as \"created\"",Instant.now());
       proof.setCreated(Instant.now());
     }
 
@@ -73,22 +80,23 @@ public class Crypto {
 
   public void sign(VerifiableJson document, KeyPair keypair, ProofProxy proof)
       throws CreateVerifyHashException, SignatureSuiteException, NoSuchStrategy {
+    log.info("sign document");
     RawSignatureStrategy signer = SignatureSuiteRegistry.INSTANCE.get(proof.getType());
-
+    log.debug("recieved signature strategy for sign document - {}", signer);
     // backup proofs
     List<ProofProxy> proofs = document.getProof();
 
     // hash and sign input
     byte[] hash = createVerifyHash(document, proof);
     byte[] signature = signer.rawSign(hash, keypair);
-
+    log.debug("include signature into a proof, add it to saved proofs");
     // include signature into a proof, add it to saved proofs
     proof.setSignatureValue(signature);
     if (proofs == null) {
       proofs = new ArrayList<>();
     }
     proofs.add(proof);
-
+    log.debug("add all {} proofs to the document", proofs.size());
     // add all proofs to the document
     document.setProof(proofs);
   }
@@ -100,8 +108,9 @@ public class Crypto {
    */
   public boolean verify(VerifiableJson document, PublicKey publicKey, ProofProxy proof)
       throws CreateVerifyHashException, SignatureSuiteException, NoSuchStrategy {
+    log.info("verify specific proof");
     RawSignatureStrategy verifier = SignatureSuiteRegistry.INSTANCE.get(proof.getType());
-
+    log.debug("recieved verify strategy for document - {}", verifier);
     byte[] hash = createVerifyHash(document, proof);
     byte[] signature = proof.getSignatureValue();
 
@@ -115,8 +124,10 @@ public class Crypto {
    */
   public boolean verifyAll(VerifiableJson document, PublicKey publicKey)
       throws CreateVerifyHashException, SignatureSuiteException, NoSuchStrategy {
+    log.info("verify all proofs of document");
     final List<ProofProxy> proofs = document.getProof();
     if (proofs == null || proofs.isEmpty()) {
+      log.error("document has no verifiable proofs");
       throw new SignatureSuiteException("document has no verifiable proofs");
     }
 
