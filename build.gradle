@@ -55,7 +55,7 @@ ext {
     liquibaseVersion = '3.6.1'
     c3p0Version = '0.9.5.2'
     jUnitVersion = '5.2.0'
-    jacksonVersion = '2.9.5'
+    jacksonVersion = '2.9.6'
 }
 
 repositories {
