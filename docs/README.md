@@ -97,7 +97,7 @@ The primary intention is that a DID Document lists public keys whose correspondi
 2. The value of the **publicKey** property SHOULD be an array of public keys.
 3. Each public key MUST include **id** and **type** properties, and exactly one **value** property. *TODO: add link with ed25519-sha3-spec*.
 4. Each public key MAY include an **owner** property, which identifies the entity that controls the corresponding private key. If this property is missing, it is assumed to be the DID subject.
-6. The value property of a public key MUST be **publicKey<Pem|Base58|Hex>**
+6. The value property of a public key MUST be **publicKey** and it MUST be encoded in HEX.
 
 
 Example:
@@ -108,20 +108,10 @@ Example:
   ...
   "publicKey": [{
     "id": "did:sora:iroha:bogdan@soramitsu.co.jp#keys-1",
-    "type": "RsaVerificationKey2018",
-    "publicKeyPem": "-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\r\n"
-  }, {
-    "id": "did:sora:iroha:bogdan@soramitsu.co.jp#keys-2",
-    "type": "Ed25519VerificationKey2018",
+    "type": "Ed25519Sha3VerificationKey",
     // note, that this key is owned by other subject
     "owner": "did:sora:iroha:takemiya@soramitsu.co.jp",
-    "publicKeyBase58": "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"
-  }, {
-    "id": "did:sora:iroha:bogdan@soramitsu.co.jp#keys-3",
-    "type": "Secp256k1VerificationKey2018",
-    // note, that this key is owned by other subject, defined with uuid
-    "owner": "did:sora:uuid:6c6abdda-4f7a-489d-9119-ebc8a0d7097b",
-    "publicKeyHex": "02b97c30de767f084ce3080168ee293053ba33b235d7116a3263d29f1450936b71"
+    "publicKey": "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"
   }],
   ...
 }
@@ -268,7 +258,7 @@ This proof is NOT proof of the binding between a DID and a DID Document.
     - **type** - signature type
     - **created** - [created timestamp](#38-Created)
     - **creator** - URI to a public key of the signature creator
-    - **signatureValue<Base58|Hex>** - signature data. 
+    - **signatureValue** - signature data encoded in HEX. 
     - **nonce** - a random string value.
 7. Every proof MAY have:
     - **purpose** - short textual description, why "creator" created this proof.
@@ -279,7 +269,7 @@ Example:
 ```JSON=
 {
   "proof": [{
-    "type": "LinkedDataSignature2015",
+    "type": "Ed25518Sha3Signature",
     "created": "2016-02-08T16:02:20Z",
     "creator": "did:sora:iroha:bogdan@soramitsu.co.jp#keys-1",
     "signatureValueBase58": "QNB13Y7Q9...1tzjn4w=="
@@ -303,39 +293,28 @@ Example of DDO for given DID: ```did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn
   "id": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV",
 
   "publicKey": [{
-    "id": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV#keys-1",
-    "type": "RsaVerificationKey2018",
-    "owner": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV",
-    "publicKeyPem": "-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\r\n"
-  }, {
-    "id": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV#keys-2",
-    "type": "RsaEncryptionKey2018",
-    "owner": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV",
-    "publicKeyPem": "-----BEGIN PUBLIC KEY...END PUBLIC KEY-----\r\n"
-  }, {
     "id": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV#keys-3",
-    "type": "Ed25519VerificationKey2018",
+    "type": "Ed25519Sha3VerificationKey",
     "owner": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV",
     "publicKeyBase58": "H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV"
   }],
 
   "authentication": [{
     // this key can be used to authenticate as this did
-    "type": "RsaSignatureAuthentication2018",
+    "type": "Ed25519Sha3Authentication",
     "publicKey": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV#keys-1"
   }],
 
   "created": "2002-10-10T17:00:00Z",
 
   "proof": [{
-    "type": "Ed25519Signature2018",
+    "type": "Ed25519Sha3Signature",
     "created": "2002-10-10T17:00:00Z",
     "creator": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV#keys-3",
     "signatureValue": "QNB13Y7Q9...1tzjn4w=="
   }]
 }
 ```
-request: byte -> pojo -> serialize
 
 Proof section must contain a signature by one of authenticated keys (**authentication** section).
 
@@ -432,7 +411,7 @@ Host: example.com
 {
   "headers": "DELETE /did/:did HTTP/1.1\r\nHost: example.com",
   "proof": {
-    "type": "Ed25519Signature2018",
+    "type": "Ed25519Sha3Signature",
     "created": "2002-10-10T17:00:00Z",
     "creator": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV#keys-3",
     "signatureValue": "QNB13Y7Q9...1tzjn4w=="
@@ -486,7 +465,7 @@ It can be represented as JSON:
 Claim example: 
 
 ```JSON=
-"claim": {
+{
     "id": "did:sora:iroha:bogdan@soramitsu.co.jp",
     "ageOver": 21
 }
@@ -494,7 +473,7 @@ Claim example:
 
 Claims can be grouped together, effectively making single claim:
 ```JSON=
-"claim": {
+{
     "id": "did:sora:iroha:bogdan@soramitsu.co.jp",
     "ageOver": 21,
     "ageBelow": 30
@@ -507,7 +486,7 @@ Since claims are published on a blockchain and thus they are public, it is very 
 
 To accomplish this, we use **ProtectedClaim**. It looks like a Claim, but has additional "salt" property, which is used as a key for HMAC. It is needed to increase security against preimage attacks. 
 
-The whole ProtectedClaim content is hashed with SHA3-256 [*TODO: what is the best way to hash it?*] and divided on two parts, public and private. Public part is signed and used to attest the private part.
+The whole ProtectedClaim content is hashed with SHA3-256 and divided on two parts, public and private. Public part is signed and used to attest the private part.
 
 ```JSON=
 // Private Part of the Claim
@@ -522,13 +501,13 @@ The whole ProtectedClaim content is hashed with SHA3-256 [*TODO: what is the bes
   }]
 
 
-// Public part of the Claim
-// calculated as: 
-// sha3_256(normalize<URDNA2015>(ProtectedClaim))
+// Public part of the Claim; calculated as: 
+// sha3_256(bencode(ProtectedClaim))
+
+// example: array of hashes of protected claims
 "claim": [
   "ffb9f9f3f61c88d07a45cfeb8b8311fcb82415aa791160d28a8bcff2abbc21c7", 
-  "9b1d60ad7406609f4902779193487b3cec58e522435a16eaad98573d124d04b1", 
-  "deeee9e2e4aef4daba6380fa9e46108c9f919c4820f5433f5cf8742bae293d0c"
+  "9b1d60ad7406609f4902779193487b3cec58e522435a16eaad98573d124d04b1"
 ]
 ```
 
@@ -540,7 +519,7 @@ For the reasons of privacy, Issuer MUST create single claim per attribute in the
 **Requirements**:
 
 1. Credential MAY contain Claims, if it does not affect User privacy.
-2. Credential MUST contain public part of ProtectedClaim, if privacy is a concern.
+2. Credential MUST contain public part of ProtectedClaim in key "claim".
 3. Credential MUST contain the following properties:
    - "id" - crenential identifier. UUIDv4. MUST be unique.
    - "issuer" - DID of issuer.
@@ -562,7 +541,7 @@ Verifiable Credential example:
       "deeee9e2e4aef4daba6380fa9e46108c9f919c4820f5433f5cf8742bae293d0c"
     ],
     "proof": [{
-      "type": "LinkedDataSignature2015",
+      "type": "Ed25519Sha3Signature",
       "created": "2016-02-08T16:02:20Z",
       "creator": "did:sora:iroha:takemiya@soramitsu.co.jp#keys-1",
       "signatureValue": "QNB13Y7Q9...1tzjn4w=="
