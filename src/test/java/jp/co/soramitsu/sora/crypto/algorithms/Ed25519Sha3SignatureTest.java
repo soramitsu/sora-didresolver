@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.List;
+import javax.xml.bind.DatatypeConverter;
 import jp.co.soramitsu.crypto.ed25519.Utils;
 import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy.SignatureSuiteException;
 import org.junit.Test;
@@ -101,10 +102,10 @@ public class Ed25519Sha3SignatureTest {
 
     public TestTuple(String line) {
       String[] x = line.split(":");
-      seed = Utils.hexToBytes(x[0].substring(0, 64)); // private key
-      pk = Utils.hexToBytes(x[1]); // public key
-      message = Utils.hexToBytes(x[2]);
-      sig = Utils.hexToBytes(x[3].substring(0, 128)); // signature
+      seed = DatatypeConverter.parseHexBinary(x[0].substring(0, 64)); // private key
+      pk = DatatypeConverter.parseHexBinary(x[1]); // public key
+      message = DatatypeConverter.parseHexBinary(x[2]);
+      sig = DatatypeConverter.parseHexBinary(x[3].substring(0, 128)); // signature
     }
   }
 }
