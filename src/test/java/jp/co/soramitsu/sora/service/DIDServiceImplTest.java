@@ -8,8 +8,8 @@ import static org.mockito.Mockito.when;
 import com.vladmihalcea.hibernate.type.json.internal.JacksonUtil;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -78,7 +78,7 @@ public class DIDServiceImplTest {
     val did = "did:sora:iroha:vasya@home.ru";
     val ddo = new DDO();
     ddo.setId(did);
-    ddo.setCreated(Timestamp.from(Instant.now()));
+    ddo.setCreated(Instant.now().truncatedTo(ChronoUnit.SECONDS));
     val ddoString = JacksonUtil.toString(ddo);
 
     when(accountRepository.findDDOByDid(did)).thenReturn(Optional.of(ddoString));

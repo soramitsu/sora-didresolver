@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import javax.sql.DataSource;
 import jp.co.soramitsu.sora.didresolver.domain.entities.Account;
@@ -63,7 +63,7 @@ public class AccountRepositoryTest {
 
     /**
      * Required for populating database from classpath:testData.json
-     * */
+     */
     @Bean
     public Jackson2RepositoryPopulatorFactoryBean repositoryPopulator() {
       Resource sourceData = new ClassPathResource("testData.json");
@@ -82,7 +82,7 @@ public class AccountRepositoryTest {
     val vault = new AccountVault();
     val ddo = new DDO();
     ddo.setId("someId");
-    ddo.setCreated(Timestamp.from(Instant.now()));
+    ddo.setCreated(Instant.now().truncatedTo(ChronoUnit.SECONDS));
     vault.setDdos(Collections.singletonMap("someId", ddo));
     account.setData(vault);
     repository.save(account);

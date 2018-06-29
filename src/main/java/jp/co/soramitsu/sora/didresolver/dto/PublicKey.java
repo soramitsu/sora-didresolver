@@ -1,9 +1,12 @@
 package jp.co.soramitsu.sora.didresolver.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import javax.validation.constraints.NotBlank;
+import jp.co.soramitsu.sora.didresolver.dto.serializers.HexValueCombinedSerializer.HexValueDeserializer;
+import jp.co.soramitsu.sora.didresolver.dto.serializers.HexValueCombinedSerializer.HexValueSerializer;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.CryptoTypeConstraint;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.DIDConstraint;
-import jp.co.soramitsu.sora.didresolver.validation.constrains.ExactlyOneConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +14,6 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ExactlyOneConstraint(group = {"publicKeyPem", "publicKeyBase58", "publicKeyHex"})
 public class PublicKey {
 
   @NotBlank
@@ -24,9 +26,7 @@ public class PublicKey {
   @DIDConstraint(isNullable = true)
   private String owner;
 
-  private String publicKeyPem;
-
-  private String publicKeyBase58;
-
-  private String publicKeyHex;
+  @JsonSerialize(using = HexValueSerializer.class)
+  @JsonDeserialize(using = HexValueDeserializer.class)
+  private byte[] publicKeyValue;
 }
