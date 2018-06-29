@@ -1,6 +1,7 @@
 package jp.co.soramitsu.sora.didresolver.services;
 
 import java.util.List;
+import java.util.Optional;
 import jp.co.soramitsu.sora.didresolver.dto.DDO;
 import jp.co.soramitsu.sora.didresolver.dto.Proof;
 import jp.co.soramitsu.sora.didresolver.dto.PublicKey;
@@ -33,5 +34,5 @@ public interface CryptoService {
    * @param publicKeys collection of public keys of document
    * @return public key corresponding to the transferred proof
    */
-  PublicKey getPublicKeyByProof(Proof proof, List<PublicKey> publicKeys);
+  Optional<PublicKey> getPublicKeyByProof(Proof proof, List<PublicKey> publicKeys);
 }

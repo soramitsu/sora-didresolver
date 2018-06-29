@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.Optional;
 import jp.co.soramitsu.sora.didresolver.dto.DDO;
 import jp.co.soramitsu.sora.didresolver.dto.Proof;
 import jp.co.soramitsu.sora.didresolver.dto.PublicKey;
@@ -48,7 +49,7 @@ public abstract class DIDResolverControllerInitializer {
     ddo = json.read(jsonReader).getObject();
     Proof proof = ddo.getProof().get(0);
     PublicKey publicKey = ddo.getPublicKey().get(1);
-    when(cryptoService.getPublicKeyByProof(proof, ddo.getPublicKey())).thenReturn(publicKey);
+    when(cryptoService.getPublicKeyByProof(proof, ddo.getPublicKey())).thenReturn(Optional.of(publicKey));
     when(cryptoService.checkProofCorrectness(proof, ddo.getId(), ddo.getPublicKey()))
         .thenReturn(true);
     when(cryptoService.verifyDDOProof(any(), any())).thenReturn(true);

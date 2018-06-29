@@ -1,14 +1,13 @@
 package jp.co.soramitsu.sora.service;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import javax.xml.bind.DatatypeConverter;
 import jp.co.soramitsu.sora.crypto.Consts;
@@ -41,6 +40,9 @@ public class CryptoServiceImplTest {
 
   private Random random = new Random();
 
+  @Autowired
+  private CryptoService cryptoService;
+
   @TestConfiguration
   static class CryptoServiceImplTestContextConfiguration {
 
@@ -50,14 +52,11 @@ public class CryptoServiceImplTest {
     }
   }
 
-  @Autowired
-  private CryptoService cryptoService;
-
   @Test
   public void testSuccessGetPublicKeyByProof() {
-    PublicKey publicKey = cryptoService
+    Optional<PublicKey> publicKey = cryptoService
         .getPublicKeyByProof(getProofForTest(), getPublicKeysForTest());
-    assertNotNull(publicKey);
+    assertTrue(publicKey.isPresent());
   }
 
   @Test
@@ -65,9 +64,9 @@ public class CryptoServiceImplTest {
     Proof proof = getProofForTest();
     proof.setCreator(ID_BASE + KEYS_COUNT + 2);
     List<PublicKey> publicKeys = getPublicKeysForTest();
-    PublicKey publicKey = cryptoService
+    Optional<PublicKey> publicKey = cryptoService
         .getPublicKeyByProof(proof, publicKeys);
-    assertNull(publicKey);
+    assertFalse(publicKey.isPresent());
   }
 
   @Test
@@ -87,7 +86,6 @@ public class CryptoServiceImplTest {
   public void testFailedCheckProofCorrectness() {
     Proof proof = getProofForTest();
     List<PublicKey> publicKeys = getPublicKeysForTest();
-    String creator = proof.getCreator();
     proof.setCreator(StringUtils.replaceChars(proof.getCreator(), '5', '8'));
     assertFalse(cryptoService.checkProofCorrectness(proof, DID, publicKeys));
     proof.setCreator(ID_BASE + KEYS_COUNT + 2);
@@ -103,8 +101,7 @@ public class CryptoServiceImplTest {
   }
 
   private Proof getProofForTest() {
-    Proof proof = new Proof(CRYPTO_TYPE, Instant.now().truncatedTo(ChronoUnit.SECONDS),
+    return new Proof(CRYPTO_TYPE, Instant.now().truncatedTo(ChronoUnit.SECONDS),
         ID_BASE + random.nextInt(KEYS_COUNT), KEY_VALUE, null, null);
-    return proof;
   }
 }
