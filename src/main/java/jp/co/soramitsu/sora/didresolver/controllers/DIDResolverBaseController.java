@@ -4,8 +4,13 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import jp.co.soramitsu.sora.didresolver.dto.DDO;
+import jp.co.soramitsu.sora.didresolver.dto.Proof;
+import jp.co.soramitsu.sora.didresolver.dto.PublicKey;
+import jp.co.soramitsu.sora.didresolver.exceptions.BadProofException;
 import jp.co.soramitsu.sora.didresolver.exceptions.DIDDuplicateException;
+import jp.co.soramitsu.sora.didresolver.exceptions.InvalidProofException;
 import jp.co.soramitsu.sora.didresolver.exceptions.UnparseableException;
+import jp.co.soramitsu.sora.didresolver.services.CryptoService;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -27,8 +32,11 @@ public class DIDResolverBaseController {
 
   StorageService storageService;
 
-  DIDResolverBaseController(StorageService storageService) {
+  CryptoService cryptoService;
+
+  DIDResolverBaseController(StorageService storageService, CryptoService cryptoService) {
     this.storageService = storageService;
+    this.cryptoService = cryptoService;
   }
 
   @PostMapping(consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE})
@@ -37,6 +45,7 @@ public class DIDResolverBaseController {
       @ApiParam(value = "url encoded DID", required = true) @Validated @RequestBody DDO ddo)
       throws UnparseableException {
     log.info("start execution of method createDDO for DID - {}", ddo.getId());
+    verifyDDOProof(ddo);
     val optionalDDO = storageService.read(ddo.getId());
     if (optionalDDO.isPresent()) {
       throw new DIDDuplicateException(ddo.getId());
@@ -45,4 +54,16 @@ public class DIDResolverBaseController {
     storageService.createOrUpdate(ddo.getId(), ddo);
   }
 
+  protected void verifyDDOProof(DDO ddo) {
+    Proof proof = ddo.getProof().get(0);
+    if (!cryptoService.checkProofCorrectness(proof, ddo.getId(), ddo.getPublicKey())) {
+      throw new InvalidProofException(ddo.getId());
+    }
+    PublicKey publicKey = cryptoService.getPublicKeyByProof(proof, ddo.getPublicKey());
+    if (!cryptoService.verifyDDOProof(ddo, publicKey.getPublicKeyValue())) {
+      log.debug("failure verify proof for DDO with DID {}", ddo.getId());
+      throw new BadProofException();
+    }
+    log.debug("success verify proof for DDO with DID {}", ddo.getId());
+  }
 }

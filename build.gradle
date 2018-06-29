@@ -56,6 +56,8 @@ ext {
     c3p0Version = '0.9.5.2'
     jUnitVersion = '5.2.0'
     jacksonVersion = '2.9.6'
+    jUnitPlatformVersion = '1.2.0'
+    ed25519Version = '1.2.0'
 }
 
 repositories {
@@ -78,12 +80,15 @@ dependencies {
     }*/
 
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
-    compile 'com.github.warchant:ed25519-sha3-java:1.2.0'
+    compile ("com.github.warchant:ed25519-sha3-java:${ed25519Version}")
 
     compile('org.springframework.boot:spring-boot-starter-validation')
     compile('org.springframework.boot:spring-boot-starter-web')
+
     compile("io.springfox:springfox-swagger2:${springSwaggerVersion}")
     compile("io.springfox:springfox-swagger-ui:${springSwaggerVersion}")
+
+    compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
 
     //commons
     compile("org.apache.commons:commons-lang3:${commonsLangVersion}")
@@ -92,16 +97,16 @@ dependencies {
     // Handy library which allows to map json/jsonb columns to java type on in entity column!!
     // https://github.com/vladmihalcea/hibernate-types
     compile("com.vladmihalcea:hibernate-types-52:${hibernateTypesVersion}")
-    compile("org.postgresql:postgresql:$postgresVersion")
-    compile("org.liquibase:liquibase-core:$liquibaseVersion")
+    compile("org.postgresql:postgresql:${postgresVersion}")
+    compile("org.liquibase:liquibase-core:${liquibaseVersion}")
 
     //logging
 //    compile("org.apache.logging.log4j:log4j-api:${log4jVersion}")
 //    compile("org.apache.logging.log4j:log4j-core:${log4jVersion}")
 //    compile("org.slf4j:slf4j-api:${slf4jVersion}")
-    implementation("org.aspectj:aspectjrt:$aspectjVersion")
-    implementation("org.aspectj:aspectjweaver:$aspectjVersion")
-    compile("com.mchange:c3p0:$c3p0Version")
+    implementation("org.aspectj:aspectjrt:${aspectjVersion}")
+    implementation("org.aspectj:aspectjweaver:${aspectjVersion}")
+    compile("com.mchange:c3p0:${c3p0Version}")
 
     compileOnly "org.springframework.boot:spring-boot-configuration-processor"
 
@@ -114,19 +119,22 @@ dependencies {
         exclude module: "logback-classic"
     }*/
     // Allows using docker containers in tests
-    testCompile("org.testcontainers:testcontainers:$testContainersVersion")
-    testCompile("org.testcontainers:postgresql:$testContainersVersion")
-    testCompile("org.junit.jupiter:junit-jupiter-api:$jUnitVersion")
-    testCompile("org.junit.jupiter:junit-jupiter-params:$jUnitVersion")
-    testRuntime("org.junit.jupiter:junit-jupiter-engine:$jUnitVersion")
-    testCompile("org.junit.vintage:junit-vintage-engine:$jUnitVersion")
-    testCompile("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+    testCompile("org.testcontainers:testcontainers:${testContainersVersion}")
+    testCompile("org.testcontainers:postgresql:${testContainersVersion}")
+    testCompile("org.junit.jupiter:junit-jupiter-api:${jUnitVersion}")
+    testCompile("org.junit.jupiter:junit-jupiter-params:${jUnitVersion}")
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:${jUnitVersion}")
+    testCompile("org.junit.vintage:junit-vintage-engine:${jUnitVersion}")
+    testCompile("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
+    testCompile("org.junit.platform:junit-platform-launcher:${jUnitPlatformVersion}")
 
-    compile("org.projectlombok:lombok:${lombokVersion}")
+    compileOnly("org.projectlombok:lombok:${lombokVersion}")
+    testCompileOnly("org.projectlombok:lombok:${lombokVersion}")
 }
 
 test {
     useJUnitPlatform()
+    failFast = true
     testLogging {
         events "passed", "skipped", "failed"
     }

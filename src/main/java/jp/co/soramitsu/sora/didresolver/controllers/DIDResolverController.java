@@ -8,6 +8,7 @@ import javax.validation.ConstraintViolationException;
 import jp.co.soramitsu.sora.didresolver.dto.DDO;
 import jp.co.soramitsu.sora.didresolver.exceptions.DIDNotFoundException;
 import jp.co.soramitsu.sora.didresolver.exceptions.UnparseableException;
+import jp.co.soramitsu.sora.didresolver.services.CryptoService;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.DIDConstraint;
 import lombok.extern.slf4j.Slf4j;
@@ -34,8 +35,8 @@ public class DIDResolverController extends DIDResolverBaseController {
 
   private static final String ERROR_FORMAT = "{ \"error\" : \"%s\"}\n";
 
-  DIDResolverController(StorageService storageService) {
-    super(storageService);
+  DIDResolverController(StorageService storageService, CryptoService cryptoService) {
+    super(storageService, cryptoService);
   }
 
   @GetMapping(produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
@@ -65,6 +66,7 @@ public class DIDResolverController extends DIDResolverBaseController {
       @ApiParam(value = "New DDO MUST contain updated property with time > created", required = true) @Validated @RequestBody DDO ddo)
       throws UnparseableException {
     log.info("Update DDO by DID - {}", did);
+    verifyDDOProof(ddo);
     storageService.read(did).orElseThrow(() -> new DIDNotFoundException(did));
     storageService.createOrUpdate(did, ddo);
   }
