@@ -1,6 +1,7 @@
 package jp.co.soramitsu.sora.didresolver.services.impl;
 
 import java.util.List;
+import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -43,16 +44,15 @@ public class CryptoServiceImpl implements CryptoService {
   @Override
   public boolean checkProofCorrectness(@NotNull @Valid Proof proof, @NotBlank String did,
       @NotNull @Valid List<PublicKey> publicKeys) {
-    String proofDID = proof.getCreator()
-        .substring(0, proof.getCreator().indexOf(Consts.DID_URI_DETERMINATOR));
-    log.debug("check proof correctness for Proof: proofDID {}, DID {}", proofDID, did);
-    return proofDID.equals(did) && isProofInPublicKeys(proof, publicKeys);
+    int indexOfDeterminator = proof.getCreator().indexOf(Consts.DID_URI_DETERMINATOR);
+    log.debug("check proof correctness for Proof: proof creator {}, DID {}", proof.getCreator(), did);
+    return indexOfDeterminator > 0 && did.equals(proof.getCreator().substring(0,indexOfDeterminator)) && isProofInPublicKeys(proof, publicKeys);
   }
 
   @Override
-  public PublicKey getPublicKeyByProof(Proof proof, List<PublicKey> publicKeys) {
+  public Optional<PublicKey> getPublicKeyByProof(Proof proof, List<PublicKey> publicKeys) {
     log.debug("get public key for proof {}", proof.getCreator());
-    return publicKeys.stream().filter(key -> proof.getCreator().equals(key.getId())).findFirst().get();
+    return publicKeys.stream().filter(key -> proof.getCreator().equals(key.getId())).findFirst();
   }
 
   private boolean isProofInPublicKeys(Proof proof, List<PublicKey> publicKeys) {

@@ -3,6 +3,7 @@ package jp.co.soramitsu.sora.didresolver.controllers;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.util.Optional;
 import jp.co.soramitsu.sora.didresolver.dto.DDO;
 import jp.co.soramitsu.sora.didresolver.dto.Proof;
 import jp.co.soramitsu.sora.didresolver.dto.PublicKey;
@@ -30,9 +31,9 @@ public class DIDResolverBaseController {
   static final String PATH = "/did";
   static final String ID_PARAM = "/{did}";
 
-  StorageService storageService;
+  protected StorageService storageService;
 
-  CryptoService cryptoService;
+  private CryptoService cryptoService;
 
   DIDResolverBaseController(StorageService storageService, CryptoService cryptoService) {
     this.storageService = storageService;
@@ -59,8 +60,9 @@ public class DIDResolverBaseController {
     if (!cryptoService.checkProofCorrectness(proof, ddo.getId(), ddo.getPublicKey())) {
       throw new InvalidProofException(ddo.getId());
     }
-    PublicKey publicKey = cryptoService.getPublicKeyByProof(proof, ddo.getPublicKey());
-    if (!cryptoService.verifyDDOProof(ddo, publicKey.getPublicKeyValue())) {
+    Optional<PublicKey> publicKey = cryptoService.getPublicKeyByProof(proof, ddo.getPublicKey());
+    if (publicKey.isPresent() && !cryptoService
+        .verifyDDOProof(ddo, publicKey.get().getPublicKeyValue())) {
       log.debug("failure verify proof for DDO with DID {}", ddo.getId());
       throw new BadProofException();
     }
