@@ -63,8 +63,10 @@ public class DIDResolverBaseController {
     Optional<PublicKey> publicKey = cryptoService.getPublicKeyByProof(proof, ddo.getPublicKey());
     if (publicKey.isPresent() && !cryptoService
         .verifyDDOProof(ddo, publicKey.get().getPublicKeyValue())) {
-      log.debug("failure verify proof for DDO with DID {}", ddo.getId());
-      throw new BadProofException();
+      String badProofMessage = String
+          .format("failure verify proof for DDO with DID %s", ddo.getId());
+      log.warn(badProofMessage);
+      throw new BadProofException(badProofMessage);
     }
     log.debug("success verify proof for DDO with DID {}", ddo.getId());
   }

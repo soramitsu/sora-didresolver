@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.UNAUTHORIZED)
 public class BadProofException extends RuntimeException {
 
-  public BadProofException() {
-    super("DDO contains bad proof");
+  public BadProofException(String message) {
+    super(message);
   }
 }
