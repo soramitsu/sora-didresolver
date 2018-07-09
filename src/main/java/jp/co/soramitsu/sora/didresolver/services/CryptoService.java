@@ -18,16 +18,6 @@ public interface CryptoService {
   boolean verifyDDOProof(DDO ddo, byte[] publicKeyBytes);
 
   /**
-   * Method for checking proof correctness
-   *
-   * @param proof element of type Proof for check
-   * @param did valid DID subject
-   * @param publicKeys collection of public keys of document
-   * @return true if proof correct otherwise return false
-   */
-  boolean checkProofCorrectness(Proof proof, String did, List<PublicKey> publicKeys);
-
-  /**
    * Receiving the public key specified in the proof
    *
    * @param proof an element of the type of Proof for which the corresponding key will be searched

@@ -1,6 +1,11 @@
 package jp.co.soramitsu.sora.didresolver.dto;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import javax.validation.constraints.NotBlank;
+import jp.co.soramitsu.sora.didresolver.commons.CryptoActionTypeEnum;
+import jp.co.soramitsu.sora.didresolver.dto.serializers.HexValueCombinedSerializer.HexValueDeserializer;
+import jp.co.soramitsu.sora.didresolver.dto.serializers.HexValueCombinedSerializer.HexValueSerializer;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.CryptoTypeConstraint;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.DIDConstraint;
 import lombok.AllArgsConstructor;
@@ -13,13 +18,14 @@ import lombok.NoArgsConstructor;
 public class Authentication {
 
   @NotBlank
-  @CryptoTypeConstraint
+  @CryptoTypeConstraint(cryptoTypeEnum = CryptoActionTypeEnum.AUTH)
   private String type;
 
   private String publicKey;
 
   @DIDConstraint(isNullable = true)
   private String owner;
-
-  private String publicKeyHex;
+  @JsonSerialize(using = HexValueSerializer.class)
+  @JsonDeserialize(using = HexValueDeserializer.class)
+  private byte[] publicKeyHex;
 }

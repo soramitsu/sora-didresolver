@@ -10,6 +10,7 @@ import jp.co.soramitsu.sora.didresolver.exceptions.DIDNotFoundException;
 import jp.co.soramitsu.sora.didresolver.exceptions.UnparseableException;
 import jp.co.soramitsu.sora.didresolver.services.CryptoService;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
+import jp.co.soramitsu.sora.didresolver.services.ValidateService;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.DIDConstraint;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -35,8 +36,8 @@ public class DIDResolverController extends DIDResolverBaseController {
 
   private static final String ERROR_FORMAT = "{ \"error\" : \"%s\"}\n";
 
-  DIDResolverController(StorageService storageService, CryptoService cryptoService) {
-    super(storageService, cryptoService);
+  DIDResolverController(StorageService storageService, CryptoService cryptoService, ValidateService validateService) {
+    super(storageService, cryptoService, validateService);
   }
 
   @GetMapping(produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})

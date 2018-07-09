@@ -32,8 +32,6 @@ public class DDO implements VerifiableJson<Proof> {
   @DIDConstraint(isNullable = true)
   private String owner;
 
-  private List<Service> service;
-
   @DIDConstraint(isNullable = true)
   private String guardian;
 

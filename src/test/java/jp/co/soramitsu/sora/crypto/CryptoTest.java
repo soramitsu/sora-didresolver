@@ -4,7 +4,9 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -16,10 +18,9 @@ import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 import jp.co.soramitsu.sora.crypto.Crypto.CreateVerifyHashException;
+import jp.co.soramitsu.sora.crypto.Crypto.NoSuchStrategy;
 import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy;
 import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy.SignatureSuiteException;
-import jp.co.soramitsu.sora.crypto.algorithms.SignatureSuiteRegistry;
-import jp.co.soramitsu.sora.crypto.algorithms.SignatureSuiteRegistry.NoSuchStrategy;
 import jp.co.soramitsu.sora.crypto.hash.RawDigestStrategy;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,7 +36,7 @@ public class CryptoTest {
   private final RawDigestStrategy digest = mock(RawDigestStrategy.class);
   private final RawSignatureStrategy signatureStrategy = mock(RawSignatureStrategy.class);
   private final ObjectMapper mapper = mock(ObjectMapper.class);
-  private final Crypto crypto = new Crypto(digest, mapper);
+  private final Crypto crypto = spy(new Crypto(digest, mapper));
 
   private VerifiableJson json = mock(VerifiableJson.class);
   private ProofProxy proofProxy = mock(ProofProxy.class);
@@ -51,15 +52,14 @@ public class CryptoTest {
   private List<ProofProxy> proofs = new LinkedList<>();
 
   @Before
-  public void setUp() throws SignatureSuiteException {
+  public void setUp() throws SignatureSuiteException, NoSuchStrategy {
     when(proofProxy.getCreated())
         .thenReturn(Instant.parse(created));
 
-    SignatureSuiteRegistry.INSTANCE
-        .register(signatureSuiteName, signatureStrategy);
     when(proofProxy.getType())
         .thenReturn(signatureSuiteName);
 
+    doReturn(signatureStrategy).when(crypto).getSignatureStrategy(signatureSuiteName);
     // when proof.setSignatureValue(bytes) is called, proof.getSignatureBytes() will return `bytes`
     doAnswer(i -> when(proofProxy.getSignatureValue()).thenReturn(jsonSignature))
         .when(proofProxy)
@@ -99,19 +99,13 @@ public class CryptoTest {
   @Test
   public void signThenVerify()
       throws CreateVerifyHashException, SignatureSuiteException, NoSuchStrategy {
+
     // Do the actual signing. This line modifies `json`.
     crypto.sign(json, keyPair, proofProxy);
-
-    when(json.getProof())
-        .thenReturn(this.proofs);
-
+    when(json.getProof()).thenReturn(this.proofs);
     // Do the actual verification.
-    boolean verified = crypto
-        .verifyAll(json, keyPair.getPublic());
-
-    verify(proofProxy)
-        .setSignatureValue(jsonSignature);
-
+    boolean verified = crypto.verifyAll(json, keyPair.getPublic());
+    verify(proofProxy).setSignatureValue(jsonSignature);
     assertTrue(verified);
   }
 }

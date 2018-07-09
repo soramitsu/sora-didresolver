@@ -121,9 +121,23 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
 
   @Test
   public void testInvalidProofExceptionOnCreateDDO() throws Exception {
-    when(
-        cryptoService.checkProofCorrectness(ddo.getProof().get(0), ddo.getId(), ddo.getPublicKey()))
+    when(validateService
+        .isProofCreatorInAuth(ddo.getProof().get(0).getCreator(), ddo.getAuthentication()))
         .thenReturn(false);
+    sendDDORequest(
+        put(URL, ddo.getId()).contentType(contentType).content(json.write(ddo).getJson()),
+        status().isBadRequest());
+
+    when(validateService
+        .isProofInPublicKeys(any(), any()))
+        .thenReturn(false);
+    sendDDORequest(
+        put(URL, ddo.getId()).contentType(contentType).content(json.write(ddo).getJson()),
+        status().isBadRequest());
+
+    when(validateService
+        .isProofCreatorInAuth(ddo.getProof().get(0).getCreator(), ddo.getAuthentication()))
+        .thenReturn(true);
     sendDDORequest(
         put(URL, ddo.getId()).contentType(contentType).content(json.write(ddo).getJson()),
         status().isBadRequest());

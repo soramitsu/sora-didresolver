@@ -1,5 +1,6 @@
 package jp.co.soramitsu.sora.crypto.algorithms;
 
+import static javax.xml.bind.DatatypeConverter.parseHexBinary;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -12,8 +13,6 @@ import java.io.InputStreamReader;
 import java.security.KeyPair;
 import java.util.ArrayList;
 import java.util.List;
-import javax.xml.bind.DatatypeConverter;
-import jp.co.soramitsu.crypto.ed25519.Utils;
 import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy.SignatureSuiteException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -102,10 +101,10 @@ public class Ed25519Sha3SignatureTest {
 
     public TestTuple(String line) {
       String[] x = line.split(":");
-      seed = DatatypeConverter.parseHexBinary(x[0].substring(0, 64)); // private key
-      pk = DatatypeConverter.parseHexBinary(x[1]); // public key
-      message = DatatypeConverter.parseHexBinary(x[2]);
-      sig = DatatypeConverter.parseHexBinary(x[3].substring(0, 128)); // signature
+      seed = parseHexBinary(x[0].substring(0, 64)); // private key
+      pk = parseHexBinary(x[1]); // public key
+      message = parseHexBinary(x[2]);
+      sig = parseHexBinary(x[3].substring(0, 128)); // signature
     }
   }
 }

@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Optional;
+import jp.co.soramitsu.sora.crypto.Consts;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -54,9 +55,19 @@ public class DIDResolverBaseControllerTest extends DIDResolverControllerInitiali
 
   @Test
   public void testInvalidProofExceptionOnCreateDDO() throws Exception {
-    when(
-        cryptoService.checkProofCorrectness(ddo.getProof().get(0), ddo.getId(), ddo.getPublicKey()))
+    when(validateService
+        .isProofCreatorInAuth(ddo.getProof().get(0).getCreator(), ddo.getAuthentication()))
         .thenReturn(false);
+    postRequest(status().isBadRequest());
+
+    when(validateService
+        .isProofInPublicKeys(any(), any()))
+        .thenReturn(false);
+    postRequest(status().isBadRequest());
+
+    when(validateService
+        .isProofCreatorInAuth(ddo.getProof().get(0).getCreator(), ddo.getAuthentication()))
+        .thenReturn(true);
     postRequest(status().isBadRequest());
   }
 
@@ -64,6 +75,15 @@ public class DIDResolverBaseControllerTest extends DIDResolverControllerInitiali
   public void testBadProofExceptionOnCreateDDO() throws Exception {
     when(cryptoService.verifyDDOProof(any(), any())).thenReturn(false);
     postRequest(status().isUnauthorized());
+  }
+
+  @Test
+  public void testGetPublicKeysFromAnotherDDO() throws Exception {
+    ddo.setId("did:sora:iroha:sergey@soramitsu.co.jp");
+    String creator = ddo.getProof().get(0).getCreator();
+    String proofCreatorDID = creator.substring(0, creator.indexOf(Consts.DID_URI_DETERMINATOR));
+    given(storageService.read(proofCreatorDID)).willReturn(Optional.of(ddo));
+    postRequest(status().isOk());
   }
 
   private void postRequest(ResultMatcher expectedStatus) throws Exception {
