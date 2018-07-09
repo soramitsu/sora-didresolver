@@ -7,7 +7,7 @@ import jp.co.soramitsu.sora.crypto.Crypto;
 import jp.co.soramitsu.sora.crypto.Crypto.CreateVerifyHashException;
 import jp.co.soramitsu.sora.crypto.Crypto.NoSuchStrategy;
 import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy.SignatureSuiteException;
-import jp.co.soramitsu.sora.crypto.hash.Sha3_256;
+import jp.co.soramitsu.sora.crypto.hash.Sha3Digest256;
 import jp.co.soramitsu.sora.didresolver.dto.DDO;
 import jp.co.soramitsu.sora.didresolver.dto.Proof;
 import jp.co.soramitsu.sora.didresolver.dto.PublicKey;
@@ -41,6 +41,6 @@ public class CryptoServiceImpl implements CryptoService {
   }
 
   private Crypto getCrypto() {
-    return new Crypto(new Sha3_256());
+    return new Crypto(new Sha3Digest256());
   }
 }
