@@ -3,6 +3,7 @@ package jp.co.soramitsu.sora.didresolver.dto;
 import javax.validation.constraints.NotBlank;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.CryptoTypeConstraint;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.DIDConstraint;
+import jp.co.soramitsu.sora.didresolver.validation.constrains.KeyConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ public class Authentication {
   @CryptoTypeConstraint
   private String type;
 
+  @KeyConstraint
   private String publicKey;
 
   @DIDConstraint(isNullable = true)

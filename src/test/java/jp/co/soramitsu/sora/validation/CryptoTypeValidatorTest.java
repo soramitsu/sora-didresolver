@@ -4,17 +4,10 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import jp.co.soramitsu.sora.didresolver.dto.DDO;
 import org.junit.Assert;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 public class CryptoTypeValidatorTest extends BaseValidatorTest {
-
-  @Test
-  public void testValidDDO() {
-    Set<ConstraintViolation<DDO>> constraintViolations = validator.validate(ddo);
-    Assert.assertTrue(constraintViolations.isEmpty());
-  }
 
   @ParameterizedTest
   @CsvSource({"invalidCryptoType, 1", "null, 1"})
