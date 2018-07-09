@@ -7,18 +7,21 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
+import jp.co.soramitsu.sora.didresolver.commons.CryptoActionTypeEnum;
 import jp.co.soramitsu.sora.didresolver.validation.CryptoTypeValidator;
 
 @Documented
 @Constraint(validatedBy = CryptoTypeValidator.class)
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-/**
- * Constraint for validation allowed algorithms of the signature
+/*
+  Constraint for validation allowed algorithms of the signature
  */
 public @interface CryptoTypeConstraint {
 
   String message() default "Invalid signature type";
+
+  CryptoActionTypeEnum cryptoTypeEnum();
 
   Class<?>[] groups() default {};
 

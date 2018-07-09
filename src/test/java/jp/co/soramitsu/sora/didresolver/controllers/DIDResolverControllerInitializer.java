@@ -14,6 +14,7 @@ import jp.co.soramitsu.sora.didresolver.dto.Proof;
 import jp.co.soramitsu.sora.didresolver.dto.PublicKey;
 import jp.co.soramitsu.sora.didresolver.services.CryptoService;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
+import jp.co.soramitsu.sora.didresolver.services.ValidateService;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.json.JacksonTester;
@@ -32,6 +33,9 @@ public abstract class DIDResolverControllerInitializer {
   @MockBean
   protected CryptoService cryptoService;
 
+  @MockBean
+  protected ValidateService validateService;
+
   @Autowired
   private ObjectMapper objectMapper;
 
@@ -49,8 +53,11 @@ public abstract class DIDResolverControllerInitializer {
     ddo = json.read(jsonReader).getObject();
     Proof proof = ddo.getProof().get(0);
     PublicKey publicKey = ddo.getPublicKey().get(1);
-    when(cryptoService.getPublicKeyByProof(proof, ddo.getPublicKey())).thenReturn(Optional.of(publicKey));
-    when(cryptoService.checkProofCorrectness(proof, ddo.getId(), ddo.getPublicKey()))
+    when(cryptoService.getPublicKeyByProof(proof, ddo.getPublicKey()))
+        .thenReturn(Optional.of(publicKey));
+    when(validateService.isProofCreatorInAuth(proof.getCreator(), ddo.getAuthentication()))
+        .thenReturn(true);
+    when(validateService.isProofInPublicKeys(proof.getCreator(), ddo.getPublicKey()))
         .thenReturn(true);
     when(cryptoService.verifyDDOProof(any(), any())).thenReturn(true);
   }

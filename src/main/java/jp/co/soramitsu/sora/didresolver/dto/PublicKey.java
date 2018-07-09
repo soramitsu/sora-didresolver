@@ -4,6 +4,7 @@ import java.net.URI;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import javax.validation.constraints.NotBlank;
+import jp.co.soramitsu.sora.didresolver.commons.CryptoActionTypeEnum;
 import jp.co.soramitsu.sora.didresolver.dto.serializers.HexValueCombinedSerializer.HexValueDeserializer;
 import jp.co.soramitsu.sora.didresolver.dto.serializers.HexValueCombinedSerializer.HexValueSerializer;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.CryptoTypeConstraint;
@@ -22,7 +23,7 @@ public class PublicKey {
   private URI id;
 
   @NotBlank
-  @CryptoTypeConstraint
+  @CryptoTypeConstraint(cryptoTypeEnum = CryptoActionTypeEnum.VERIFY)
   private String type;
 
   @DIDConstraint(isNullable = true)
