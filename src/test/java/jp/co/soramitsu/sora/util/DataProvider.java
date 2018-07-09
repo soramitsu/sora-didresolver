@@ -63,7 +63,7 @@ public class DataProvider {
     objectMapper.registerModule(new JavaTimeModule());
     Reader jsonReader = new BufferedReader(
         new InputStreamReader(
-            SignatureCreator.class.getClassLoader().getResourceAsStream(fileName)));
+            DataProvider.class.getClassLoader().getResourceAsStream(fileName)));
     return objectMapper.readValue(jsonReader, DDO.class);
   }
 
