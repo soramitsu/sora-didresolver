@@ -11,6 +11,7 @@ import jp.co.soramitsu.sora.didresolver.commons.CryptoActionTypeEnum;
 import jp.co.soramitsu.sora.didresolver.dto.serializers.HexValueCombinedSerializer.HexValueDeserializer;
 import jp.co.soramitsu.sora.didresolver.dto.serializers.HexValueCombinedSerializer.HexValueSerializer;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.CryptoTypeConstraint;
+import jp.co.soramitsu.sora.didresolver.validation.constrains.KeyConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,7 +29,7 @@ public class Proof implements ProofProxy {
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
   private Instant created;
 
-  @NotBlank
+  @KeyConstraint
   private String creator;
 
   @JsonSerialize(using = HexValueSerializer.class)

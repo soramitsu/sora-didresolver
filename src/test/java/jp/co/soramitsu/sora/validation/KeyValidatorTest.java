@@ -7,11 +7,11 @@ import org.junit.Assert;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 
-public class DIDValidatorTest extends BaseValidatorTest {
+public class KeyValidatorTest extends BaseValidatorTest {
 
   @ParameterizedTest
-  @CsvFileSource(resources = "/incorrectDids.csv", numLinesToSkip = 1)
-  public void testInvalidDID(String did) {
+  @CsvFileSource(resources = {"/incorrectDids.csv", "/incorrectKeys.csv"}, numLinesToSkip = 1)
+  public void testInvalid(String did) {
     ddo.setId(did);
     Set<ConstraintViolation<DDO>> constraintViolations = validator.validate(ddo);
     Assert.assertEquals(constraintViolations.size(), 1);

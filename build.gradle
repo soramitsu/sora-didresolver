@@ -52,7 +52,7 @@ ext {
     hibernateTypesVersion = '2.2.2'
     testContainersVersion = '1.8.0'
     postgresVersion = '42.2.2'
-    liquibaseVersion = '3.6.1'
+    liquibaseVersion = '3.6.2'
     c3p0Version = '0.9.5.2'
     jUnitVersion = '5.2.0'
     jacksonVersion = '2.9.6'

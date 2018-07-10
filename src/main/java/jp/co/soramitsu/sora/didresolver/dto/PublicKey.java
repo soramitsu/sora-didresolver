@@ -8,6 +8,7 @@ import jp.co.soramitsu.sora.didresolver.dto.serializers.HexValueCombinedSerializ
 import jp.co.soramitsu.sora.didresolver.dto.serializers.HexValueCombinedSerializer.HexValueSerializer;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.CryptoTypeConstraint;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.DIDConstraint;
+import jp.co.soramitsu.sora.didresolver.validation.constrains.KeyConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,7 @@ import lombok.NoArgsConstructor;
 public class PublicKey {
 
   @NotBlank
+  @KeyConstraint
   private String id;
 
   @NotBlank
