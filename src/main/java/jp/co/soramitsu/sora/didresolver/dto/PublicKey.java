@@ -3,7 +3,7 @@ package jp.co.soramitsu.sora.didresolver.dto;
 import javax.validation.constraints.NotBlank;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.CryptoTypeConstraint;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.DIDConstraint;
-import jp.co.soramitsu.sora.didresolver.validation.constrains.ExactlyOneConstraint;
+import jp.co.soramitsu.sora.didresolver.validation.constrains.KeyConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ExactlyOneConstraint(group = {"publicKeyPem", "publicKeyBase58", "publicKeyHex"})
 public class PublicKey {
 
   @NotBlank
+  @KeyConstraint
   private String id;
 
   @NotBlank

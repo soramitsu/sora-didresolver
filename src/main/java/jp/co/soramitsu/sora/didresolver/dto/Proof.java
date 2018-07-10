@@ -4,7 +4,7 @@ import java.util.Date;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.CryptoTypeConstraint;
-import jp.co.soramitsu.sora.didresolver.validation.constrains.ExactlyOneConstraint;
+import jp.co.soramitsu.sora.didresolver.validation.constrains.KeyConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,24 +12,24 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@ExactlyOneConstraint(group = {"signatureValueBase58", "signatureValueHex"})
 public class Proof {
 
-    @NotBlank
-    @CryptoTypeConstraint
-    private String type;
+  @NotBlank
+  @CryptoTypeConstraint
+  private String type;
 
-    @NotNull
-    private Date created;
+  @NotNull
+  private Date created;
 
-    @NotBlank
-    private String creator;
+  @NotBlank
+  @KeyConstraint
+  private String creator;
 
-    private String signatureValueBase58;
+  private String signatureValueBase58;
 
-    private String signatureValueHex;
+  private String signatureValueHex;
 
-    private String nonce;
+  private String nonce;
 
-    private String purpose;
+  private String purpose;
 }
