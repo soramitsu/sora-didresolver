@@ -7,6 +7,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -55,7 +56,7 @@ public class CryptoServiceImplTest {
   @Test
   public void testFailedGetPublicKeyByProof() {
     Proof proof = dataProvider.getProofForTest();
-    proof.setCreator(ID_BASE + KEYS_COUNT + 2);
+    proof.setCreator(URI.create(ID_BASE + KEYS_COUNT + 2));
     List<PublicKey> publicKeys = dataProvider.getPublicKeysForTest();
     Optional<PublicKey> publicKey = cryptoService
         .getPublicKeyByProof(proof, publicKeys);

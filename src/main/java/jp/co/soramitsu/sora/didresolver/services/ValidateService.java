@@ -1,5 +1,6 @@
 package jp.co.soramitsu.sora.didresolver.services;
 
+import java.net.URI;
 import java.util.List;
 import jp.co.soramitsu.sora.didresolver.dto.Authentication;
 import jp.co.soramitsu.sora.didresolver.dto.PublicKey;
@@ -13,7 +14,7 @@ public interface ValidateService {
    * @param publicKeys array of public keys from DDO
    * @return true if public keys contains key with id equals value of creator otherwise false
    */
-  boolean isProofInPublicKeys(String proofCreator, List<PublicKey> publicKeys);
+  boolean isProofInPublicKeys(URI proofCreator, List<PublicKey> publicKeys);
 
   /**
    * Check that Proof field creator is in authentication section
@@ -21,5 +22,5 @@ public interface ValidateService {
    * @param creator value of field creator of proof section
    * @param authentication array of values of authentication section
    */
-  boolean isProofCreatorInAuth(String creator, List<Authentication> authentication);
+  boolean isProofCreatorInAuth(URI creator, List<Authentication> authentication);
 }

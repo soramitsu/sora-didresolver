@@ -1,6 +1,10 @@
 package jp.co.soramitsu.sora.didresolver.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.net.URI;
+import java.time.Instant;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import jp.co.soramitsu.sora.crypto.ProofProxy;

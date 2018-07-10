@@ -6,8 +6,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.net.URI;
 import java.util.Optional;
-import jp.co.soramitsu.sora.crypto.Consts;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -80,8 +80,8 @@ public class DIDResolverBaseControllerTest extends DIDResolverControllerInitiali
   @Test
   public void testGetPublicKeysFromAnotherDDO() throws Exception {
     ddo.setId("did:sora:iroha:sergey@soramitsu.co.jp");
-    String creator = ddo.getProof().get(0).getCreator();
-    String proofCreatorDID = creator.substring(0, creator.indexOf(Consts.DID_URI_DETERMINATOR));
+    URI creator = ddo.getProof().get(0).getCreator();
+    String proofCreatorDID = creator.getScheme() + ":" + creator.getSchemeSpecificPart();
     given(storageService.read(proofCreatorDID)).willReturn(Optional.of(ddo));
     postRequest(status().isOk());
   }

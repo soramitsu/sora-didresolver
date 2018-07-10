@@ -8,7 +8,6 @@ import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import jp.co.soramitsu.sora.crypto.Consts;
 import jp.co.soramitsu.sora.didresolver.dto.DDO;
 import jp.co.soramitsu.sora.didresolver.dto.Proof;
 import jp.co.soramitsu.sora.didresolver.dto.PublicKey;
@@ -67,9 +66,12 @@ public class DIDResolverBaseController {
 
   protected void verifyDDOProof(DDO ddo) throws UnparseableException {
     Proof proof = ddo.getProof().get(0);
-    if (!validateService.isProofCreatorInAuth(proof.getCreator(), ddo.getAuthentication())
+    if (!validateService
+        .isProofCreatorInAuth(proof.getCreator(), ddo.getAuthentication())
         || !validateService.isProofInPublicKeys(proof.getCreator(),
-        getPublicKeysForCheck(proof.getCreator(), ddo.getId(), ddo.getPublicKey()))) {
+        getPublicKeysForCheck(
+            proof.getCreator().getScheme() + ":" + proof.getCreator().getSchemeSpecificPart(),
+            ddo.getId(), ddo.getPublicKey()))) {
       throw new InvalidProofException(ddo.getId());
     }
     Optional<PublicKey> publicKey = cryptoService.getPublicKeyByProof(proof, ddo.getPublicKey());
@@ -84,15 +86,15 @@ public class DIDResolverBaseController {
   /**
    * Get array of public keys for check proof correctness
    *
-   * @param creator value of field creator of proof section
+   * @param proofCreatorDID DID part of the value of field creator of proof section
    * @param did valid DID of DDO
    * @param publicKey array of public keys of the current DDO
    * @return array of public keys of the current DDO in case when creator DID equals did, otherwise
    * array of public keys of DDO with did from creator
    */
-  private List<PublicKey> getPublicKeysForCheck(@NotBlank String creator, @NotBlank String did,
+  private List<PublicKey> getPublicKeysForCheck(@NotBlank String proofCreatorDID,
+      @NotBlank String did,
       @NotNull @Valid List<PublicKey> publicKey) throws UnparseableException {
-    String proofCreatorDID = creator.substring(0, creator.indexOf(Consts.DID_URI_DETERMINATOR));
     if (!did.equals(proofCreatorDID)) {
       val proofCreatorDDO = storageService.read(proofCreatorDID);
       if (proofCreatorDDO.isPresent()) {

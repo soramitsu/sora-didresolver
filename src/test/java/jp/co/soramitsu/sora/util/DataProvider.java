@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -37,7 +38,8 @@ public class DataProvider {
     List<PublicKey> publicKeys = new ArrayList<>();
     for (int i = 0; i < KEYS_COUNT; i++) {
       publicKeys.add(
-          new PublicKey(ID_BASE + i, getCryptoType(CryptoActionTypeEnum.VERIFY), null, KEY_VALUE));
+          new PublicKey(URI.create(ID_BASE + i), getCryptoType(CryptoActionTypeEnum.VERIFY), null,
+              KEY_VALUE));
     }
     return publicKeys;
   }
@@ -45,14 +47,15 @@ public class DataProvider {
   public Proof getProofForTest() {
     return new Proof(getCryptoType(CryptoActionTypeEnum.SIGNATURE),
         Instant.now().truncatedTo(ChronoUnit.SECONDS),
-        ID_BASE + random.nextInt(KEYS_COUNT), KEY_VALUE, null, null);
+        URI.create(ID_BASE + random.nextInt(KEYS_COUNT)), KEY_VALUE, null, null);
   }
 
   public List<Authentication> getAuthenticationForTest() {
     List<Authentication> authentications = new ArrayList<>();
     for (int i = 0; i < KEYS_COUNT; i++) {
       authentications.add(
-          new Authentication(getCryptoType(CryptoActionTypeEnum.AUTH), ID_BASE + i, null,
+          new Authentication(getCryptoType(CryptoActionTypeEnum.AUTH), URI.create(ID_BASE + i),
+              null,
               KEY_VALUE));
     }
     return authentications;

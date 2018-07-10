@@ -12,6 +12,4 @@ public final class Consts {
 
   public String ED25519_SHA3_SIGNATURE_SUITE = "Ed25519Sha3Signature";
   public String ECDSAWITHSHA256_SIGNATURE_SUITE = "EcdsaWithSha256Signature";
-
-  public char DID_URI_DETERMINATOR = '#';
 }

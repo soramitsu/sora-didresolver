@@ -5,6 +5,7 @@ import static jp.co.soramitsu.sora.util.DataProvider.KEYS_COUNT;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.net.URI;
 import java.util.List;
 import jp.co.soramitsu.sora.didresolver.dto.Authentication;
 import jp.co.soramitsu.sora.didresolver.dto.Proof;
@@ -47,9 +48,9 @@ public class ValidateServiceImplTest {
   public void testFailedIsProofCreatorInAuth() {
     Proof proof = dataProvider.getProofForTest();
     List<Authentication> authentications = dataProvider.getAuthenticationForTest();
-    proof.setCreator(StringUtils.replaceChars(proof.getCreator(), '5', '8'));
+    proof.setCreator(URI.create(StringUtils.replaceChars(proof.getCreator().toString(), '5', '8')));
     assertFalse(validateService.isProofCreatorInAuth(proof.getCreator(), authentications));
-    proof.setCreator(ID_BASE + KEYS_COUNT + 2);
+    proof.setCreator(URI.create(ID_BASE + KEYS_COUNT + 2));
     assertFalse(validateService.isProofCreatorInAuth(proof.getCreator(), authentications));
   }
 
@@ -63,9 +64,9 @@ public class ValidateServiceImplTest {
   public void testFailedIsProofInPublicKeys() {
     Proof proof = dataProvider.getProofForTest();
     List<PublicKey> publicKeys = dataProvider.getPublicKeysForTest();
-    proof.setCreator(StringUtils.replaceChars(proof.getCreator(), '5', '8'));
+    proof.setCreator(URI.create(StringUtils.replaceChars(proof.getCreator().toString(), '5', '8')));
     assertFalse(validateService.isProofInPublicKeys(proof.getCreator(), publicKeys));
-    proof.setCreator(ID_BASE + KEYS_COUNT + 2);
+    proof.setCreator(URI.create(ID_BASE + KEYS_COUNT + 2));
     assertFalse(validateService.isProofInPublicKeys(proof.getCreator(), publicKeys));
   }
 }
