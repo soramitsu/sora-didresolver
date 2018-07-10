@@ -14,7 +14,4 @@ public final class Consts {
   public String ECDSAWITHSHA256_SIGNATURE_SUITE = "EcdsaWithSha256Signature";
 
   public char DID_URI_DETERMINATOR = '#';
-
-  private Consts() {
-  }
 }
