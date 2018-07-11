@@ -1,5 +1,6 @@
 package jp.co.soramitsu.sora.didresolver.dto;
 
+import java.net.URI;
 import javax.validation.constraints.NotBlank;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.CryptoTypeConstraint;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.DIDConstraint;
@@ -13,9 +14,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PublicKey {
 
-  @NotBlank
   @KeyConstraint
-  private String id;
+  private URI id;
 
   @NotBlank
   @CryptoTypeConstraint

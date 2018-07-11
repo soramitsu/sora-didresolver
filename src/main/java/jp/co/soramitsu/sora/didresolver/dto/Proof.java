@@ -1,5 +1,6 @@
 package jp.co.soramitsu.sora.didresolver.dto;
 
+import java.net.URI;
 import java.util.Date;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -21,9 +22,8 @@ public class Proof {
   @NotNull
   private Date created;
 
-  @NotBlank
   @KeyConstraint
-  private String creator;
+  private URI creator;
 
   private String signatureValueBase58;
 

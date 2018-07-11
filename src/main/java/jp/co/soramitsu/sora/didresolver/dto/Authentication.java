@@ -1,5 +1,6 @@
 package jp.co.soramitsu.sora.didresolver.dto;
 
+import java.net.URI;
 import javax.validation.constraints.NotBlank;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.CryptoTypeConstraint;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.DIDConstraint;
@@ -18,7 +19,7 @@ public class Authentication {
   private String type;
 
   @KeyConstraint
-  private String publicKey;
+  private URI publicKey;
 
   @DIDConstraint(isNullable = true)
   private String owner;
