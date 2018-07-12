@@ -51,7 +51,7 @@ ext {
     mockitoCoreVersion = '2.19.0'
     hibernateTypesVersion = '2.2.2'
     testContainersVersion = '1.8.1'
-    postgresVersion = '42.2.2'
+    postgresVersion = '42.2.3'
     liquibaseVersion = '3.6.2'
     c3p0Version = '0.9.5.2'
     jUnitVersion = '5.2.0'
