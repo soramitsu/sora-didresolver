@@ -11,8 +11,6 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy;
 import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy.SignatureSuiteException;
-import jp.co.soramitsu.sora.crypto.algorithms.SignatureSuiteRegistry;
-import jp.co.soramitsu.sora.crypto.algorithms.SignatureSuiteRegistry.NoSuchStrategy;
 import jp.co.soramitsu.sora.crypto.hash.RawDigestStrategy;
 import jp.co.soramitsu.sora.util.bencoder.BencodeMapper;
 import lombok.Getter;
@@ -71,7 +69,7 @@ public class Crypto {
     log.debug("sanitize proof for verify hash");
     // if "created" is empty, then set current time as "created"
     if (proof.getCreated() == null) {
-      log.debug("set current time {} as \"created\"",Instant.now());
+      log.debug("set current time {} as \"created\"", Instant.now());
       proof.setCreated(Instant.now());
     }
 
@@ -81,7 +79,7 @@ public class Crypto {
   public void sign(VerifiableJson document, KeyPair keypair, ProofProxy proof)
       throws CreateVerifyHashException, SignatureSuiteException, NoSuchStrategy {
     log.info("sign document");
-    RawSignatureStrategy signer = SignatureSuiteRegistry.INSTANCE.get(proof.getType());
+    RawSignatureStrategy signer = getSignatureStrategy(proof.getType());
     log.debug("recieved signature strategy for sign document - {}", signer);
     // backup proofs
     List<ProofProxy> proofs = document.getProof();
@@ -109,10 +107,10 @@ public class Crypto {
   public boolean verify(VerifiableJson document, PublicKey publicKey, ProofProxy proof)
       throws CreateVerifyHashException, SignatureSuiteException, NoSuchStrategy {
     log.info("verify specific proof");
-    RawSignatureStrategy verifier = SignatureSuiteRegistry.INSTANCE.get(proof.getType());
+    RawSignatureStrategy verifier = getSignatureStrategy(proof.getType());
     log.debug("recieved verify strategy for document - {}", verifier);
-    byte[] hash = createVerifyHash(document, proof);
     byte[] signature = proof.getSignatureValue();
+    byte[] hash = createVerifyHash(document, proof);
 
     return verifier.rawVerify(hash, signature, publicKey);
   }
@@ -140,11 +138,33 @@ public class Crypto {
     return true;
   }
 
+  /**
+   * Create instance of signature strategy by name. The signature strategy should be in the same directory as RawSignatureStrategy interface.
+   *
+   * @param signatureStrategyName - signature strategy name
+   * @return instance of signature strategy which implements interface RawSignatureStrategy
+   * @throws NoSuchStrategy - when signature strategy with name signatureStrategyName does not found
+   */
+  public RawSignatureStrategy getSignatureStrategy(String signatureStrategyName)
+      throws NoSuchStrategy {
+    try {
+      return (RawSignatureStrategy) Class.forName(RawSignatureStrategy.class.getPackage().getName()+ '.' + signatureStrategyName).newInstance();
+    } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+      throw new NoSuchStrategy(signatureStrategyName);
+    }
+  }
 
   public static class CreateVerifyHashException extends IOException {
 
     CreateVerifyHashException(IOException e) {
       super(e);
+    }
+  }
+
+  public static class NoSuchStrategy extends Exception {
+
+    public NoSuchStrategy(String key) {
+      super(key + " signature suite is not implemented");
     }
   }
 }

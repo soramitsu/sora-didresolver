@@ -1,6 +1,7 @@
 package jp.co.soramitsu.sora.validation;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -28,6 +29,7 @@ public abstract class BaseValidatorTest {
   public static void setUpClass() {
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     validator = factory.getValidator();
+    objectMapper.registerModule(new JavaTimeModule());
   }
 
   @BeforeEach
