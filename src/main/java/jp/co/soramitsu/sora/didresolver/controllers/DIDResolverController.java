@@ -8,9 +8,9 @@ import javax.validation.ConstraintViolationException;
 import jp.co.soramitsu.sora.didresolver.dto.DDO;
 import jp.co.soramitsu.sora.didresolver.exceptions.DIDNotFoundException;
 import jp.co.soramitsu.sora.didresolver.exceptions.UnparseableException;
-import jp.co.soramitsu.sora.didresolver.services.CryptoService;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
 import jp.co.soramitsu.sora.didresolver.services.ValidateService;
+import jp.co.soramitsu.sora.didresolver.services.VerifyService;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.DIDConstraint;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -36,8 +36,9 @@ public class DIDResolverController extends DIDResolverBaseController {
 
   private static final String ERROR_FORMAT = "{ \"error\" : \"%s\"}\n";
 
-  DIDResolverController(StorageService storageService, CryptoService cryptoService, ValidateService validateService) {
-    super(storageService, cryptoService, validateService);
+  DIDResolverController(StorageService storageService, VerifyService verifyService,
+      ValidateService validateService) {
+    super(storageService, verifyService, validateService);
   }
 
   @GetMapping(produces = {MediaType.APPLICATION_JSON_UTF8_VALUE})
@@ -56,7 +57,6 @@ public class DIDResolverController extends DIDResolverBaseController {
       @ApiParam(value = "url encoded DID", required = true) @DIDConstraint(isNullable = false) @PathVariable String did)
       throws UnparseableException {
     log.info("Delete DDO by DID - {}", did);
-    storageService.read(did).orElseThrow(() -> new DIDNotFoundException(did));
     storageService.delete(did);
   }
 

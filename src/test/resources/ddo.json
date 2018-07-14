@@ -21,13 +21,11 @@
     }
   ],
   "created": "2018-07-04T17:00:00Z",
-  "proof": [
-    {
-      "type": "Ed25519Sha3Signature",
-      "created": "2018-07-05T17:00:00Z",
-      "creator": "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf#keys-2",
-      "signatureValue": "02b97c30de767f084ce3080168ee293053ba33b235d7116a3263d29f1450936b71",
-      "nonce": "123123123123123"
-    }
-  ]
+  "proof": {
+    "type": "Ed25519Sha3Signature",
+    "created": "2018-07-05T17:00:00Z",
+    "creator": "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf#keys-2",
+    "signatureValue": "02b97c30de767f084ce3080168ee293053ba33b235d7116a3263d29f1450936b71",
+    "nonce": "123123123123123"
+  }
 }

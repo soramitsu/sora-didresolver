@@ -14,7 +14,7 @@ public class CryptoTypeValidatorTest extends BaseValidatorTest {
       "Ed25519Sha3Authentication, 1"})
   public void testInvalidCryptoTypeOnProof(String cryptoTypeValue,
       int expectedConstraintViolations) {
-    ddo.getProof().forEach(proof -> proof.setType(cryptoTypeValue));
+    ddo.getProof().setType(cryptoTypeValue);
     Set<ConstraintViolation<DDO>> constraintViolations = validator.validate(ddo);
     Assert.assertEquals(expectedConstraintViolations, constraintViolations.size());
   }

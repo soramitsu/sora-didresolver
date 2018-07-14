@@ -6,9 +6,16 @@ import jp.co.soramitsu.sora.didresolver.exceptions.UnparseableException;
 
 public interface StorageService {
 
-  void createOrUpdate(String did, DDO ddo) throws UnparseableException;
+  void createOrUpdate(String did, DDO ddo);
 
   Optional<DDO> read(String did) throws UnparseableException;
 
-  void delete(String did) throws UnparseableException;
+  /**
+   * Delete DDO by DID
+   *
+   * @param did - valid DID
+   * @throws jp.co.soramitsu.sora.didresolver.exceptions.DIDNotFoundException - if the DID is not
+   * found in the storage
+   */
+  void delete(String did);
 }

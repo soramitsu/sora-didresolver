@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import jp.co.soramitsu.sora.didresolver.dto.DDO;
+import jp.co.soramitsu.sora.didresolver.exceptions.DIDNotFoundException;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
 import lombok.NoArgsConstructor;
 import org.springframework.context.annotation.Profile;
@@ -21,13 +22,16 @@ public class MockStorageServiceImpl implements StorageService {
     mockStorage.put(did, ddo);
   }
 
-    @Override
-    public Optional<DDO> read(String did) {
-        return Optional.ofNullable(mockStorage.get(did));
-    }
+  @Override
+  public Optional<DDO> read(String did) {
+    return Optional.ofNullable(mockStorage.get(did));
+  }
 
   @Override
   public void delete(String did) {
+    if (!mockStorage.containsKey(did)) {
+      throw new DIDNotFoundException(did);
+    }
     mockStorage.remove(did);
   }
 }

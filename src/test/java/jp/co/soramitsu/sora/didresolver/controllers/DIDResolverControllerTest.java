@@ -2,6 +2,7 @@ package jp.co.soramitsu.sora.didresolver.controllers;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -11,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.time.Instant;
 import java.util.Optional;
+import jp.co.soramitsu.sora.didresolver.exceptions.DIDNotFoundException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -55,6 +57,7 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
 
   @Test
   public void testDIDNotFoundOnDeleteDDO() throws Exception {
+    doThrow(new DIDNotFoundException(ddo.getId())).when(storageService).delete(ddo.getId());
     sendDDORequest(delete(URL, ddo.getId()), status().isNotFound());
   }
 
@@ -122,7 +125,7 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
   @Test
   public void testInvalidProofExceptionOnCreateDDO() throws Exception {
     when(validateService
-        .isProofCreatorInAuth(ddo.getProof().get(0).getCreator(), ddo.getAuthentication()))
+        .isProofCreatorInAuth(ddo.getProof().getCreator(), ddo.getAuthentication()))
         .thenReturn(false);
     sendDDORequest(
         put(URL, ddo.getId()).contentType(contentType).content(json.write(ddo).getJson()),
@@ -136,7 +139,7 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
         status().isBadRequest());
 
     when(validateService
-        .isProofCreatorInAuth(ddo.getProof().get(0).getCreator(), ddo.getAuthentication()))
+        .isProofCreatorInAuth(ddo.getProof().getCreator(), ddo.getAuthentication()))
         .thenReturn(true);
     sendDDORequest(
         put(URL, ddo.getId()).contentType(contentType).content(json.write(ddo).getJson()),
@@ -145,7 +148,7 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
 
   @Test
   public void testBadProofExceptionOnCreateDDO() throws Exception {
-    when(cryptoService.verifyDDOProof(any(), any())).thenReturn(false);
+    when(verifyService.verifyDDOProof(any(), any())).thenReturn(false);
     sendDDORequest(
         put(URL, ddo.getId()).contentType(contentType).content(json.write(ddo).getJson()),
         status().isUnauthorized());
