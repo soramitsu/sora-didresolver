@@ -7,6 +7,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import jp.co.soramitsu.sora.didresolver.dto.DDO;
 import jp.co.soramitsu.sora.didresolver.exceptions.DIDNotFoundException;
+import jp.co.soramitsu.sora.didresolver.exceptions.IncorrectUpdateException;
 import jp.co.soramitsu.sora.didresolver.exceptions.UnparseableException;
 import jp.co.soramitsu.sora.didresolver.services.CryptoService;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
@@ -68,6 +69,9 @@ public class DIDResolverController extends DIDResolverBaseController {
       throws UnparseableException {
     log.info("Update DDO by DID - {}", did);
     verifyDDOProof(ddo);
+    if (!ddo.getUpdated().isAfter(ddo.getCreated())){
+      throw new IncorrectUpdateException(ddo.getCreated().toString(),ddo.getUpdated().toString());
+    }
     storageService.read(did).orElseThrow(() -> new DIDNotFoundException(did));
     storageService.createOrUpdate(did, ddo);
   }
