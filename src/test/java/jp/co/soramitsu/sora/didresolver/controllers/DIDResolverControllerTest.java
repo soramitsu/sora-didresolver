@@ -68,7 +68,7 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
   @Test
   public void testUpdateDDO() throws Exception {
     given(storageService.read(ddo.getId())).willReturn(Optional.of(ddo));
-    ddo.setCreated(Instant.now());
+    ddo.setUpdated(Instant.now());
     sendDDORequest(
         put(URL, ddo.getId()).contentType(contentType).content(json.write(ddo).getJson()),
         status().isOk());
@@ -76,7 +76,7 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
 
   @Test
   public void testDIDNotFoundOnUpdateDDO() throws Exception {
-    ddo.setCreated(Instant.now());
+    ddo.setUpdated(Instant.now());
     sendDDORequest(
         put(URL, ddo.getId()).contentType(contentType).content(json.write(ddo).getJson()),
         status().isNotFound());
@@ -86,7 +86,7 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
   public void testIncorrectDIDOnUpdateDDO() throws Exception {
     // set incorrect did for check validation
     ddo.setId(INCORRECT_DID);
-    ddo.setCreated(Instant.now());
+    ddo.setUpdated(Instant.now());
     sendDDORequest(
         put(URL, ddo.getId()).contentType(contentType).content(json.write(ddo).getJson()),
         status().isBadRequest());
@@ -95,7 +95,7 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
   @Test
   public void testCheckPublicKeyOnUpdateDDO() throws Exception {
     ddo.setPublicKey(null);
-    ddo.setCreated(Instant.now());
+    ddo.setUpdated(Instant.now());
     sendDDORequest(
         put(URL, ddo.getId()).contentType(contentType).content(json.write(ddo).getJson()),
         status().isBadRequest());
@@ -104,7 +104,7 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
   @Test
   public void testCheckAuthenticationOnUpdateDDO() throws Exception {
     ddo.setAuthentication(null);
-    ddo.setCreated(Instant.now());
+    ddo.setUpdated(Instant.now());
     sendDDORequest(
         put(URL, ddo.getId()).contentType(contentType).content(json.write(ddo).getJson()),
         status().isBadRequest());
@@ -113,6 +113,15 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
   @Test
   public void testCheckProofOnUpdateDDO() throws Exception {
     ddo.setProof(null);
+    ddo.setUpdated(Instant.now());
+    sendDDORequest(
+        put(URL, ddo.getId()).contentType(contentType).content(json.write(ddo).getJson()),
+        status().isBadRequest());
+  }
+
+  @Test
+  public void testWrongUpdateDateOnUpdateDDO() throws Exception {
+    ddo.setUpdated(ddo.getCreated());
     ddo.setCreated(Instant.now());
     sendDDORequest(
         put(URL, ddo.getId()).contentType(contentType).content(json.write(ddo).getJson()),
