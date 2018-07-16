@@ -56,7 +56,7 @@ public class DIDResolverBaseControllerTest extends DIDResolverControllerInitiali
   @Test
   public void testInvalidProofExceptionOnCreateDDO() throws Exception {
     when(validateService
-        .isProofCreatorInAuth(ddo.getProof().get(0).getCreator(), ddo.getAuthentication()))
+        .isProofCreatorInAuth(ddo.getProof().getCreator(), ddo.getAuthentication()))
         .thenReturn(false);
     postRequest(status().isBadRequest());
 
@@ -66,21 +66,21 @@ public class DIDResolverBaseControllerTest extends DIDResolverControllerInitiali
     postRequest(status().isBadRequest());
 
     when(validateService
-        .isProofCreatorInAuth(ddo.getProof().get(0).getCreator(), ddo.getAuthentication()))
+        .isProofCreatorInAuth(ddo.getProof().getCreator(), ddo.getAuthentication()))
         .thenReturn(true);
     postRequest(status().isBadRequest());
   }
 
   @Test
   public void testBadProofExceptionOnCreateDDO() throws Exception {
-    when(cryptoService.verifyDDOProof(any(), any())).thenReturn(false);
+    when(verifyService.verifyDDOProof(any(), any())).thenReturn(false);
     postRequest(status().isUnauthorized());
   }
 
   @Test
   public void testGetPublicKeysFromAnotherDDO() throws Exception {
     ddo.setId("did:sora:iroha:sergey@soramitsu.co.jp");
-    URI creator = ddo.getProof().get(0).getCreator();
+    URI creator = ddo.getProof().getCreator();
     String proofCreatorDID = creator.getScheme() + ":" + creator.getSchemeSpecificPart();
     given(storageService.read(proofCreatorDID)).willReturn(Optional.of(ddo));
     postRequest(status().isOk());

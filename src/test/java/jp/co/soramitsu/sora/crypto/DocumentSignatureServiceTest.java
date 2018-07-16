@@ -2,7 +2,6 @@ package jp.co.soramitsu.sora.crypto;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyList;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -15,10 +14,8 @@ import java.security.KeyPair;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.time.Instant;
-import java.util.LinkedList;
-import java.util.List;
-import jp.co.soramitsu.sora.crypto.Crypto.CreateVerifyHashException;
-import jp.co.soramitsu.sora.crypto.Crypto.NoSuchStrategy;
+import jp.co.soramitsu.sora.crypto.DocumentSignatureService.CreateVerifyHashException;
+import jp.co.soramitsu.sora.crypto.DocumentSignatureService.NoSuchStrategy;
 import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy;
 import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy.SignatureSuiteException;
 import jp.co.soramitsu.sora.crypto.hash.RawDigestStrategy;
@@ -28,7 +25,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-public class CryptoTest {
+public class DocumentSignatureServiceTest {
 
   private final String created = "2010-01-01T19:43:24Z";
   private final String signatureSuiteName = "Ed25519Sha3SignatureMock";
@@ -36,7 +33,8 @@ public class CryptoTest {
   private final RawDigestStrategy digest = mock(RawDigestStrategy.class);
   private final RawSignatureStrategy signatureStrategy = mock(RawSignatureStrategy.class);
   private final ObjectMapper mapper = mock(ObjectMapper.class);
-  private final Crypto crypto = spy(new Crypto(digest, mapper));
+  private final DocumentSignatureService documentSignatureService = spy(
+      new DocumentSignatureService(digest, mapper));
 
   private VerifiableJson json = mock(VerifiableJson.class);
   private ProofProxy proofProxy = mock(ProofProxy.class);
@@ -48,9 +46,6 @@ public class CryptoTest {
   private final PrivateKey privateKey = mock(PrivateKey.class);
   private final KeyPair keyPair = new KeyPair(publicKey, privateKey);
 
-
-  private List<ProofProxy> proofs = new LinkedList<>();
-
   @Before
   public void setUp() throws SignatureSuiteException, NoSuchStrategy {
     when(proofProxy.getCreated())
@@ -59,17 +54,12 @@ public class CryptoTest {
     when(proofProxy.getType())
         .thenReturn(signatureSuiteName);
 
-    doReturn(signatureStrategy).when(crypto).getSignatureStrategy(signatureSuiteName);
+    doReturn(signatureStrategy).when(documentSignatureService)
+        .getSignatureStrategy(signatureSuiteName);
     // when proof.setSignatureValue(bytes) is called, proof.getSignatureBytes() will return `bytes`
     doAnswer(i -> when(proofProxy.getSignatureValue()).thenReturn(jsonSignature))
         .when(proofProxy)
         .setSignatureValue(jsonSignature);
-
-    // setProof() inside tested class will save proof into `this.proofs`
-    proofs.clear();
-    doAnswer(inv -> proofs.addAll(inv.getArgument(0)))
-        .when(json)
-        .setProof(anyList());
 
     when(digest.digest(any()))
         .thenReturn(jsonHash);
@@ -89,7 +79,6 @@ public class CryptoTest {
         publicKey
         )
     ).thenReturn(Boolean.TRUE);
-
   }
 
 
@@ -101,10 +90,10 @@ public class CryptoTest {
       throws CreateVerifyHashException, SignatureSuiteException, NoSuchStrategy {
 
     // Do the actual signing. This line modifies `json`.
-    crypto.sign(json, keyPair, proofProxy);
-    when(json.getProof()).thenReturn(this.proofs);
+    documentSignatureService.sign(json, keyPair, proofProxy);
+    when(json.getProof()).thenReturn(proofProxy);
     // Do the actual verification.
-    boolean verified = crypto.verifyAll(json, keyPair.getPublic());
+    boolean verified = documentSignatureService.verify(json, keyPair.getPublic(), proofProxy);
     verify(proofProxy).setSignatureValue(jsonSignature);
     assertTrue(verified);
   }

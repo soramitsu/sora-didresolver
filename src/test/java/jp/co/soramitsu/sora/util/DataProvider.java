@@ -28,7 +28,7 @@ public class DataProvider {
 
   public static final byte[] KEY_VALUE = DatatypeConverter
       .parseHexBinary(
-          "6C0816523644DD538B756F88D5043C311764D44221926E91A189FDA20B96D491");
+          "A023B2D2438BAEE133A9CD51507614BA80E07552EC238EB0890CCB3EE78DF792");
 
   public static final int KEYS_COUNT = 5;
 

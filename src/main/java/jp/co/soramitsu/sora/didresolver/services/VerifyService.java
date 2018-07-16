@@ -6,7 +6,7 @@ import jp.co.soramitsu.sora.didresolver.dto.DDO;
 import jp.co.soramitsu.sora.didresolver.dto.Proof;
 import jp.co.soramitsu.sora.didresolver.dto.PublicKey;
 
-public interface CryptoService {
+public interface VerifyService {
 
   /**
    * Method for verifying proof of DDO

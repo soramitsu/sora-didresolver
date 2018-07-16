@@ -1,5 +1,6 @@
 package jp.co.soramitsu.sora.util;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.BufferedReader;
@@ -17,8 +18,8 @@ import jp.co.soramitsu.crypto.ed25519.Ed25519Sha3;
 import jp.co.soramitsu.crypto.ed25519.Ed25519Sha3.CryptoException;
 import jp.co.soramitsu.crypto.ed25519.EdDSAPrivateKey;
 import jp.co.soramitsu.crypto.ed25519.EdDSAPublicKey;
-import jp.co.soramitsu.sora.crypto.Crypto;
-import jp.co.soramitsu.sora.crypto.Crypto.NoSuchStrategy;
+import jp.co.soramitsu.sora.crypto.DocumentSignatureService;
+import jp.co.soramitsu.sora.crypto.DocumentSignatureService.NoSuchStrategy;
 import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy.SignatureSuiteException;
 import jp.co.soramitsu.sora.crypto.hash.Sha3Digest256;
 import jp.co.soramitsu.sora.didresolver.dto.DDO;
@@ -29,9 +30,11 @@ public class SignatureGenerator {
 
   public static void main(String[] args)
       throws IOException, SignatureSuiteException, NoSuchStrategy, CryptoException {
-    Crypto crypto = new Crypto(new Sha3Digest256());
+    DocumentSignatureService documentSignatureService = new DocumentSignatureService(
+        new Sha3Digest256());
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.registerModule(new JavaTimeModule());
+    objectMapper.setSerializationInclusion(Include.NON_NULL);
     Reader jsonReader = new BufferedReader(
         new InputStreamReader(
             SignatureGenerator.class.getClassLoader().getResourceAsStream("ddo.json")));
@@ -39,7 +42,7 @@ public class SignatureGenerator {
     KeyPair keyPair = new Ed25519Sha3().generateKeypair();
     writeKeyPairToFile(keyPair);
     ddo.getPublicKey().get(1).setPublicKeyValue(((EdDSAPublicKey) keyPair.getPublic()).getAbyte());
-    crypto.sign(ddo, keyPair, ddo.getProof().get(0));
+    documentSignatureService.sign(ddo, keyPair, ddo.getProof());
     try (Writer writer = new BufferedWriter(
         new OutputStreamWriter(new FileOutputStream(PATH + "canonicalDDO.json")))) {
       objectMapper.writeValue(writer, ddo);

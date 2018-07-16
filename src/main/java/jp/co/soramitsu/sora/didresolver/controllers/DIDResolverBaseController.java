@@ -3,21 +3,21 @@ package jp.co.soramitsu.sora.didresolver.controllers;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import jp.co.soramitsu.sora.didresolver.dto.DDO;
-import jp.co.soramitsu.sora.didresolver.dto.Proof;
 import jp.co.soramitsu.sora.didresolver.dto.PublicKey;
 import jp.co.soramitsu.sora.didresolver.exceptions.BadProofException;
 import jp.co.soramitsu.sora.didresolver.exceptions.DIDDuplicateException;
 import jp.co.soramitsu.sora.didresolver.exceptions.InvalidProofException;
 import jp.co.soramitsu.sora.didresolver.exceptions.UnparseableException;
-import jp.co.soramitsu.sora.didresolver.services.CryptoService;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
 import jp.co.soramitsu.sora.didresolver.services.ValidateService;
+import jp.co.soramitsu.sora.didresolver.services.VerifyService;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.http.MediaType;
@@ -38,14 +38,14 @@ public class DIDResolverBaseController {
 
   protected StorageService storageService;
 
-  private CryptoService cryptoService;
+  private VerifyService verifyService;
 
   private ValidateService validateService;
 
-  protected DIDResolverBaseController(StorageService storageService, CryptoService cryptoService,
+  protected DIDResolverBaseController(StorageService storageService, VerifyService verifyService,
       ValidateService validateService) {
     this.storageService = storageService;
-    this.cryptoService = cryptoService;
+    this.verifyService = verifyService;
     this.validateService = validateService;
   }
 
@@ -65,17 +65,18 @@ public class DIDResolverBaseController {
   }
 
   protected void verifyDDOProof(DDO ddo) throws UnparseableException {
-    Proof proof = ddo.getProof().get(0);
+    URI creator = ddo.getProof().getCreator();
     if (!validateService
-        .isProofCreatorInAuth(proof.getCreator(), ddo.getAuthentication())
-        || !validateService.isProofInPublicKeys(proof.getCreator(),
+        .isProofCreatorInAuth(creator, ddo.getAuthentication())
+        || !validateService.isProofInPublicKeys(creator,
         getPublicKeysForCheck(
-            proof.getCreator().getScheme() + ":" + proof.getCreator().getSchemeSpecificPart(),
+            creator.getScheme() + ":" + creator.getSchemeSpecificPart(),
             ddo.getId(), ddo.getPublicKey()))) {
       throw new InvalidProofException(ddo.getId());
     }
-    Optional<PublicKey> publicKey = cryptoService.getPublicKeyByProof(proof, ddo.getPublicKey());
-    if (publicKey.isPresent() && !cryptoService
+    Optional<PublicKey> publicKey = verifyService
+        .getPublicKeyByProof(ddo.getProof(), ddo.getPublicKey());
+    if (publicKey.isPresent() && !verifyService
         .verifyDDOProof(ddo, publicKey.get().getPublicKeyValue())) {
       log.warn("failure verify proof for DDO with DID {}", ddo.getId());
       throw new BadProofException(ddo.getId());

@@ -43,5 +43,5 @@ public class DDO implements VerifiableJson<Proof> {
 
   @NotNull
   @Valid
-  private List<Proof> proof;
+  private Proof proof;
 }

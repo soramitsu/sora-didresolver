@@ -12,13 +12,13 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
-import jp.co.soramitsu.sora.crypto.Crypto.NoSuchStrategy;
+import jp.co.soramitsu.sora.crypto.DocumentSignatureService.NoSuchStrategy;
 import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy.SignatureSuiteException;
 import jp.co.soramitsu.sora.didresolver.dto.DDO;
 import jp.co.soramitsu.sora.didresolver.dto.Proof;
 import jp.co.soramitsu.sora.didresolver.dto.PublicKey;
-import jp.co.soramitsu.sora.didresolver.services.CryptoService;
-import jp.co.soramitsu.sora.didresolver.services.impl.CryptoServiceImpl;
+import jp.co.soramitsu.sora.didresolver.services.VerifyService;
+import jp.co.soramitsu.sora.didresolver.services.impl.VerifyServiceImpl;
 import jp.co.soramitsu.sora.util.DataProvider;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,12 +28,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-public class CryptoServiceImplTest {
+public class VerifyServiceImplTest {
 
   private static final String DDO_JSON_NAME = "canonicalDDO.json";
 
   @Autowired
-  private CryptoService cryptoService;
+  private VerifyService verifyService;
 
   private DataProvider dataProvider = new DataProvider();
 
@@ -41,14 +41,14 @@ public class CryptoServiceImplTest {
   static class CryptoServiceImplTestContextConfiguration {
 
     @Bean
-    public CryptoService cryptoService() {
-      return new CryptoServiceImpl();
+    public VerifyService cryptoService() {
+      return new VerifyServiceImpl();
     }
   }
 
   @Test
   public void testSuccessGetPublicKeyByProof() {
-    Optional<PublicKey> publicKey = cryptoService
+    Optional<PublicKey> publicKey = verifyService
         .getPublicKeyByProof(dataProvider.getProofForTest(), dataProvider.getPublicKeysForTest());
     assertTrue(publicKey.isPresent());
   }
@@ -58,7 +58,7 @@ public class CryptoServiceImplTest {
     Proof proof = dataProvider.getProofForTest();
     proof.setCreator(URI.create(ID_BASE + KEYS_COUNT + 2));
     List<PublicKey> publicKeys = dataProvider.getPublicKeysForTest();
-    Optional<PublicKey> publicKey = cryptoService
+    Optional<PublicKey> publicKey = verifyService
         .getPublicKeyByProof(proof, publicKeys);
     assertFalse(publicKey.isPresent());
   }
@@ -66,7 +66,7 @@ public class CryptoServiceImplTest {
   @Test
   public void testSuccessVerifyDDOProof()
       throws SignatureSuiteException, IOException, NoSuchStrategy {
-    assertTrue(cryptoService.verifyDDOProof(dataProvider.getDDOFromJson(DDO_JSON_NAME), KEY_VALUE));
+    assertTrue(verifyService.verifyDDOProof(dataProvider.getDDOFromJson(DDO_JSON_NAME), KEY_VALUE));
   }
 
   @Test
@@ -74,6 +74,6 @@ public class CryptoServiceImplTest {
       throws SignatureSuiteException, IOException, NoSuchStrategy {
     DDO ddo = dataProvider.getDDOFromJson(DDO_JSON_NAME);
     ddo.setCreated(Instant.now().truncatedTo(ChronoUnit.SECONDS));
-    assertFalse(cryptoService.verifyDDOProof(ddo, KEY_VALUE));
+    assertFalse(verifyService.verifyDDOProof(ddo, KEY_VALUE));
   }
 }
