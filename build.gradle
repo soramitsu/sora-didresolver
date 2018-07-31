@@ -48,7 +48,7 @@ ext {
 //    slf4jVersion = '1.7.25'
     aspectjVersion = '1.9.1'
     spongycastleVersion = '1.58.0.0'
-    mockitoCoreVersion = '2.20.1'
+    mockitoCoreVersion = '2.21.0'
     hibernateTypesVersion = '2.2.2'
     testContainersVersion = '1.8.2'
     postgresVersion = '42.2.4'
