@@ -50,7 +50,7 @@ ext {
     spongycastleVersion = '1.58.0.0'
     mockitoCoreVersion = '2.21.0'
     hibernateTypesVersion = '2.2.2'
-    testContainersVersion = '1.8.2'
+    testContainersVersion = '1.8.3'
     postgresVersion = '42.2.4'
     liquibaseVersion = '3.6.2'
     c3p0Version = '0.9.5.2'
