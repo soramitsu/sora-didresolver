@@ -7,7 +7,6 @@ import java.net.URI;
 import java.time.Instant;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import jp.co.soramitsu.sora.crypto.ProofProxy;
 import jp.co.soramitsu.sora.didresolver.commons.CryptoActionTypeEnum;
 import jp.co.soramitsu.sora.didresolver.dto.serializers.HexValueCombinedSerializer.HexValueDeserializer;
 import jp.co.soramitsu.sora.didresolver.dto.serializers.HexValueCombinedSerializer.HexValueSerializer;
@@ -20,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Proof implements ProofProxy {
+public class Proof {
 
   @NotBlank
   @CryptoTypeConstraint(cryptoTypeEnum = CryptoActionTypeEnum.SIGNATURE)

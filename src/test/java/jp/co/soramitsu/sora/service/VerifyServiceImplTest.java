@@ -12,8 +12,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
-import jp.co.soramitsu.sora.crypto.DocumentSignatureService.NoSuchStrategy;
-import jp.co.soramitsu.sora.crypto.algorithms.RawSignatureStrategy.SignatureSuiteException;
 import jp.co.soramitsu.sora.didresolver.dto.DDO;
 import jp.co.soramitsu.sora.didresolver.dto.Proof;
 import jp.co.soramitsu.sora.didresolver.dto.PublicKey;
@@ -64,14 +62,14 @@ public class VerifyServiceImplTest {
   }
 
   @Test
-  public void testSuccessVerifyDDOProof()
-      throws SignatureSuiteException, IOException, NoSuchStrategy {
-    assertTrue(verifyService.verifyDDOProof(dataProvider.getDDOFromJson(DDO_JSON_NAME), KEY_VALUE));
+  public void testSuccessVerifyDDOProof() throws IOException {
+    DDO ddo = dataProvider.getDDOFromJson(DDO_JSON_NAME);
+    assertFalse(verifyService.verifyDDOProof(ddo, KEY_VALUE));
+    assertTrue(verifyService.verifyDDOProof(ddo, ddo.getPublicKey().get(0).getPublicKeyValue()));
   }
 
   @Test
-  public void testFailedVerifyDDOProof()
-      throws SignatureSuiteException, IOException, NoSuchStrategy {
+  public void testFailedVerifyDDOProof() throws IOException {
     DDO ddo = dataProvider.getDDOFromJson(DDO_JSON_NAME);
     ddo.setCreated(Instant.now().truncatedTo(ChronoUnit.SECONDS));
     assertFalse(verifyService.verifyDDOProof(ddo, KEY_VALUE));

@@ -1,8 +1,8 @@
 package jp.co.soramitsu.sora.didresolver.dto;
 
-import java.net.URI;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.net.URI;
 import javax.validation.constraints.NotBlank;
 import jp.co.soramitsu.sora.didresolver.commons.CryptoActionTypeEnum;
 import jp.co.soramitsu.sora.didresolver.dto.serializers.HexValueCombinedSerializer.HexValueDeserializer;

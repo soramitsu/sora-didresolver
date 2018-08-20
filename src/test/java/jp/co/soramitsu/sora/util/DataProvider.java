@@ -1,11 +1,10 @@
 package jp.co.soramitsu.sora.util;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -62,12 +61,18 @@ public class DataProvider {
   }
 
   public DDO getDDOFromJson(String fileName) throws IOException {
-    ObjectMapper objectMapper = new ObjectMapper();
-    objectMapper.registerModule(new JavaTimeModule());
-    Reader jsonReader = new BufferedReader(
-        new InputStreamReader(
-            DataProvider.class.getClassLoader().getResourceAsStream(fileName)));
-    return objectMapper.readValue(jsonReader, DDO.class);
+    ObjectMapper objectMapper = new ObjectMapper()
+        .registerModule(new JavaTimeModule())
+        .enable(SerializationFeature.INDENT_OUTPUT)
+        .setSerializationInclusion(Include.NON_NULL);
+
+    return objectMapper
+        .readValue(
+            DataProvider.class
+                .getClassLoader()
+                .getResourceAsStream(fileName),
+            DDO.class
+        );
   }
 
   private String getCryptoType(CryptoActionTypeEnum actionTypeEnum) {
