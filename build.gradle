@@ -57,7 +57,7 @@ ext {
     jUnitVersion = '5.2.0'
     jacksonVersion = '2.9.6'
     jUnitPlatformVersion = '1.2.0'
-    ed25519Version = '1.3.3'
+    soraCryptoVersion = '8e4ace36a1'
 }
 
 repositories {
@@ -66,6 +66,9 @@ repositories {
 }
 
 dependencies {
+    compile "com.github.soramitsu:sora-crypto-java:${soraCryptoVersion}"
+
+
     // log4j case
     /*[
             "org.springframework:spring-context",
@@ -80,8 +83,6 @@ dependencies {
     }*/
 
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
-    compile ("com.github.warchant:ed25519-sha3-java:${ed25519Version}")
-
     compile('org.springframework.boot:spring-boot-starter-validation')
     compile('org.springframework.boot:spring-boot-starter-web')
 

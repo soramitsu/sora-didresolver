@@ -6,7 +6,6 @@ import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import jp.co.soramitsu.sora.crypto.VerifiableJson;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.DIDConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DDO implements VerifiableJson<Proof> {
+public class DDO {
 
   @NotBlank
   @DIDConstraint(isNullable = false)

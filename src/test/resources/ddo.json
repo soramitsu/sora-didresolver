@@ -5,7 +5,7 @@
       "id": "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf#keys-1",
       "type": "Ed25519Sha3VerificationKey",
       "owner": "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf",
-      "publicKeyValue": "02b97c30de767f084ce3080168ee293053ba33b235d7116a3263d29f1450936b71"
+      "publicKeyValue": "02b97c30de767f084ce3080168ee293053ba33b235d7116a3263d29f1450936b"
     },
     {
       "id": "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf#keys-2",
@@ -17,14 +17,14 @@
   "authentication": [
     {
       "type": "Ed25519Sha3Authentication",
-      "publicKey": "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf#keys-2"
+      "publicKey": "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf#keys-1"
     }
   ],
   "created": "2018-07-04T17:00:00Z",
   "proof": {
     "type": "Ed25519Sha3Signature",
     "created": "2018-07-05T17:00:00Z",
-    "creator": "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf#keys-2",
+    "creator": "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf#keys-1",
     "signatureValue": "02b97c30de767f084ce3080168ee293053ba33b235d7116a3263d29f1450936b71",
     "nonce": "123123123123123"
   }
