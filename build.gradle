@@ -43,7 +43,7 @@ sourceCompatibility = 1.8
 ext {
     lombokVersion = '1.18.2'
     springSwaggerVersion = '2.9.2'
-    commonsLangVersion = '3.7'
+    commonsLangVersion = '3.8'
 //    log4jVersion = '2.11.0'
 //    slf4jVersion = '1.7.25'
     aspectjVersion = '1.9.1'
