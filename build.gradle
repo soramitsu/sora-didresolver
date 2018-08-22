@@ -57,7 +57,7 @@ ext {
     jUnitVersion = '5.2.0'
     jacksonVersion = '2.9.6'
     jUnitPlatformVersion = '1.2.0'
-    soraCryptoVersion = '8e4ace36a1'
+    soraCryptoVersion = '0.1'
 }
 
 repositories {
