@@ -1,8 +1,9 @@
 package jp.co.soramitsu.sora.util;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.net.URI;
@@ -63,8 +64,8 @@ public class DataProvider {
   public DDO getDDOFromJson(String fileName) throws IOException {
     ObjectMapper objectMapper = new ObjectMapper()
         .registerModule(new JavaTimeModule())
-        .enable(SerializationFeature.INDENT_OUTPUT)
-        .setSerializationInclusion(Include.NON_NULL);
+        .enable(INDENT_OUTPUT)
+        .setSerializationInclusion(NON_NULL);
 
     return objectMapper
         .readValue(

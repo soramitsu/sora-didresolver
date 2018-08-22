@@ -1,8 +1,10 @@
 package jp.co.soramitsu.sora.util;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;
+import static jp.co.soramitsu.crypto.ed25519.EdDSAKey.KEY_ALGORITHM;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.BufferedWriter;
 import java.io.FileOutputStream;
@@ -16,7 +18,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.util.Arrays;
 import javax.xml.bind.DatatypeConverter;
-import jp.co.soramitsu.crypto.ed25519.EdDSAKey;
 import jp.co.soramitsu.crypto.ed25519.EdDSAPrivateKey;
 import jp.co.soramitsu.crypto.ed25519.EdDSAPublicKey;
 import jp.co.soramitsu.sora.crypto.common.SecurityProvider;
@@ -37,8 +38,8 @@ public class SignatureGenerator {
 
     ObjectMapper objectMapper = new ObjectMapper()
         .registerModule(new JavaTimeModule())
-        .enable(SerializationFeature.INDENT_OUTPUT)
-        .setSerializationInclusion(Include.NON_NULL);
+        .enable(INDENT_OUTPUT)
+        .setSerializationInclusion(NON_NULL);
 
     JSONEd25519Sha3SignatureSuite documentSignatureService = new JSONEd25519Sha3SignatureSuite(
         new SecurityProvider(), new JSONCanonizerWithOneCoding(), objectMapper);
@@ -46,7 +47,7 @@ public class SignatureGenerator {
     InputStream in = SignatureGenerator.class.getClassLoader().getResourceAsStream("ddo.json");
     DDO ddo = objectMapper.readValue(in, DDO.class);
 
-    KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(EdDSAKey.KEY_ALGORITHM);
+    KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(KEY_ALGORITHM);
     KeyPair keyPair = keyPairGenerator.generateKeyPair();
     writeKeyPairToFile(keyPair);
 

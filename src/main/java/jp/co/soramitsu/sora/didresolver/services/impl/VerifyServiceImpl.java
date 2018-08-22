@@ -1,8 +1,10 @@
 package jp.co.soramitsu.sora.didresolver.services.impl;
 
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;
+import static jp.co.soramitsu.crypto.ed25519.spec.EdDSANamedCurveTable.ED_25519;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.util.List;
@@ -29,11 +31,11 @@ public class VerifyServiceImpl implements VerifyService {
 
   private static final ObjectMapper mapper = new ObjectMapper()
       .registerModule(new JavaTimeModule())
-      .enable(SerializationFeature.INDENT_OUTPUT)
-      .setSerializationInclusion(Include.NON_NULL);
+      .enable(INDENT_OUTPUT)
+      .setSerializationInclusion(NON_NULL);
 
   private static final EdDSAParameterSpec parameterSpec = EdDSANamedCurveTable
-      .getByName(EdDSANamedCurveTable.ED_25519);
+      .getByName(ED_25519);
 
   private static final JSONEd25519Sha3SignatureSuite suite =
       new JSONEd25519Sha3SignatureSuite(
