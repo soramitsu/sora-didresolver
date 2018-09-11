@@ -12,7 +12,7 @@ public class DIDValidator implements ConstraintValidator<DIDConstraint, String> 
 
   //TODO move to application properties
   private static final String DID_STRUCT_REGEXP = "did:sora:\\w*:.*";
-  private static final char DELIMETER = ':';
+  private static final char DELIMITER = ':';
 
   private boolean isNullable;
 
@@ -26,7 +26,7 @@ public class DIDValidator implements ConstraintValidator<DIDConstraint, String> 
     log.debug("validation format of DID - {}", did);
     boolean isValid = isNullable;
     if (StringUtils.isNotBlank(did) && did.matches(DID_STRUCT_REGEXP)) {
-      String[] didParts = StringUtils.split(did, DELIMETER);
+      String[] didParts = StringUtils.split(did, DELIMITER);
       isValid = didParts.length > 3 && checkTypeAndIdentifier(didParts[2], didParts[3]);
     }
     log.debug("result of validation format of DID - {} is {}", did, isValid);

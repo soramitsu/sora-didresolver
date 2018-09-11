@@ -7,11 +7,13 @@ import static org.junit.Assert.assertTrue;
 
 import java.net.URI;
 import java.util.List;
-import jp.co.soramitsu.sora.didresolver.dto.Authentication;
-import jp.co.soramitsu.sora.didresolver.dto.Proof;
-import jp.co.soramitsu.sora.didresolver.dto.PublicKey;
 import jp.co.soramitsu.sora.didresolver.services.ValidateService;
 import jp.co.soramitsu.sora.didresolver.services.impl.ValidateServiceImpl;
+import jp.co.soramitsu.sora.sdk.did.model.dto.Authentication;
+import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
+import jp.co.soramitsu.sora.sdk.did.model.dto.Proof;
+import jp.co.soramitsu.sora.sdk.did.model.dto.PublicKey;
+import jp.co.soramitsu.sora.sdk.did.parser.generated.ParserException;
 import jp.co.soramitsu.sora.util.DataProvider;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
@@ -39,34 +41,35 @@ public class ValidateServiceImplTest {
   }
 
   @Test
-  public void testSuccessIsProofCreatorInAuth() {
-    assertTrue(validateService.isProofCreatorInAuth(dataProvider.getProofForTest().getCreator(),
+  public void testSuccessIsProofCreatorInAuth() throws ParserException {
+    DID proofCreator = dataProvider.getProofForTest().getOptions().getCreator();
+    assertTrue(validateService.isProofCreatorInAuth(proofCreator,
         dataProvider.getAuthenticationForTest()));
   }
 
   @Test
-  public void testFailedIsProofCreatorInAuth() {
+  public void testFailedIsProofCreatorInAuth() throws ParserException {
     Proof proof = dataProvider.getProofForTest();
     List<Authentication> authentications = dataProvider.getAuthenticationForTest();
-    proof.setCreator(URI.create(StringUtils.replaceChars(proof.getCreator().toString(), '5', '8')));
-    assertFalse(validateService.isProofCreatorInAuth(proof.getCreator(), authentications));
-    proof.setCreator(URI.create(ID_BASE + KEYS_COUNT + 2));
-    assertFalse(validateService.isProofCreatorInAuth(proof.getCreator(), authentications));
+    proof.getOptions().setCreator(DID.parse(StringUtils.replaceChars(proof.getOptions().getCreator().toString(), '5', '8')));
+    assertFalse(validateService.isProofCreatorInAuth(proof.getOptions().getCreator(), authentications));
+    proof.getOptions().setCreator(DID.parse(ID_BASE + KEYS_COUNT + 2));
+    assertFalse(validateService.isProofCreatorInAuth(proof.getOptions().getCreator(), authentications));
   }
 
   @Test
   public void testSuccessIsProofInPublicKeys() {
-    assertTrue(validateService.isProofInPublicKeys(dataProvider.getProofForTest().getCreator(),
+    assertTrue(validateService.isProofInPublicKeys(dataProvider.getProofForTest().getOptions().getCreator(),
         dataProvider.getPublicKeysForTest()));
   }
 
   @Test
-  public void testFailedIsProofInPublicKeys() {
+  public void testFailedIsProofInPublicKeys() throws ParserException {
     Proof proof = dataProvider.getProofForTest();
     List<PublicKey> publicKeys = dataProvider.getPublicKeysForTest();
-    proof.setCreator(URI.create(StringUtils.replaceChars(proof.getCreator().toString(), '5', '8')));
-    assertFalse(validateService.isProofInPublicKeys(proof.getCreator(), publicKeys));
-    proof.setCreator(URI.create(ID_BASE + KEYS_COUNT + 2));
-    assertFalse(validateService.isProofInPublicKeys(proof.getCreator(), publicKeys));
+    proof.getOptions().setCreator(DID.parse(StringUtils.replaceChars(proof.getOptions().getCreator().toString(), '5', '8')));
+    assertFalse(validateService.isProofInPublicKeys(proof.getOptions().getCreator(), publicKeys));
+    proof.getOptions().setCreator(DID.parse(ID_BASE + KEYS_COUNT + 2));
+    assertFalse(validateService.isProofInPublicKeys(proof.getOptions().getCreator(), publicKeys));
   }
 }

@@ -15,7 +15,8 @@ import java.util.Collections;
 import javax.sql.DataSource;
 import jp.co.soramitsu.sora.didresolver.domain.entities.Account;
 import jp.co.soramitsu.sora.didresolver.domain.entities.AccountVault;
-import jp.co.soramitsu.sora.didresolver.dto.DDO;
+import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
+import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
 import lombok.val;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -81,9 +82,9 @@ public class AccountRepositoryTest {
     account.setAccountId("Vasya");
     val vault = new AccountVault();
     val ddo = new DDO();
-    ddo.setId("someId");
+    ddo.setId(DID.randomUUID());
     ddo.setCreated(Instant.now().truncatedTo(ChronoUnit.SECONDS));
-    vault.setDdos(Collections.singletonMap("someId", ddo));
+    vault.setDdos(Collections.singletonMap(ddo.getId().toString(), ddo));
     account.setData(vault);
     repository.save(account);
 

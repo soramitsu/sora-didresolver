@@ -15,11 +15,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import jp.co.soramitsu.sora.didresolver.domain.repositories.AccountRepository;
-import jp.co.soramitsu.sora.didresolver.domain.valueobjects.DID;
-import jp.co.soramitsu.sora.didresolver.dto.DDO;
 import jp.co.soramitsu.sora.didresolver.exceptions.UnparseableException;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
 import jp.co.soramitsu.sora.didresolver.services.impl.DIDServiceViaRepository;
+import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
+import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
+import jp.co.soramitsu.sora.sdk.did.parser.generated.ParserException;
 import lombok.val;
 import org.junit.Before;
 import org.junit.Rule;
@@ -63,27 +64,18 @@ public class DIDServiceImplTest {
     storageService = new DIDServiceViaRepository(accountRepository);
   }
 
-  @Theory
-  public void givenIncorrectDidsWhenCalledReadAssertExceptionThrown(String did)
-      throws UnparseableException {
-    expectedException.expect(UnparseableException.class);
-    val didObject = new DID(did);
-
-    storageService.read(didObject.getDidString());
-  }
-
   @Test
   public void givenCorrectIrohaIdWhenCalledReadAssertAccountEntityReturned()
       throws UnparseableException {
     val did = "did:sora:iroha:vasya@home.ru";
     val ddo = new DDO();
-    ddo.setId(did);
+    ddo.setId(DID.randomUUID());
     ddo.setCreated(Instant.now().truncatedTo(ChronoUnit.SECONDS));
     val ddoString = JacksonUtil.toString(ddo);
 
     when(accountRepository.findDDOByDid(did)).thenReturn(Optional.of(ddoString));
 
-    val result = storageService.read(did);
+    val result = storageService.findDDObyDID(did);
 
     assertThat(result.isPresent(), is(true));
     assertThat(result.get(), equalTo(ddo));

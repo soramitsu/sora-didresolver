@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import jp.co.soramitsu.sora.didresolver.dto.DDO;
+import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 import lombok.Data;
 import lombok.val;
 

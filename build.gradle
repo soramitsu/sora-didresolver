@@ -44,20 +44,18 @@ ext {
     lombokVersion = '1.18.2'
     springSwaggerVersion = '2.9.2'
     commonsLangVersion = '3.8'
-//    log4jVersion = '2.11.0'
-//    slf4jVersion = '1.7.25'
     aspectjVersion = '1.9.1'
     spongycastleVersion = '1.58.0.0'
     mockitoCoreVersion = '2.21.0'
     hibernateTypesVersion = '2.2.3'
     testContainersVersion = '1.8.3'
-    postgresVersion = '42.2.4'
     liquibaseVersion = '3.6.2'
     c3p0Version = '0.9.5.2'
     jUnitVersion = '5.3.0'
     jacksonVersion = '2.9.6'
     jUnitPlatformVersion = '1.3.0'
     soraCryptoVersion = '0.1'
+    soraSDKVersion = '0.2.1'
 }
 
 repositories {
@@ -67,20 +65,7 @@ repositories {
 
 dependencies {
     compile "com.github.soramitsu:sora-crypto-java:${soraCryptoVersion}"
-
-
-    // log4j case
-    /*[
-            "org.springframework:spring-context",
-            "org.springframework.boot:spring-boot-starter-web",
-            "org.springframework.boot:spring-boot-starter-validation",
-            "org.springframework.boot:spring-boot-starter-data-jpa"
-    ].each { dep ->
-        compile(dep) {
-            exclude module: "spring-boot-starter-logging"
-            exclude module: "logback-classic"
-        }
-    }*/
+    compile "com.github.soramitsu:sora-sdk:${soraSDKVersion}"
 
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
     compile('org.springframework.boot:spring-boot-starter-validation')
@@ -91,22 +76,16 @@ dependencies {
 
     compile("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${jacksonVersion}")
 
-    //commons
     compile("org.apache.commons:commons-lang3:${commonsLangVersion}")
 
     //DB
-    // Handy library which allows to map json/jsonb columns to java type on in entity column!!
-    // https://github.com/vladmihalcea/hibernate-types
     compile("com.vladmihalcea:hibernate-types-52:${hibernateTypesVersion}")
-    compile("org.postgresql:postgresql:${postgresVersion}")
+    compile("org.postgresql:postgresql")
     compile("org.liquibase:liquibase-core:${liquibaseVersion}")
 
     //logging
-//    compile("org.apache.logging.log4j:log4j-api:${log4jVersion}")
-//    compile("org.apache.logging.log4j:log4j-core:${log4jVersion}")
-//    compile("org.slf4j:slf4j-api:${slf4jVersion}")
-    implementation("org.aspectj:aspectjrt:${aspectjVersion}")
-    implementation("org.aspectj:aspectjweaver:${aspectjVersion}")
+    compile("org.aspectj:aspectjrt:${aspectjVersion}")
+    compile("org.aspectj:aspectjweaver:${aspectjVersion}")
     compile("com.mchange:c3p0:${c3p0Version}")
 
     compileOnly "org.springframework.boot:spring-boot-configuration-processor"
@@ -114,21 +93,13 @@ dependencies {
     //tests
     testCompile("org.mockito:mockito-core:${mockitoCoreVersion}")
     testCompile('org.springframework.boot:spring-boot-starter-test')
-    // log4j case
-    /*testCompile('org.springframework.boot:spring-boot-starter-test'){
-        exclude module: "spring-boot-starter-logging"
-        exclude module: "logback-classic"
-    }*/
-    // Allows using docker containers in tests
     testCompile("org.testcontainers:testcontainers:${testContainersVersion}")
     testCompile("org.testcontainers:postgresql:${testContainersVersion}")
     testCompile("org.junit.jupiter:junit-jupiter-api:${jUnitVersion}")
     testCompile("org.junit.jupiter:junit-jupiter-params:${jUnitVersion}")
     testRuntime("org.junit.jupiter:junit-jupiter-engine:${jUnitVersion}")
-    testCompile("org.junit.vintage:junit-vintage-engine:${jUnitVersion}")
     testCompile("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
     testCompile("org.junit.platform:junit-platform-launcher:${jUnitPlatformVersion}")
-
     compileOnly("org.projectlombok:lombok:${lombokVersion}")
     testCompileOnly("org.projectlombok:lombok:${lombokVersion}")
 }

@@ -3,9 +3,9 @@ package jp.co.soramitsu.sora.didresolver.services.impl;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import jp.co.soramitsu.sora.didresolver.dto.DDO;
 import jp.co.soramitsu.sora.didresolver.exceptions.DIDNotFoundException;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
+import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 import lombok.NoArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ public class MockStorageServiceImpl implements StorageService {
   }
 
   @Override
-  public Optional<DDO> read(String did) {
+  public Optional<DDO> findDDObyDID(String did) {
     return Optional.ofNullable(mockStorage.get(did));
   }
 

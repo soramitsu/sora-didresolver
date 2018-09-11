@@ -12,11 +12,13 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
-import jp.co.soramitsu.sora.didresolver.dto.DDO;
-import jp.co.soramitsu.sora.didresolver.dto.Proof;
-import jp.co.soramitsu.sora.didresolver.dto.PublicKey;
 import jp.co.soramitsu.sora.didresolver.services.VerifyService;
 import jp.co.soramitsu.sora.didresolver.services.impl.VerifyServiceImpl;
+import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
+import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
+import jp.co.soramitsu.sora.sdk.did.model.dto.Proof;
+import jp.co.soramitsu.sora.sdk.did.model.dto.PublicKey;
+import jp.co.soramitsu.sora.sdk.did.parser.generated.ParserException;
 import jp.co.soramitsu.sora.util.DataProvider;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -47,31 +49,31 @@ public class VerifyServiceImplTest {
   @Test
   public void testSuccessGetPublicKeyByProof() {
     Optional<PublicKey> publicKey = verifyService
-        .getPublicKeyByProof(dataProvider.getProofForTest(), dataProvider.getPublicKeysForTest());
+        .getProofPublicKeyByProof(dataProvider.getPublicKeysForTest(), dataProvider.getProofForTest());
     assertTrue(publicKey.isPresent());
   }
 
   @Test
-  public void testFailedGetPublicKeyByProof() {
+  public void testFailedGetPublicKeyByProof() throws ParserException {
     Proof proof = dataProvider.getProofForTest();
-    proof.setCreator(URI.create(ID_BASE + KEYS_COUNT + 2));
+    proof.getOptions().setCreator(DID.parse(ID_BASE + KEYS_COUNT + 2));
     List<PublicKey> publicKeys = dataProvider.getPublicKeysForTest();
     Optional<PublicKey> publicKey = verifyService
-        .getPublicKeyByProof(proof, publicKeys);
+        .getProofPublicKeyByProof(publicKeys, proof);
     assertFalse(publicKey.isPresent());
   }
 
   @Test
   public void testSuccessVerifyDDOProof() throws IOException {
     DDO ddo = dataProvider.getDDOFromJson(DDO_JSON_NAME);
-    assertFalse(verifyService.verifyDDOProof(ddo, KEY_VALUE));
-    assertTrue(verifyService.verifyDDOProof(ddo, ddo.getPublicKey().get(0).getPublicKeyValue()));
+    assertFalse(verifyService.verifyDDOProof(ddo, new String(KEY_VALUE)));
+    assertTrue(verifyService.verifyDDOProof(ddo, ddo.getPublicKey().get(0).getId().toString()));
   }
 
   @Test
   public void testFailedVerifyDDOProof() throws IOException {
     DDO ddo = dataProvider.getDDOFromJson(DDO_JSON_NAME);
     ddo.setCreated(Instant.now().truncatedTo(ChronoUnit.SECONDS));
-    assertFalse(verifyService.verifyDDOProof(ddo, KEY_VALUE));
+    assertFalse(verifyService.verifyDDOProof(ddo, new String(KEY_VALUE)));
   }
 }

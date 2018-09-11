@@ -9,12 +9,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Optional;
-import jp.co.soramitsu.sora.didresolver.dto.DDO;
-import jp.co.soramitsu.sora.didresolver.dto.Proof;
-import jp.co.soramitsu.sora.didresolver.dto.PublicKey;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
 import jp.co.soramitsu.sora.didresolver.services.ValidateService;
 import jp.co.soramitsu.sora.didresolver.services.VerifyService;
+import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
+import jp.co.soramitsu.sora.sdk.did.model.dto.Proof;
+import jp.co.soramitsu.sora.sdk.did.model.dto.PublicKey;
 import org.junit.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.json.JacksonTester;
@@ -53,11 +53,11 @@ public abstract class DIDResolverControllerInitializer {
     ddo = json.read(jsonReader).getObject();
     Proof proof = ddo.getProof();
     PublicKey publicKey = ddo.getPublicKey().get(1);
-    when(verifyService.getPublicKeyByProof(proof, ddo.getPublicKey()))
+    when(verifyService.getProofPublicKeyByProof(ddo.getPublicKey(), proof))
         .thenReturn(Optional.of(publicKey));
-    when(validateService.isProofCreatorInAuth(proof.getCreator(), ddo.getAuthentication()))
+    when(validateService.isProofCreatorInAuth(proof.getOptions().getCreator(), ddo.getAuthentication()))
         .thenReturn(true);
-    when(validateService.isProofInPublicKeys(proof.getCreator(), ddo.getPublicKey()))
+    when(validateService.isProofInPublicKeys(proof.getOptions().getCreator(), ddo.getPublicKey()))
         .thenReturn(true);
     when(verifyService.verifyDDOProof(any(), any())).thenReturn(true);
   }

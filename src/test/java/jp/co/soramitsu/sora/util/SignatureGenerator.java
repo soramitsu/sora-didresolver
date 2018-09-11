@@ -25,8 +25,9 @@ import jp.co.soramitsu.sora.crypto.json.JSONCanonizerWithOneCoding;
 import jp.co.soramitsu.sora.crypto.proof.Options;
 import jp.co.soramitsu.sora.crypto.signature.suite.JSONEd25519Sha3SignatureSuite;
 import jp.co.soramitsu.sora.crypto.type.SignatureTypeEnum;
-import jp.co.soramitsu.sora.didresolver.dto.DDO;
-import jp.co.soramitsu.sora.didresolver.dto.Proof;
+import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
+import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
+import jp.co.soramitsu.sora.sdk.did.model.dto.Proof;
 import lombok.val;
 
 public class SignatureGenerator {
@@ -53,15 +54,16 @@ public class SignatureGenerator {
 
     ddo.getPublicKey()
         .get(0)
-        .setPublicKeyValue(keyPair.getPublic().getEncoded());
+        .setId(DID.randomUUID());
+//        .setId(keyPair.getPublic().getEncoded());
 
     Proof proof = ddo.getProof();
     Options options = new Options(
-        SignatureTypeEnum.valueOf(proof.getType()),
-        proof.getCreated().toString(),
-        proof.getCreator().toString(),
-        proof.getNonce(),
-        proof.getPurpose()
+        SignatureTypeEnum.valueOf(proof.getOptions().getType().getSignatureType()),
+        proof.getOptions().getCreated().toString(),
+        proof.getOptions().getCreator().toString(),
+        proof.getOptions().getNonce(),
+        proof.getOptions().getPurpose()
     );
 
     val signed = documentSignatureService

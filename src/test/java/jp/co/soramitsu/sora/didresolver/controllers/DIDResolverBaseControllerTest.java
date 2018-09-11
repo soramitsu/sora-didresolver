@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.net.URI;
 import java.util.Optional;
+import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -25,7 +26,7 @@ public class DIDResolverBaseControllerTest extends DIDResolverControllerInitiali
 
   @Test
   public void testDuplicateDDO() throws Exception {
-    given(storageService.read(ddo.getId())).willReturn(Optional.of(ddo));
+    given(storageService.findDDObyDID(ddo.getId().toString())).willReturn(Optional.of(ddo));
     postRequest(status().isUnprocessableEntity());
   }
 
@@ -56,7 +57,7 @@ public class DIDResolverBaseControllerTest extends DIDResolverControllerInitiali
   @Test
   public void testInvalidProofExceptionOnCreateDDO() throws Exception {
     when(validateService
-        .isProofCreatorInAuth(ddo.getProof().getCreator(), ddo.getAuthentication()))
+        .isProofCreatorInAuth(ddo.getProof().getOptions().getCreator(), ddo.getAuthentication()))
         .thenReturn(false);
     postRequest(status().isBadRequest());
 
@@ -66,7 +67,7 @@ public class DIDResolverBaseControllerTest extends DIDResolverControllerInitiali
     postRequest(status().isBadRequest());
 
     when(validateService
-        .isProofCreatorInAuth(ddo.getProof().getCreator(), ddo.getAuthentication()))
+        .isProofCreatorInAuth(ddo.getProof().getOptions().getCreator(), ddo.getAuthentication()))
         .thenReturn(true);
     postRequest(status().isBadRequest());
   }
@@ -79,10 +80,9 @@ public class DIDResolverBaseControllerTest extends DIDResolverControllerInitiali
 
   @Test
   public void testGetPublicKeysFromAnotherDDO() throws Exception {
-    ddo.setId("did:sora:iroha:sergey@soramitsu.co.jp");
-    URI creator = ddo.getProof().getCreator();
-    String proofCreatorDID = creator.getScheme() + ":" + creator.getSchemeSpecificPart();
-    given(storageService.read(proofCreatorDID)).willReturn(Optional.of(ddo));
+    ddo.setId(DID.randomUUID());
+    DID proofCreator = ddo.getProof().getOptions().getCreator();
+    given(storageService.findDDObyDID(proofCreator.toString())).willReturn(Optional.of(ddo));
     postRequest(status().isOk());
   }
 
