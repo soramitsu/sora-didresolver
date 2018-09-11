@@ -66,44 +66,21 @@ public class DIDResolverBaseController {
     storageService.createOrUpdate(ddo.getId().toString(), ddo);
   }
 
-  protected void verifyDDOProof(DDO ddo) throws UnparseableException {
+  protected void verifyDDOProof(DDO ddo) {
 //    todo: change to correct validation process
-//    DID proofCreator = ddo.getProof().getOptions().getCreator();
-//    if (!validateService.isProofCreatorInAuth(proofCreator, ddo.getAuthentication())
-//        || !validateService.isProofInPublicKeys(
-//            proofCreator, getPublicKeysForCheck(proofCreator, ddo.getId(), ddo.getPublicKey()))) {
-//      throw new InvalidProofException(ddo.getId().toString());
-//    }
-//    Optional<PublicKey> publicKey =
-//        verifyService.getProofPublicKeyByProof(ddo.getPublicKey(), ddo.getProof());
-//    if (publicKey.isPresent()
-//        && !verifyService.verifyDDOProof(ddo, publicKey.get().getId().toString())) {
-//      log.warn("failure verify proof for DDO with DID {}", ddo.getId());
-//      throw new BadProofException(ddo.getId().toString());
-//    }
-//    log.debug("success verify proof for DDO with DID {}", ddo.getId());
-  }
-
-  /**
-   * Receives an array of proof's public keys for check proof's integrity
-   *
-   * @param proofCreator DID part of the value of field creator of proof section
-   * @param subjectDid subject DID
-   * @param subjectPublicKeys array of public keys of the current DDO
-   * @return an array of Subject's public keys when Proof Creator and Subject DID are the same,
-   *     otherwise return an array of Proof's public keys
-   */
-  private List<PublicKey> getPublicKeysForCheck(
-      @NotBlank DID proofCreator,
-      @NotBlank DID subjectDid,
-      @NotNull @Valid List<PublicKey> subjectPublicKeys)
-      throws UnparseableException {
-    if (!subjectDid.equals(proofCreator)) {
-      val proofCreatorDDO = storageService.findDDObyDID(proofCreator.toString());
-      if (proofCreatorDDO.isPresent()) {
-        return proofCreatorDDO.get().getPublicKey();
-      }
+    DID proofCreator = ddo.getProof().getOptions().getCreator();
+    if (!validateService.isProofCreatorInAuth(proofCreator, ddo.getAuthentication())
+        || !validateService.isProofInPublicKeys(
+            proofCreator, ddo.getPublicKey())) {
+      throw new InvalidProofException(ddo.getId().toString());
     }
-    return subjectPublicKeys;
+    Optional<PublicKey> publicKey =
+        verifyService.getProofPublicKeyByProof(ddo.getPublicKey(), ddo.getProof());
+    if (publicKey.isPresent()
+        && !verifyService.verifyDDOProof(ddo, publicKey.get().getId().toString())) {
+      log.warn("failure verify proof for DDO with DID {}", ddo.getId());
+      throw new BadProofException(ddo.getId().toString());
+    }
+    log.debug("success verify proof for DDO with DID {}", ddo.getId());
   }
 }
