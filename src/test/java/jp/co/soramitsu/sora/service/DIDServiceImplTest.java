@@ -66,8 +66,9 @@ public class DIDServiceImplTest {
 
   @Test
   public void givenCorrectIrohaIdWhenCalledReadAssertAccountEntityReturned()
-      throws UnparseableException {
-    val did = "did:sora:iroha:vasya@home.ru";
+      throws UnparseableException, ParserException {
+
+    val did = "did:sora:soraUser8";
     val ddo = new DDO();
     ddo.setId(DID.randomUUID());
     ddo.setCreated(Instant.now().truncatedTo(ChronoUnit.SECONDS));

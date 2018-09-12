@@ -98,11 +98,11 @@ public class AccountRepositoryTest {
   public void whenCalledFindDDOByDidThenReturnStringAndMapToDDO()
       throws IOException {
     val ddoString = repository
-        .findDDOByDid("did:sora:iroha:bogdan@soramitsu.co.jp");
+        .findDDOByDid("did:sora:soraUser8");
 
     assertThat(ddoString.isPresent(), is(true));
 
     val ddo = mapper.readValue(ddoString.get(), DDO.class);
-    assertThat(ddo.getId(), equalTo("did:sora:iroha:bogdan@soramitsu.co.jp"));
+    assertThat(ddo.getId().toString(), equalTo("did:sora:soraUser8"));
   }
 }

@@ -6,8 +6,7 @@ import lombok.Getter;
 import lombok.val;
 
 public enum DIDTypeEnum {
-  IROHA("(?<ACCOUNT>\\w+)@(?<DOMAIN>\\w+[\\w|.]*)"),
-  UUID("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}");
+  USERNAME("[a-zA-Z0-9]{6,32}");
 
   @Getter
   private String regexp;
@@ -17,7 +16,7 @@ public enum DIDTypeEnum {
 
   DIDTypeEnum(String regexp) {
     this.regexp = regexp;
-    this.pattern = Pattern.compile("did:sora:" + name().toLowerCase() + ":(?<IDENTIFIER>" + getRegexp() + ")");
+    this.pattern = Pattern.compile("did:sora:" + "(?<IDENTIFIER>" + getRegexp() + ")");
   }
 
   public String identifier(String did) throws DIDUnparseableException {

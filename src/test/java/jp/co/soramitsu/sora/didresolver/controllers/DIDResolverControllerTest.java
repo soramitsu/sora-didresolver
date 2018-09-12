@@ -1,5 +1,6 @@
 package jp.co.soramitsu.sora.didresolver.controllers;
 
+import static java.util.Optional.of;
 import static jp.co.soramitsu.sora.didresolver.commons.URIConstants.ID_PARAM;
 import static jp.co.soramitsu.sora.didresolver.commons.URIConstants.PATH;
 import static org.mockito.ArgumentMatchers.any;
@@ -14,11 +15,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.Instant;
-import java.util.Optional;
-import jp.co.soramitsu.sora.didresolver.controllers.dto.ErrorRs;
-import jp.co.soramitsu.sora.didresolver.controllers.dto.ErrorRs.BusinessErrors;
 import jp.co.soramitsu.sora.didresolver.exceptions.DIDNotFoundException;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
+import jp.co.soramitsu.sora.sdk.did.parser.generated.ParserException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -38,14 +37,14 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
 
   @Test
   public void testGetDDO() throws Exception {
-    given(storageService.findDDObyDID(ddo.getId().toString())).willReturn(Optional.of(ddo));
-    sendDDORequest(get(URL, ddo.getId()), status().isOk(), content().contentType(contentType),
+    given(storageService.findDDObyDID(ddo.getId().toString())).willReturn(of(ddo));
+    sendDDORequest(get(URL, ddo.getId().toString()), status().isOk(), content().contentType(contentType),
         content().json(json.write(ddo).getJson()));
   }
 
   @Test
   public void testDIDNotFoundOnGetDDO() throws Exception {
-    sendDDORequest(get(URL, ddo.getId()), status().isNotFound());
+    sendDDORequest(get(URL, ddo.getId().toString()), status().isNotFound());
   }
 
   @Test
@@ -57,29 +56,30 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
 
   @Test
   public void testDeleteDDO() throws Exception {
-    given(storageService.findDDObyDID(ddo.getId().toString())).willReturn(Optional.of(ddo));
-    sendDDORequest(delete(URL, ddo.getId()), status().isOk());
+    given(storageService.findDDObyDID(ddo.getId().toString())).willReturn(of(ddo));
+    sendDDORequest(delete(URL, ddo.getId().toString()), status().isOk());
   }
 
   @Test
   public void testDIDNotFoundOnDeleteDDO() throws Exception {
-    doThrow(new DIDNotFoundException(ddo.getId().toString())).when(storageService).delete(ddo.getId().toString());
-    sendDDORequest(delete(URL, ddo.getId()), status().isNotFound());
+    doThrow(new DIDNotFoundException(ddo.getId().toString())).when(storageService)
+        .delete(ddo.getId().toString());
+    sendDDORequest(delete(URL, ddo.getId().toString()), status().isNotFound());
   }
 
   @Test
   public void testIncorrectDIDOnDeleteDDO() throws Exception {
     // set incorrect did for check validation
     ddo.setId(DID.parse(INCORRECT_DID));
-    sendDDORequest(delete(URL, ddo.getId()), status().isBadRequest());
+    sendDDORequest(delete(URL, ddo.getId().toString()), status().isBadRequest());
   }
 
   @Test
   public void testUpdateDDO() throws Exception {
-    given(storageService.findDDObyDID(ddo.getId().toString())).willReturn(Optional.of(ddo));
+    given(storageService.findDDObyDID(ddo.getId().toString())).willReturn(of(ddo));
     ddo.setUpdated(Instant.now());
     sendDDORequest(
-        put(URL, ddo.getId()).contentType(contentType).content(json.write(ddo).getJson()),
+        put(URL, ddo.getId().toString()).contentType(contentType).content(json.write(ddo).getJson()),
         status().isOk());
   }
 
@@ -87,7 +87,7 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
   public void testDIDNotFoundOnUpdateDDO() throws Exception {
     ddo.setUpdated(Instant.now());
     sendDDORequest(
-        put(URL, ddo.getId()).contentType(contentType).content(json.write(ddo).getJson()),
+        put(URL, ddo.getId().toString()).contentType(contentType).content(json.write(ddo).getJson()),
         status().isNotFound());
   }
 
@@ -161,29 +161,23 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
         status().isBadRequest());
   }
 
-//  todo: test Proof
-//  @Test
-//  public void testBadProofExceptionOnCreateDDO() throws Exception {
-//    when(verifyService.verifyIntegrityOfDDO(any()).thenReturn(false);
-//    sendDDORequest(
-//        put(URL, ddo.getId()).contentType(contentType).content(json.write(ddo).getJson()),
-//        status().isUnauthorized());
-//  }
-
+  /* CREATING DDO */
   @Test
   public void testCreateDDO() throws Exception {
     postRequest(status().isOk());
   }
 
+  // TODO: 12/09/2018 implement tests for creating DDO using testRestTemplate
+
   @Test
   public void testDuplicateDDO() throws Exception {
-    given(storageService.findDDObyDID(ddo.getId().toString())).willReturn(Optional.of(ddo));
+    given(storageService.findDDObyDID(ddo.getId().toString())).willReturn(of(ddo));
     postRequest(status().isOk());
   }
 
-  @Test
+  @Test(expected = ParserException.class)
   public void testCheckDIDOnCreateDDO() throws Exception {
-    ddo.setId(null);
+    ddo.setId(DID.parse("sdg"));
     postRequest(status().isBadRequest());
   }
 
@@ -205,17 +199,11 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
     postRequest(status().isBadRequest());
   }
 
-//  @Test
-//  public void testBadProofExceptionOnCreateDDO() throws Exception {
-//    when(verifyService.verifyIntegrityOfDDO(any())).thenReturn(false);
-//    postRequest(status().isUnauthorized());
-//  }
-
   @Test
   public void testGetPublicKeysFromAnotherDDO() throws Exception {
     ddo.setId(DID.randomUUID());
     DID proofCreator = ddo.getProof().getOptions().getCreator();
-    given(storageService.findDDObyDID(proofCreator.toString())).willReturn(Optional.of(ddo));
+    given(storageService.findDDObyDID(proofCreator.toString())).willReturn(of(ddo));
     postRequest(status().isOk());
   }
 

@@ -11,7 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 public class DIDValidator implements ConstraintValidator<DIDConstraint, String> {
 
   //TODO move to application properties
-  private static final String DID_STRUCT_REGEXP = "did:sora:\\w*:.*";
+  private static final String DID_STRUCT_REGEXP = "did:sora:.*";
   private static final char DELIMITER = ':';
 
   private boolean isNullable;
@@ -27,18 +27,17 @@ public class DIDValidator implements ConstraintValidator<DIDConstraint, String> 
     boolean isValid = isNullable;
     if (StringUtils.isNotBlank(did) && did.matches(DID_STRUCT_REGEXP)) {
       String[] didParts = StringUtils.split(did, DELIMITER);
-      isValid = didParts.length > 3 && checkTypeAndIdentifier(didParts[2], didParts[3]);
+      isValid = didParts.length > 2 && checkTypeAndIdentifier(didParts[2]);
     }
     log.debug("result of validation format of DID - {} is {}", did, isValid);
     return isValid;
   }
 
-  private boolean checkTypeAndIdentifier(String didType, String identifier) {
+  private boolean checkTypeAndIdentifier(String identifier) {
     boolean checkResult = false;
     try {
-      checkResult = identifier.matches(DIDTypeEnum.valueOf(didType.toUpperCase()).getRegexp());
-    } catch (NullPointerException | IllegalArgumentException ignored) {
-    }
+      checkResult = identifier.matches(DIDTypeEnum.USERNAME.getRegexp());
+    } catch (NullPointerException | IllegalArgumentException ignored) {}
     return checkResult;
   }
 

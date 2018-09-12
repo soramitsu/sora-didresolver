@@ -57,8 +57,8 @@ public class VerifyServiceImpl implements VerifyService {
       @NotNull DID creator, @NotNull @Valid List<Authentication> authentication) {
 
     return true;
-    // FIXME: 11/09/2018 NPE occurring, however creator and getPublicKey are initialized
-//    return authentication.stream().anyMatch(auth -> auth.getPublicKey().equals(creator));
+//     FIXME: 11/09/2018 NPE due to incorrect constructing of Authentication
+//    return authentication.stream().anyMatch(auth -> auth.getPublicKey().toString().equals(creator.toString()));
   }
 
   @Override

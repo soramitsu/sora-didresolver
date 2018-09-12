@@ -1,30 +1,30 @@
 {
-  "id": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV",
+  "id": "did:sora:soraUser8",
   "publicKey": [
     {
-      "id": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV#keys-1",
+      "id": "did:sora:soraUser8#keys-1",
       "type": "Ed25519Sha3VerificationKey",
-      "owner": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV",
+      "owner": "did:sora:soraUser8",
       "publicKey": "ee4a9ce4d9e88c7247675d4473970608b3082a02550c12a1ac06eef58adf5458"
     },
     {
       "id": "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf#keys-2",
       "type": "Ed25519Sha3VerificationKey",
-      "owner": "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf",
+      "owner": "did:sora:soraUser8",
       "publicKey": "5294436285FB81F3806BA7B3FDFCEA1EC0AA275E2073348A0DF1289C64766D6E"
     }
   ],
   "authentication": [
     {
       "type": "Ed25519Sha3Authentication",
-      "publicKey": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV#keys-1"
+      "publicKey": "did:sora:soraUser8#keys-1"
     }
   ],
   "created": "2002-10-10T17:00:00Z",
   "proof": {
     "type": "Ed25519Sha3Signature",
     "created": "2002-10-10T17:00:00Z",
-    "creator": "did:sora:ed:H3C2AVvLMv6gmMNam3uVAjZpfkcJCwDwnZn6z3wXmqPV#keys-1",
+    "creator": "did:sora:soraUser8#keys-1",
     "signatureValue": "c2lnbmF0dXJl",
     "nonce": "nonce"
   }

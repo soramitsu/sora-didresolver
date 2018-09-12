@@ -6,9 +6,7 @@ import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
-import java.net.URI;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -18,15 +16,17 @@ import jp.co.soramitsu.sora.didresolver.commons.CryptoTypeEnum;
 import jp.co.soramitsu.sora.sdk.did.model.dto.Authentication;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
+import jp.co.soramitsu.sora.sdk.did.model.dto.Options;
 import jp.co.soramitsu.sora.sdk.did.model.dto.Proof;
 import jp.co.soramitsu.sora.sdk.did.model.dto.PublicKey;
 import jp.co.soramitsu.sora.sdk.did.model.dto.authentication.Ed25519Sha3Authentication;
 import jp.co.soramitsu.sora.sdk.did.model.dto.publickey.Ed25519Sha3VerificationKey;
+import jp.co.soramitsu.sora.sdk.did.model.type.SignatureTypeEnum;
 import jp.co.soramitsu.sora.sdk.did.parser.generated.ParserException;
 
 public class DataProvider {
 
-  public static final String TEST_DID = "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf";
+  public static final String TEST_DID = "did:sora:soraUser8";
 
   public static final String ID_BASE = TEST_DID + "#keys-";
 
@@ -38,16 +38,25 @@ public class DataProvider {
 
   private Random random = new Random();
 
-  public List<PublicKey> getPublicKeysForTest() {
+  public List<PublicKey> getPublicKeysForTest() throws ParserException {
     List<PublicKey> publicKeys = new ArrayList<>();
     for (int i = 0; i < KEYS_COUNT; i++) {
-      publicKeys.add(new Ed25519Sha3VerificationKey(DID.randomUUID(), null, KEY_VALUE));
+      publicKeys.add(new Ed25519Sha3VerificationKey(DID.parse(ID_BASE + i), null, KEY_VALUE));
     }
     return publicKeys;
   }
 
   public Proof getProofForTest() {
-    return new Proof();
+    try {
+      Options options = new Options(
+          SignatureTypeEnum.Ed25519Sha3Signature, Instant.now(),
+          DID.parse(ID_BASE + 2),
+          "23532",
+          "test");
+      return Proof.builder().options(options).signatureValue("test".getBytes()).build();
+    } catch (ParserException e) {
+    }
+    return null;
   }
 
   public List<Authentication> getAuthenticationForTest() throws ParserException {
