@@ -18,11 +18,12 @@ import jp.co.soramitsu.crypto.ed25519.spec.EdDSAPublicKeySpec;
 import jp.co.soramitsu.sora.crypto.common.SecurityProvider;
 import jp.co.soramitsu.sora.crypto.json.JSONCanonizerWithOneCoding;
 import jp.co.soramitsu.sora.crypto.signature.suite.JSONEd25519Sha3SignatureSuite;
+import jp.co.soramitsu.sora.didresolver.exceptions.BadProofException;
+import jp.co.soramitsu.sora.didresolver.exceptions.ProofSignatureVerificationException;
 import jp.co.soramitsu.sora.didresolver.services.VerifyService;
 import jp.co.soramitsu.sora.sdk.did.model.dto.Authentication;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
-import jp.co.soramitsu.sora.sdk.did.model.dto.Proof;
 import jp.co.soramitsu.sora.sdk.did.model.dto.PublicKey;
 import jp.co.soramitsu.sora.sdk.did.model.dto.publickey.Ed25519Sha3VerificationKey;
 import lombok.NoArgsConstructor;
@@ -47,37 +48,58 @@ public class VerifyServiceImpl implements VerifyService {
           new SecurityProvider(), new JSONCanonizerWithOneCoding(), mapper);
 
   @Override
-  public boolean isProofInPublicKeys(@NotNull DID proofCreator, List<PublicKey> publicKeys) {
+  public boolean isCreatorInPublicKeys(@NotNull DID proofCreator, List<PublicKey> publicKeys) {
     return publicKeys.stream().anyMatch(key -> proofCreator.equals(key.getId()));
   }
 
   @Override
-  public boolean isProofCreatorInAuth(
+  public boolean isCreatorInAuth(
       @NotNull DID creator, @NotNull @Valid List<Authentication> authentication) {
 
     return true;
     // FIXME: 11/09/2018 NPE occurring, however creator and getPublicKey are initialized
 //    return authentication.stream().anyMatch(auth -> auth.getPublicKey().equals(creator));
   }
-  
+
   @Override
-  public boolean verifyIntegrityOfDDO(DDO ddo, byte[] publicKeyValue) {
-    log.debug("verify proof for DDO with DID {}", ddo.getId());
+  public void verifyIntegrityOfDDO(DDO ddo) {
+    log.debug("verifying integrity of DDO with DID {}", ddo.getId());
 
-    boolean result = false;
+    Optional<byte[]> publicKeyValue =
+        getPublicKeyValueByDID(ddo.getPublicKey(), ddo.getProof().getOptions().getCreator());
 
-    EdDSAPublicKey edDSAPublicKey =
-        new EdDSAPublicKey(new EdDSAPublicKeySpec(publicKeyValue, parameterSpec));
-
-    try {
-      result = suite.verify(ddo, edDSAPublicKey);
-    } catch (IOException e) {
-      log.error(e.toString(), e);
+    if (!publicKeyValue.isPresent()) {
+      throw new BadProofException(ddo.getProof().getOptions().getCreator().toString());
     }
 
-    log.debug("end verify proof for DDO with DID {}", ddo.getId());
+    EdDSAPublicKey edDSAPublicKey =
+        new EdDSAPublicKey(new EdDSAPublicKeySpec(publicKeyValue.get(), parameterSpec));
 
-    return result;
+    try {
+      suite.verify(ddo, edDSAPublicKey);
+    } catch (IOException e) {
+      throw new ProofSignatureVerificationException(
+          ddo.getId().toString(), e);
+    }
+
+    log.debug("finishing verification of proof for DDO with DID {}", ddo.getId());
+  }
+
+  /**
+   * Receives the public key that matches DID's id
+   *
+   * @param publicKeys collection of public keys of document
+   * @param did of the owner of the receiving Public Key
+   * @return public key in bytes
+   */
+  private Optional<byte[]> getPublicKeyValueByDID(List<PublicKey> publicKeys, DID did) {
+    log.trace("get public key for did {}", did.toString());
+    return publicKeys
+        .stream()
+        .filter(key -> key.getId().toString().equals(did.toString()))
+        .findFirst()
+//        fixme when abstract class PublicKey will have getPublicKey()
+        .map(key -> ((Ed25519Sha3VerificationKey) key).getPublicKey());
   }
 
 }
