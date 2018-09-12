@@ -44,7 +44,7 @@ ext {
     lombokVersion = '1.18.2'
     springSwaggerVersion = '2.9.2'
     commonsLangVersion = '3.8'
-//    log4jVersion = '2.11.0'
+//    log4jVersion = '2.11.1'
 //    slf4jVersion = '1.7.25'
     aspectjVersion = '1.9.1'
     spongycastleVersion = '1.58.0.0'
