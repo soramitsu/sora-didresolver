@@ -32,9 +32,6 @@ public abstract class DIDResolverControllerInitializer {
   @MockBean
   protected VerifyService verifyService;
 
-  @MockBean
-  protected ValidateService validateService;
-
   @Autowired
   private ObjectMapper objectMapper;
 
@@ -52,12 +49,10 @@ public abstract class DIDResolverControllerInitializer {
     ddo = json.read(jsonReader).getObject();
     Proof proof = ddo.getProof();
     PublicKey publicKey = ddo.getPublicKey().get(1);
-    when(verifyService.getPublicKeyValueByDID(ddo.getPublicKey(), proof))
-        .thenReturn(Optional.of(publicKey));
-    when(validateService.isProofCreatorInAuth(proof.getOptions().getCreator(), ddo.getAuthentication()))
+    when(verifyService.isCreatorInAuth(proof.getOptions().getCreator(), ddo.getAuthentication()))
         .thenReturn(true);
-    when(validateService.isProofInPublicKeys(proof.getOptions().getCreator(), ddo.getPublicKey()))
+    when(verifyService.isCreatorInPublicKeys(proof.getOptions().getCreator(), ddo.getPublicKey()))
         .thenReturn(true);
-    when(verifyService.verifyIntegrityOfDDO(any(), any())).thenReturn(true);
+//    when(verifyService.verifyIntegrityOfDDO(any())).thenReturn(true);
   }
 }

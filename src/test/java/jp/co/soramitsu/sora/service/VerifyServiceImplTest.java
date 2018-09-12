@@ -44,35 +44,18 @@ public class VerifyServiceImplTest {
       return new VerifyServiceImpl();
     }
   }
-
-  @Test
-  public void testSuccessGetPublicKeyByProof() {
-    Optional<PublicKey> publicKey = verifyService
-        .getPublicKeyValueByDID(dataProvider.getPublicKeysForTest(), dataProvider.getProofForTest());
-    assertTrue(publicKey.isPresent());
-  }
-
-  @Test
-  public void testFailedGetPublicKeyByProof() throws ParserException {
-    Proof proof = dataProvider.getProofForTest();
-    proof.getOptions().setCreator(DID.parse(ID_BASE + KEYS_COUNT + 2));
-    List<PublicKey> publicKeys = dataProvider.getPublicKeysForTest();
-    Optional<PublicKey> publicKey = verifyService
-        .getPublicKeyValueByDID(publicKeys, proof);
-    assertFalse(publicKey.isPresent());
-  }
-
-  @Test
-  public void testSuccessVerifyDDOProof() throws IOException {
-    DDO ddo = dataProvider.getDDOFromJson(DDO_JSON_NAME);
-    assertFalse(verifyService.verifyIntegrityOfDDO(ddo, new String(KEY_VALUE)));
-    assertTrue(verifyService.verifyIntegrityOfDDO(ddo, ddo.getPublicKey().get(0).getId().toString()));
-  }
-
-  @Test
-  public void testFailedVerifyDDOProof() throws IOException {
-    DDO ddo = dataProvider.getDDOFromJson(DDO_JSON_NAME);
-    ddo.setCreated(Instant.now().truncatedTo(ChronoUnit.SECONDS));
-    assertFalse(verifyService.verifyIntegrityOfDDO(ddo, new String(KEY_VALUE)));
-  }
+//
+//  @Test
+//  public void testSuccessVerifyDDOProof() throws IOException {
+//    DDO ddo = dataProvider.getDDOFromJson(DDO_JSON_NAME);
+//    assertFalse(verifyService.verifyIntegrityOfDDO(ddo));
+//    assertTrue(verifyService.verifyIntegrityOfDDO(ddo, ddo.getPublicKey().get(0).getId().toString()));
+//  }
+//
+//  @Test
+//  public void testFailedVerifyDDOProof() throws IOException {
+//    DDO ddo = dataProvider.getDDOFromJson(DDO_JSON_NAME);
+//    ddo.setCreated(Instant.now().truncatedTo(ChronoUnit.SECONDS));
+//    assertFalse(verifyService.verifyIntegrityOfDDO(ddo, new String(KEY_VALUE)));
+//  }
 }
