@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.net.URI;
 import java.util.Optional;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
 import org.junit.Test;
@@ -74,7 +73,7 @@ public class DIDResolverBaseControllerTest extends DIDResolverControllerInitiali
 
   @Test
   public void testBadProofExceptionOnCreateDDO() throws Exception {
-    when(verifyService.verifyDDOProof(any(), any())).thenReturn(false);
+    when(verifyService.verifyIntegrityOfDDO(any(), any())).thenReturn(false);
     postRequest(status().isUnauthorized());
   }
 

@@ -5,10 +5,7 @@ import static jp.co.soramitsu.sora.util.DataProvider.KEYS_COUNT;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.net.URI;
 import java.util.List;
-import jp.co.soramitsu.sora.didresolver.services.ValidateService;
-import jp.co.soramitsu.sora.didresolver.services.impl.ValidateServiceImpl;
 import jp.co.soramitsu.sora.sdk.did.model.dto.Authentication;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
 import jp.co.soramitsu.sora.sdk.did.model.dto.Proof;

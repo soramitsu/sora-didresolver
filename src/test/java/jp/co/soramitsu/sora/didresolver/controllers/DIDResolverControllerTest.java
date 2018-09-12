@@ -158,7 +158,7 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
 
   @Test
   public void testBadProofExceptionOnCreateDDO() throws Exception {
-    when(verifyService.verifyDDOProof(any(), any())).thenReturn(false);
+    when(verifyService.verifyIntegrityOfDDO(any(), any())).thenReturn(false);
     sendDDORequest(
         put(URL, ddo.getId()).contentType(contentType).content(json.write(ddo).getJson()),
         status().isUnauthorized());

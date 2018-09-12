@@ -12,7 +12,6 @@ import jp.co.soramitsu.sora.didresolver.exceptions.DIDNotFoundException;
 import jp.co.soramitsu.sora.didresolver.exceptions.IncorrectUpdateException;
 import jp.co.soramitsu.sora.didresolver.exceptions.UnparseableException;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
-import jp.co.soramitsu.sora.didresolver.services.ValidateService;
 import jp.co.soramitsu.sora.didresolver.services.VerifyService;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.DIDConstraint;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
@@ -21,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -41,9 +39,8 @@ public class DIDResolverController extends DIDResolverBaseController {
 
   private static final String ERROR_FORMAT = "{ \"error\" : \"%s\"}\n";
 
-  DIDResolverController(StorageService storageService, VerifyService verifyService,
-      ValidateService validateService) {
-    super(storageService, verifyService, validateService);
+  DIDResolverController(StorageService storageService, VerifyService verifyService) {
+    super(storageService, verifyService);
   }
 
   @GetMapping(produces = {APPLICATION_JSON_UTF8_VALUE})

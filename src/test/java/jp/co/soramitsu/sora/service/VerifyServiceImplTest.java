@@ -7,7 +7,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.net.URI;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -49,7 +48,7 @@ public class VerifyServiceImplTest {
   @Test
   public void testSuccessGetPublicKeyByProof() {
     Optional<PublicKey> publicKey = verifyService
-        .getProofPublicKeyByProof(dataProvider.getPublicKeysForTest(), dataProvider.getProofForTest());
+        .getPublicKeyValueByDID(dataProvider.getPublicKeysForTest(), dataProvider.getProofForTest());
     assertTrue(publicKey.isPresent());
   }
 
@@ -59,21 +58,21 @@ public class VerifyServiceImplTest {
     proof.getOptions().setCreator(DID.parse(ID_BASE + KEYS_COUNT + 2));
     List<PublicKey> publicKeys = dataProvider.getPublicKeysForTest();
     Optional<PublicKey> publicKey = verifyService
-        .getProofPublicKeyByProof(publicKeys, proof);
+        .getPublicKeyValueByDID(publicKeys, proof);
     assertFalse(publicKey.isPresent());
   }
 
   @Test
   public void testSuccessVerifyDDOProof() throws IOException {
     DDO ddo = dataProvider.getDDOFromJson(DDO_JSON_NAME);
-    assertFalse(verifyService.verifyDDOProof(ddo, new String(KEY_VALUE)));
-    assertTrue(verifyService.verifyDDOProof(ddo, ddo.getPublicKey().get(0).getId().toString()));
+    assertFalse(verifyService.verifyIntegrityOfDDO(ddo, new String(KEY_VALUE)));
+    assertTrue(verifyService.verifyIntegrityOfDDO(ddo, ddo.getPublicKey().get(0).getId().toString()));
   }
 
   @Test
   public void testFailedVerifyDDOProof() throws IOException {
     DDO ddo = dataProvider.getDDOFromJson(DDO_JSON_NAME);
     ddo.setCreated(Instant.now().truncatedTo(ChronoUnit.SECONDS));
-    assertFalse(verifyService.verifyDDOProof(ddo, new String(KEY_VALUE)));
+    assertFalse(verifyService.verifyIntegrityOfDDO(ddo, new String(KEY_VALUE)));
   }
 }

@@ -10,7 +10,6 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Optional;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
-import jp.co.soramitsu.sora.didresolver.services.ValidateService;
 import jp.co.soramitsu.sora.didresolver.services.VerifyService;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 import jp.co.soramitsu.sora.sdk.did.model.dto.Proof;
@@ -53,12 +52,12 @@ public abstract class DIDResolverControllerInitializer {
     ddo = json.read(jsonReader).getObject();
     Proof proof = ddo.getProof();
     PublicKey publicKey = ddo.getPublicKey().get(1);
-    when(verifyService.getProofPublicKeyByProof(ddo.getPublicKey(), proof))
+    when(verifyService.getPublicKeyValueByDID(ddo.getPublicKey(), proof))
         .thenReturn(Optional.of(publicKey));
     when(validateService.isProofCreatorInAuth(proof.getOptions().getCreator(), ddo.getAuthentication()))
         .thenReturn(true);
     when(validateService.isProofInPublicKeys(proof.getOptions().getCreator(), ddo.getPublicKey()))
         .thenReturn(true);
-    when(verifyService.verifyDDOProof(any(), any())).thenReturn(true);
+    when(verifyService.verifyIntegrityOfDDO(any(), any())).thenReturn(true);
   }
 }

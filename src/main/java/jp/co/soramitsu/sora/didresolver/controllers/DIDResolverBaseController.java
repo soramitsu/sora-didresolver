@@ -7,22 +7,18 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import java.util.List;
 import java.util.Optional;
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import jp.co.soramitsu.sora.didresolver.exceptions.BadProofException;
 import jp.co.soramitsu.sora.didresolver.exceptions.DIDDuplicateException;
 import jp.co.soramitsu.sora.didresolver.exceptions.InvalidProofException;
 import jp.co.soramitsu.sora.didresolver.exceptions.UnparseableException;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
-import jp.co.soramitsu.sora.didresolver.services.ValidateService;
 import jp.co.soramitsu.sora.didresolver.services.VerifyService;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
 import jp.co.soramitsu.sora.sdk.did.model.dto.PublicKey;
+import jp.co.soramitsu.sora.sdk.did.model.dto.publickey.Ed25519Sha3VerificationKey;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,13 +38,10 @@ public class DIDResolverBaseController {
 
   private VerifyService verifyService;
 
-  private ValidateService validateService;
-
   protected DIDResolverBaseController(
-      StorageService storageService, VerifyService verifyService, ValidateService validateService) {
+      StorageService storageService, VerifyService verifyService) {
     this.storageService = storageService;
     this.verifyService = verifyService;
-    this.validateService = validateService;
   }
 
   @PostMapping(consumes = {APPLICATION_JSON_UTF8_VALUE})
@@ -67,20 +60,36 @@ public class DIDResolverBaseController {
   }
 
   protected void verifyDDOProof(DDO ddo) {
-//    todo: change to correct validation process
     DID proofCreator = ddo.getProof().getOptions().getCreator();
-    if (!validateService.isProofCreatorInAuth(proofCreator, ddo.getAuthentication())
-        || !validateService.isProofInPublicKeys(
+    if (!verifyService.isProofCreatorInAuth(proofCreator, ddo.getAuthentication())
+        || !verifyService.isProofInPublicKeys(
             proofCreator, ddo.getPublicKey())) {
       throw new InvalidProofException(ddo.getId().toString());
     }
-    Optional<PublicKey> publicKey =
-        verifyService.getProofPublicKeyByProof(ddo.getPublicKey(), ddo.getProof());
+
+    Optional<byte[]> publicKey =
+        getPublicKeyValueByDID(ddo.getPublicKey(), ddo.getProof().getOptions().getCreator());
     if (publicKey.isPresent()
-        && !verifyService.verifyDDOProof(ddo, publicKey.get().getId().toString())) {
+        && !verifyService.verifyIntegrityOfDDO(ddo, publicKey.get())) {
       log.warn("failure verify proof for DDO with DID {}", ddo.getId());
       throw new BadProofException(ddo.getId().toString());
     }
     log.debug("success verify proof for DDO with DID {}", ddo.getId());
+  }
+
+  /**
+   * Receives the public key that matches DID's id
+   *
+   * @param publicKeys collection of public keys of document
+   * @param did of the owner of the receiving Public Key
+   * @return public key in bytes
+   */
+  protected Optional<byte[]> getPublicKeyValueByDID(List<PublicKey> publicKeys, DID did) {
+    log.debug("get public key for proof {}, {}, {}", did.toString());
+    return publicKeys
+        .stream()
+        .filter(key -> key.getId().toString().equals(did.toString()))
+        .findFirst()
+        .map(key -> ((Ed25519Sha3VerificationKey) key).getPublicKey());
   }
 }
