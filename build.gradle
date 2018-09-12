@@ -87,7 +87,6 @@ dependencies {
     //logging
     compile("org.aspectj:aspectjrt:${aspectjVersion}")
     compile("org.aspectj:aspectjweaver:${aspectjVersion}")
-    compile("com.mchange:c3p0:${c3p0Version}")
 
     compileOnly "org.springframework.boot:spring-boot-configuration-processor"
 
