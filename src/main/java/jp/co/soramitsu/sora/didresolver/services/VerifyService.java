@@ -1,14 +1,12 @@
 package jp.co.soramitsu.sora.didresolver.services;
 
 import java.util.List;
-import java.util.Optional;
 import jp.co.soramitsu.sora.sdk.did.model.dto.Authentication;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
-import jp.co.soramitsu.sora.sdk.did.model.dto.Proof;
 import jp.co.soramitsu.sora.sdk.did.model.dto.PublicKey;
 
-public interface  VerifyService {
+public interface VerifyService {
 
   /**
    * Check that DID in the list of Public keys
@@ -32,5 +30,5 @@ public interface  VerifyService {
    *
    * @param ddo - DDO that is needed to be verified
    */
-  void verifyIntegrityOfDDO(DDO ddo);
+  boolean verifyIntegrityOfDDO(DDO ddo);
 }

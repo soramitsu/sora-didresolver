@@ -56,6 +56,7 @@ ext {
     jUnitPlatformVersion = '1.3.0'
     soraCryptoVersion = '0.1'
     soraSDKVersion = '0.2.1'
+    springCloudVersion = 'Finchley.RELEASE'
 }
 
 repositories {
@@ -102,6 +103,16 @@ dependencies {
     testCompile("org.junit.platform:junit-platform-launcher:${jUnitPlatformVersion}")
     compileOnly("org.projectlombok:lombok:${lombokVersion}")
     testCompileOnly("org.projectlombok:lombok:${lombokVersion}")
+
+    // ========== Distributed Tracing ==========
+    compile "org.springframework.cloud:spring-cloud-starter-zipkin"
+    compile "org.springframework.cloud:spring-cloud-starter-sleuth"
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 test {

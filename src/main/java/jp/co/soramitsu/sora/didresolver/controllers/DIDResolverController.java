@@ -13,6 +13,7 @@ import jp.co.soramitsu.sora.didresolver.exceptions.DIDDuplicateException;
 import jp.co.soramitsu.sora.didresolver.exceptions.DIDNotFoundException;
 import jp.co.soramitsu.sora.didresolver.exceptions.IncorrectUpdateException;
 import jp.co.soramitsu.sora.didresolver.exceptions.InvalidProofException;
+import jp.co.soramitsu.sora.didresolver.exceptions.ProofSignatureVerificationException;
 import jp.co.soramitsu.sora.didresolver.exceptions.UnparseableException;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
 import jp.co.soramitsu.sora.didresolver.services.VerifyService;
@@ -102,7 +103,9 @@ public class DIDResolverController {
   private void verifyDDOProof(DDO ddo) {
     checkCreatorValidity(ddo);
 
-    verifyService.verifyIntegrityOfDDO(ddo);
+    if (!verifyService.verifyIntegrityOfDDO(ddo)) {
+      throw new ProofSignatureVerificationException(ddo.getId().toString());
+    }
 
     log.debug("proof has been successfully verified for DDO with DID {}", ddo.getId());
   }
@@ -112,9 +115,7 @@ public class DIDResolverController {
       throw new InvalidProofException(ddo.getId().toString());
     }
     DID proofCreator = ddo.getProof().getOptions().getCreator();
-    if (!verifyService.isCreatorInAuth(proofCreator, ddo.getAuthentication())
-        ||
-        !verifyService.isCreatorInPublicKeys(proofCreator, ddo.getPublicKey())) {
+    if (!verifyService.isCreatorInPublicKeys(proofCreator, ddo.getPublicKey())) {
       throw new InvalidProofException(ddo.getId().toString());
     }
   }

@@ -18,7 +18,7 @@ import jp.co.soramitsu.crypto.ed25519.spec.EdDSAPublicKeySpec;
 import jp.co.soramitsu.sora.crypto.common.SecurityProvider;
 import jp.co.soramitsu.sora.crypto.json.JSONCanonizerWithOneCoding;
 import jp.co.soramitsu.sora.crypto.signature.suite.JSONEd25519Sha3SignatureSuite;
-import jp.co.soramitsu.sora.didresolver.exceptions.BadProofException;
+import jp.co.soramitsu.sora.didresolver.exceptions.PublicKeyValueNotPresentedException;
 import jp.co.soramitsu.sora.didresolver.exceptions.ProofSignatureVerificationException;
 import jp.co.soramitsu.sora.didresolver.services.VerifyService;
 import jp.co.soramitsu.sora.sdk.did.model.dto.Authentication;
@@ -62,31 +62,32 @@ public class VerifyServiceImpl implements VerifyService {
   }
 
   @Override
-  public void verifyIntegrityOfDDO(DDO ddo) {
+  public boolean verifyIntegrityOfDDO(DDO ddo) {
     log.debug("verifying integrity of DDO with DID {}", ddo.getId());
 
     Optional<byte[]> publicKeyValue =
         getPublicKeyValueByDID(ddo.getPublicKey(), ddo.getProof().getOptions().getCreator());
 
     if (!publicKeyValue.isPresent()) {
-      throw new BadProofException(ddo.getProof().getOptions().getCreator().toString());
+      throw new PublicKeyValueNotPresentedException(ddo.getProof().getOptions().getCreator().toString());
     }
 
     EdDSAPublicKey edDSAPublicKey =
         new EdDSAPublicKey(new EdDSAPublicKeySpec(publicKeyValue.get(), parameterSpec));
 
+    boolean isDDOVerified;
     try {
-      suite.verify(ddo, edDSAPublicKey);
+      isDDOVerified = suite.verify(ddo, edDSAPublicKey);
     } catch (IOException e) {
       throw new ProofSignatureVerificationException(
           ddo.getId().toString(), e);
     }
-
     log.debug("finishing verification of proof for DDO with DID {}", ddo.getId());
+    return isDDOVerified;
   }
 
   /**
-   * Receives the public key that matches DID's id
+   * Receives the public key from a given collection of public keys that matches DID's id
    *
    * @param publicKeys collection of public keys of document
    * @param did of the owner of the receiving Public Key
