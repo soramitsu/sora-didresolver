@@ -18,14 +18,13 @@ import jp.co.soramitsu.crypto.ed25519.spec.EdDSAPublicKeySpec;
 import jp.co.soramitsu.sora.crypto.common.SecurityProvider;
 import jp.co.soramitsu.sora.crypto.json.JSONCanonizerWithOneCoding;
 import jp.co.soramitsu.sora.crypto.signature.suite.JSONEd25519Sha3SignatureSuite;
-import jp.co.soramitsu.sora.didresolver.exceptions.PublicKeyValueNotPresentedException;
 import jp.co.soramitsu.sora.didresolver.exceptions.ProofSignatureVerificationException;
+import jp.co.soramitsu.sora.didresolver.exceptions.PublicKeyValueNotPresentedException;
 import jp.co.soramitsu.sora.didresolver.services.VerifyService;
 import jp.co.soramitsu.sora.sdk.did.model.dto.Authentication;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
 import jp.co.soramitsu.sora.sdk.did.model.dto.PublicKey;
-import jp.co.soramitsu.sora.sdk.did.model.dto.publickey.Ed25519Sha3VerificationKey;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -56,9 +55,8 @@ public class VerifyServiceImpl implements VerifyService {
   public boolean isCreatorInAuth(
       @NotNull DID creator, @NotNull @Valid List<Authentication> authentication) {
 
-    return true;
-//     FIXME: 11/09/2018 NPE due to incorrect constructing of Authentication
-//    return authentication.stream().anyMatch(auth -> auth.getPublicKey().toString().equals(creator.toString()));
+    return authentication.stream()
+        .anyMatch(auth -> auth.getPublicKey().toString().equals(creator.toString()));
   }
 
   @Override
@@ -69,7 +67,8 @@ public class VerifyServiceImpl implements VerifyService {
         getPublicKeyValueByDID(ddo.getPublicKey(), ddo.getProof().getOptions().getCreator());
 
     if (!publicKeyValue.isPresent()) {
-      throw new PublicKeyValueNotPresentedException(ddo.getProof().getOptions().getCreator().toString());
+      throw new PublicKeyValueNotPresentedException(
+          ddo.getProof().getOptions().getCreator().toString());
     }
 
     EdDSAPublicKey edDSAPublicKey =
@@ -99,8 +98,7 @@ public class VerifyServiceImpl implements VerifyService {
         .stream()
         .filter(key -> key.getId().toString().equals(did.toString()))
         .findFirst()
-//        fixme when abstract class PublicKey will have getPublicKey()
-        .map(key -> ((Ed25519Sha3VerificationKey) key).getPublicKey());
+        .map(PublicKey::getPublicKey);
   }
 
 }
