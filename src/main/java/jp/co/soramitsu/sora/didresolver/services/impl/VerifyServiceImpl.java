@@ -63,16 +63,15 @@ public class VerifyServiceImpl implements VerifyService {
   public boolean verifyIntegrityOfDDO(DDO ddo) {
     log.debug("verifying integrity of DDO with DID {}", ddo.getId());
 
-    Optional<byte[]> publicKeyValue =
-        getPublicKeyValueByDID(ddo.getPublicKey(), ddo.getProof().getOptions().getCreator());
-
-    if (!publicKeyValue.isPresent()) {
-      throw new PublicKeyValueNotPresentedException(
-          ddo.getProof().getOptions().getCreator().toString());
-    }
+    byte[] publicKeyValue = getPublicKeyValueByDID(
+        ddo.getPublicKey(),
+        ddo.getProof().getOptions().getCreator()
+    ).orElseThrow(
+        () -> new PublicKeyValueNotPresentedException(
+            ddo.getProof().getOptions().getCreator().toString()));
 
     EdDSAPublicKey edDSAPublicKey =
-        new EdDSAPublicKey(new EdDSAPublicKeySpec(publicKeyValue.get(), parameterSpec));
+        new EdDSAPublicKey(new EdDSAPublicKeySpec(publicKeyValue, parameterSpec));
 
     boolean isDDOVerified;
     try {

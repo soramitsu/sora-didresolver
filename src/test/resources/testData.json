@@ -3,7 +3,7 @@
     "_class": "jp.co.soramitsu.sora.didresolver.domain.entities.Account",
     "accountId": "bogdan",
     "domainId": "soramitsu.co.jp",
-    "data": "{\"ddos\":{\"did:sora:soraUser8\":{\"id\":\"did:sora:soraUser2\"}}}"
+    "data": "{\"ddos\":{\"did:sora:soraUser8\":{\"id\":\"did:sora:soraUser8\"}}}"
   }
 ]
 

@@ -1,5 +1,8 @@
 package jp.co.soramitsu.sora.didresolver.domain.repositories;
 
+import static java.time.Instant.now;
+import static java.util.Collections.singletonMap;
+import static jp.co.soramitsu.sora.sdk.did.model.dto.DID.randomUUID;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
@@ -9,14 +12,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import java.io.IOException;
-import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Collections;
 import javax.sql.DataSource;
 import jp.co.soramitsu.sora.didresolver.domain.entities.Account;
 import jp.co.soramitsu.sora.didresolver.domain.entities.AccountVault;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
-import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
 import lombok.val;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -33,21 +33,49 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 /**
- * TODO: resolve why can't properly shut down EntityManagerFactory (probably resource closing
- * order issue/not issue)
+ * TODO: resolve why can't properly shut down EntityManagerFactory (probably resource closing order
+ * issue/not issue)
  */
 @RunWith(SpringRunner.class)
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = NONE)
 public class AccountRepositoryTest {
 
-  @Autowired
-  private AccountRepository repository;
-
   @ClassRule
   public static PostgreSQLContainer pgContainer = new PostgreSQLContainer();
-
+  @Autowired
+  private AccountRepository repository;
   private ObjectMapper mapper = new ObjectMapper();
+
+  @Test
+  public void givenPersistedEntityWhenFoundByIdAssertItIsSame() {
+    val account = new Account();
+    account.setAccountId("Vasya");
+    val vault = new AccountVault();
+    val ddo = new DDO();
+    ddo.setId(randomUUID());
+    ddo.setCreated(now().truncatedTo(ChronoUnit.SECONDS));
+    vault.setDdos(singletonMap(ddo.getId().toString(), ddo));
+    account.setData(vault);
+    repository.save(account);
+
+    val persistedAccount = repository.findById(account.getAccountId());
+
+    assertThat(persistedAccount.isPresent(), is(true));
+    assertThat(persistedAccount.get(), equalTo(account));
+  }
+
+  @Test
+  public void whenCalledFindDDOByDidThenReturnStringAndMapToDDO()
+      throws IOException {
+    val ddoString = repository
+        .findDDOByDid("did:sora:soraUser8");
+
+    assertThat(ddoString.isPresent(), is(true));
+
+    val ddo = mapper.readValue(ddoString.get(), DDO.class);
+    assertThat(ddo.getId().toString(), equalTo("did:sora:soraUser8"));
+  }
 
   @TestConfiguration
   public static class TestConfig {
@@ -74,35 +102,5 @@ public class AccountRepositoryTest {
       return factory;
     }
 
-  }
-
-  @Test
-  public void givenPersistedEntityWhenFoundByIdAssertItIsSame() {
-    val account = new Account();
-    account.setAccountId("Vasya");
-    val vault = new AccountVault();
-    val ddo = new DDO();
-    ddo.setId(DID.randomUUID());
-    ddo.setCreated(Instant.now().truncatedTo(ChronoUnit.SECONDS));
-    vault.setDdos(Collections.singletonMap(ddo.getId().toString(), ddo));
-    account.setData(vault);
-    repository.save(account);
-
-    val persistedAccount = repository.findById(account.getAccountId());
-
-    assertThat(persistedAccount.isPresent(), is(true));
-    assertThat(persistedAccount.get(), equalTo(account));
-  }
-
-  @Test
-  public void whenCalledFindDDOByDidThenReturnStringAndMapToDDO()
-      throws IOException {
-    val ddoString = repository
-        .findDDOByDid("did:sora:soraUser8");
-
-    assertThat(ddoString.isPresent(), is(true));
-
-    val ddo = mapper.readValue(ddoString.get(), DDO.class);
-    assertThat(ddo.getId().toString(), equalTo("did:sora:soraUser8"));
   }
 }

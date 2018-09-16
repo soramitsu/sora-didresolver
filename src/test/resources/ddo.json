@@ -25,7 +25,7 @@
     "type": "Ed25519Sha3Signature",
     "created": "2002-10-10T17:00:00Z",
     "creator": "did:sora:soraUser8#keys-1",
-    "signatureValue": "c2lnbmF0dXJl",
+    "signatureValue": "7369676e6174757265",
     "nonce": "nonce"
   }
 }

@@ -5,8 +5,8 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.security.SignatureException;
 import java.util.List;
-import jp.co.soramitsu.sora.didresolver.exceptions.ProofSignatureVerificationException;
 import jp.co.soramitsu.sora.didresolver.services.VerifyService;
 import jp.co.soramitsu.sora.didresolver.services.impl.VerifyServiceImpl;
 import jp.co.soramitsu.sora.sdk.did.model.dto.Authentication;
@@ -18,7 +18,6 @@ import jp.co.soramitsu.sora.sdk.did.model.dto.publickey.Ed25519Sha3VerificationK
 import jp.co.soramitsu.sora.sdk.did.parser.generated.ParserException;
 import jp.co.soramitsu.sora.util.DataProvider;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +41,7 @@ public class VerifyServiceImplTest {
     verifyService.verifyIntegrityOfDDO(ddo);
   }
 
-  @Test(expected = ProofSignatureVerificationException.class)
+  @Test(expected = SignatureException.class)
   public void testFailedVerifyDDOProof_incorrectSignature()
       throws IOException, NoSuchFieldException, IllegalAccessException {
     DDO ddo = dataProvider.getDDOFromJson(DDO_JSON_NAME);
@@ -53,10 +52,13 @@ public class VerifyServiceImplTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testFailedVerifyDDOProof_incorrectLengthOfTheKey() throws IOException {
+  public void testFailedVerifyDDOProof_incorrectLengthOfTheKey()
+      throws IOException, NoSuchFieldException, IllegalAccessException {
     DDO ddo = dataProvider.getDDOFromJson(DDO_JSON_NAME);
     Ed25519Sha3VerificationKey publicKey = (Ed25519Sha3VerificationKey) ddo.getPublicKey().get(0);
-    publicKey.setPublicKey("testKey".getBytes());
+    Field publicKeyField = Ed25519Sha3VerificationKey.class.getDeclaredField("publicKey");
+    publicKeyField.setAccessible(true);
+    publicKeyField.set(publicKey, "testKey".getBytes());
     verifyService.verifyIntegrityOfDDO(ddo);
   }
 
@@ -67,8 +69,6 @@ public class VerifyServiceImplTest {
         dataProvider.getAuthenticationForTest()));
   }
 
-  // FIXME: 12/09/2018 after fixing a bug in sora-sdk
-  @Ignore
   @Test
   public void testFailedIsProofCreatorInAuth() throws ParserException {
     Proof proof = dataProvider.getProofForTest();

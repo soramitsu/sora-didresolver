@@ -28,12 +28,10 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
   protected ResponseEntity<Object> handleExceptions(
       RuntimeException ex, WebRequest request) {
 
-    ErrorRs errorRs;
+    ErrorRs errorRs = null;
 
     if (ex instanceof DIDDuplicateException) {
       errorRs = new ErrorRs(DID_DUPLICATE.name());
-    } else {
-      errorRs = new ErrorRs(UNKNOWN.name());
     }
 
     return handleExceptionInternal(ex, errorRs, new HttpHeaders(), OK, request);

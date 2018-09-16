@@ -5,6 +5,7 @@ import static jp.co.soramitsu.sora.didresolver.commons.URIConstants.ID_PARAM;
 import static jp.co.soramitsu.sora.didresolver.commons.URIConstants.PATH;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.http.ResponseEntity.ok;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -20,6 +21,7 @@ import jp.co.soramitsu.sora.didresolver.services.VerifyService;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.DIDConstraint;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +36,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping(PATH)
 @Api(value = PATH, description = "CRUD operations on DID documents")
 @Validated
@@ -42,13 +45,6 @@ public class DIDResolverController {
 
   private StorageService storageService;
   private VerifyService verifyService;
-
-  public DIDResolverController(
-      StorageService storageService,
-      VerifyService verifyService) {
-    this.storageService = storageService;
-    this.verifyService = verifyService;
-  }
 
   @PostMapping(consumes = {APPLICATION_JSON_UTF8_VALUE})
   @ApiOperation("This operation is used to register new DID-DDO pair in Identity System")
@@ -73,7 +69,7 @@ public class DIDResolverController {
       throws UnparseableException {
     log.info("Receive DDO by DID - {}", did);
     val ddo = storageService.findDDObyDID(did).orElseThrow(() -> new DIDNotFoundException(did));
-    return new ResponseEntity<>(ddo, OK);
+    return ok(ddo);
   }
 
   @DeleteMapping(value = ID_PARAM)
