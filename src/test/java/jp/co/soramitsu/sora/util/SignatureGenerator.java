@@ -20,14 +20,14 @@ import java.util.Arrays;
 import javax.xml.bind.DatatypeConverter;
 import jp.co.soramitsu.crypto.ed25519.EdDSAPrivateKey;
 import jp.co.soramitsu.crypto.ed25519.EdDSAPublicKey;
-import jp.co.soramitsu.sora.crypto.common.SecurityProvider;
-import jp.co.soramitsu.sora.crypto.json.JSONCanonizerWithOneCoding;
-import jp.co.soramitsu.sora.crypto.proof.Options;
-import jp.co.soramitsu.sora.crypto.signature.suite.JSONEd25519Sha3SignatureSuite;
-import jp.co.soramitsu.sora.crypto.type.SignatureTypeEnum;
+import jp.co.soramitsu.sora.sdk.crypto.common.SecurityProvider;
+import jp.co.soramitsu.sora.sdk.crypto.json.JSONCanonizerWithOneCoding;
+import jp.co.soramitsu.sora.sdk.crypto.json.JSONEd25519Sha3SignatureSuite;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
+import jp.co.soramitsu.sora.sdk.did.model.dto.Options;
 import jp.co.soramitsu.sora.sdk.did.model.dto.Proof;
+import jp.co.soramitsu.sora.sdk.did.model.type.SignatureTypeEnum;
 import lombok.val;
 
 public class SignatureGenerator {
@@ -37,13 +37,15 @@ public class SignatureGenerator {
   public static void main(String[] args)
       throws IOException, SignatureException, NoSuchAlgorithmException {
 
-    ObjectMapper objectMapper = new ObjectMapper()
-        .registerModule(new JavaTimeModule())
-        .enable(INDENT_OUTPUT)
-        .setSerializationInclusion(NON_NULL);
+    ObjectMapper objectMapper =
+        new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .enable(INDENT_OUTPUT)
+            .setSerializationInclusion(NON_NULL);
 
-    JSONEd25519Sha3SignatureSuite documentSignatureService = new JSONEd25519Sha3SignatureSuite(
-        new SecurityProvider(), new JSONCanonizerWithOneCoding(), objectMapper);
+    JSONEd25519Sha3SignatureSuite documentSignatureService =
+        new JSONEd25519Sha3SignatureSuite(
+            new SecurityProvider(), new JSONCanonizerWithOneCoding(), objectMapper);
 
     InputStream in = SignatureGenerator.class.getClassLoader().getResourceAsStream("ddo.json");
     DDO ddo = objectMapper.readValue(in, DDO.class);
@@ -52,36 +54,34 @@ public class SignatureGenerator {
     KeyPair keyPair = keyPairGenerator.generateKeyPair();
     writeKeyPairToFile(keyPair);
 
-    ddo.getPublicKey()
-        .get(0)
-        .setId(DID.randomUUID());
-//        .setId(keyPair.getPublic().getEncoded());
+    ddo.getPublicKey().get(0).setId(DID.randomUUID());
+    //        .setId(keyPair.getPublic().getEncoded());
 
     Proof proof = ddo.getProof();
-    Options options = new Options(
-        SignatureTypeEnum.valueOf(proof.getOptions().getType().getSignatureType()),
-        proof.getOptions().getCreated().toString(),
-        proof.getOptions().getCreator().toString(),
-        proof.getOptions().getNonce(),
-        proof.getOptions().getPurpose()
-    );
+    Options options =
+        new Options(
+            SignatureTypeEnum.valueOf(proof.getOptions().getType().getSignatureType()),
+            proof.getOptions().getCreated(),
+            proof.getOptions().getCreator(),
+            proof.getOptions().getNonce(),
+            proof.getOptions().getPurpose());
 
-    val signed = documentSignatureService
-        .sign(ddo, (EdDSAPrivateKey) keyPair.getPrivate(), options);
+    val signed =
+        documentSignatureService.sign(ddo, (EdDSAPrivateKey) keyPair.getPrivate(), options);
 
     assert documentSignatureService.verify(signed, (EdDSAPublicKey) keyPair.getPublic());
 
-    try (Writer writer = new BufferedWriter(
-        new OutputStreamWriter(new FileOutputStream(PATH + "canonicalDDO.json")))) {
-      objectMapper
-          .writeValue(writer, signed);
+    try (Writer writer =
+        new BufferedWriter(
+            new OutputStreamWriter(new FileOutputStream(PATH + "canonicalDDO.json")))) {
+      objectMapper.writeValue(writer, signed);
     }
     System.out.println(ddo);
   }
 
   private static void writeKeyPairToFile(KeyPair keyPair) throws IOException {
-    try (Writer keyWriter = new BufferedWriter(
-        new OutputStreamWriter(new FileOutputStream(PATH + "keypair.txt")))) {
+    try (Writer keyWriter =
+        new BufferedWriter(new OutputStreamWriter(new FileOutputStream(PATH + "keypair.txt")))) {
       StringBuilder stringBuilder = new StringBuilder();
       stringBuilder.append("publicKey : ");
       byte[] publicKey = ((EdDSAPublicKey) keyPair.getPublic()).getAbyte();

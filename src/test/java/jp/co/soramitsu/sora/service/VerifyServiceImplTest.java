@@ -30,15 +30,14 @@ public class VerifyServiceImplTest {
 
   private static final String DDO_JSON_NAME = "canonicalDDO.json";
 
-  @Autowired
-  private VerifyService verifyService;
+  @Autowired private VerifyService verifyService;
 
   private DataProvider dataProvider = new DataProvider();
 
   @Test
   public void testSuccessVerifyDDOProof() throws IOException {
     DDO ddo = dataProvider.getDDOFromJson(DDO_JSON_NAME);
-    verifyService.verifyIntegrityOfDDO(ddo);
+    assertTrue(verifyService.verifyIntegrityOfDDO(ddo));
   }
 
   @Test(expected = SignatureException.class)
@@ -65,33 +64,39 @@ public class VerifyServiceImplTest {
   @Test
   public void testSuccessIsProofCreatorInAuth() throws ParserException {
     DID proofCreator = dataProvider.getProofForTest().getOptions().getCreator();
-    assertTrue(verifyService.isCreatorInAuth(proofCreator,
-        dataProvider.getAuthenticationForTest()));
+    assertTrue(
+        verifyService.isCreatorInAuth(proofCreator, dataProvider.getAuthenticationForTest()));
   }
 
   @Test
   public void testFailedIsProofCreatorInAuth() throws ParserException {
     Proof proof = dataProvider.getProofForTest();
     List<Authentication> authentications = dataProvider.getAuthenticationForTest();
-    proof.getOptions().setCreator(DID.parse(StringUtils
-        .replaceChars(proof.getOptions().getCreator().toString(), '8', 'l')));
+    proof
+        .getOptions()
+        .setCreator(
+            DID.parse(
+                StringUtils.replaceChars(proof.getOptions().getCreator().toString(), '8', 'l')));
     assertFalse(verifyService.isCreatorInAuth(proof.getOptions().getCreator(), authentications));
   }
 
   @Test
   public void testSuccessIsProofInPublicKeys() throws ParserException {
-    assertTrue(verifyService.isCreatorInPublicKeys(
-        dataProvider.getProofForTest().getOptions().getCreator(),
-        dataProvider.getPublicKeysForTest())
-    );
+    assertTrue(
+        verifyService.isCreatorInPublicKeys(
+            dataProvider.getProofForTest().getOptions().getCreator(),
+            dataProvider.getPublicKeysForTest()));
   }
 
   @Test
   public void testFailedIsProofInPublicKeys() throws ParserException {
     Proof proof = dataProvider.getProofForTest();
     List<PublicKey> publicKeys = dataProvider.getPublicKeysForTest();
-    proof.getOptions().setCreator(
-        DID.parse(StringUtils.replaceChars(proof.getOptions().getCreator().toString(), '8', 'l')));
+    proof
+        .getOptions()
+        .setCreator(
+            DID.parse(
+                StringUtils.replaceChars(proof.getOptions().getCreator().toString(), '8', 'l')));
     assertFalse(verifyService.isCreatorInPublicKeys(proof.getOptions().getCreator(), publicKeys));
   }
 

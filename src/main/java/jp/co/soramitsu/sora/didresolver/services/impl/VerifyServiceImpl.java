@@ -1,11 +1,8 @@
 package jp.co.soramitsu.sora.didresolver.services.impl;
 
-import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
-import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;
 import static jp.co.soramitsu.crypto.ed25519.spec.EdDSANamedCurveTable.ED_25519;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -15,16 +12,18 @@ import jp.co.soramitsu.crypto.ed25519.EdDSAPublicKey;
 import jp.co.soramitsu.crypto.ed25519.spec.EdDSANamedCurveTable;
 import jp.co.soramitsu.crypto.ed25519.spec.EdDSAParameterSpec;
 import jp.co.soramitsu.crypto.ed25519.spec.EdDSAPublicKeySpec;
-import jp.co.soramitsu.sora.crypto.common.SecurityProvider;
-import jp.co.soramitsu.sora.crypto.json.JSONCanonizerWithOneCoding;
-import jp.co.soramitsu.sora.crypto.signature.suite.JSONEd25519Sha3SignatureSuite;
 import jp.co.soramitsu.sora.didresolver.exceptions.ProofSignatureVerificationException;
 import jp.co.soramitsu.sora.didresolver.exceptions.PublicKeyValueNotPresentedException;
 import jp.co.soramitsu.sora.didresolver.services.VerifyService;
+import jp.co.soramitsu.sora.sdk.crypto.common.SecurityProvider;
+import jp.co.soramitsu.sora.sdk.crypto.json.JSONCanonizerWithOneCoding;
+import jp.co.soramitsu.sora.sdk.crypto.json.JSONEd25519Sha3SignatureSuite;
 import jp.co.soramitsu.sora.sdk.did.model.dto.Authentication;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
 import jp.co.soramitsu.sora.sdk.did.model.dto.PublicKey;
+import jp.co.soramitsu.sora.sdk.did.model.dto.publickey.Ed25519Sha3VerificationKey;
+import jp.co.soramitsu.sora.sdk.json.JsonUtil;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,11 +33,7 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class VerifyServiceImpl implements VerifyService {
 
-  private static final ObjectMapper mapper =
-      new ObjectMapper()
-          .registerModule(new JavaTimeModule())
-          .enable(INDENT_OUTPUT)
-          .setSerializationInclusion(NON_NULL);
+  private static final ObjectMapper mapper = JsonUtil.buildMapper();
 
   private static final EdDSAParameterSpec parameterSpec = EdDSANamedCurveTable.getByName(ED_25519);
 
@@ -55,7 +50,8 @@ public class VerifyServiceImpl implements VerifyService {
   public boolean isCreatorInAuth(
       @NotNull DID creator, @NotNull @Valid List<Authentication> authentication) {
 
-    return authentication.stream()
+    return authentication
+        .stream()
         .anyMatch(auth -> auth.getPublicKey().toString().equals(creator.toString()));
   }
 
@@ -63,12 +59,12 @@ public class VerifyServiceImpl implements VerifyService {
   public boolean verifyIntegrityOfDDO(DDO ddo) {
     log.debug("verifying integrity of DDO with DID {}", ddo.getId());
 
-    byte[] publicKeyValue = getPublicKeyValueByDID(
-        ddo.getPublicKey(),
-        ddo.getProof().getOptions().getCreator()
-    ).orElseThrow(
-        () -> new PublicKeyValueNotPresentedException(
-            ddo.getProof().getOptions().getCreator().toString()));
+    byte[] publicKeyValue =
+        getPublicKeyValueByDID(ddo.getPublicKey(), ddo.getProof().getOptions().getCreator())
+            .orElseThrow(
+                () ->
+                    new PublicKeyValueNotPresentedException(
+                        ddo.getProof().getOptions().getCreator().toString()));
 
     EdDSAPublicKey edDSAPublicKey =
         new EdDSAPublicKey(new EdDSAPublicKeySpec(publicKeyValue, parameterSpec));
@@ -77,8 +73,7 @@ public class VerifyServiceImpl implements VerifyService {
     try {
       isDDOVerified = suite.verify(ddo, edDSAPublicKey);
     } catch (IOException e) {
-      throw new ProofSignatureVerificationException(
-          ddo.getId().toString(), e);
+      throw new ProofSignatureVerificationException(ddo.getId().toString(), e);
     }
     log.debug("finishing verification of proof for DDO with DID {}", ddo.getId());
     return isDDOVerified;
@@ -99,5 +94,4 @@ public class VerifyServiceImpl implements VerifyService {
         .findFirst()
         .map(PublicKey::getPublicKey);
   }
-
 }
