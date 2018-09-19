@@ -113,17 +113,6 @@ dependencyManagement {
     }
 }
 
-test {
-    useJUnitPlatform()
-    failFast = true
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
-    reports {
-        html.enabled = true
-    }
-}
-
 task wrapper(type: Wrapper) {
     gradleVersion = '4.8'
 }
