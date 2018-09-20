@@ -1,4 +1,4 @@
-package jp.co.soramitsu.sora.util;
+package jp.co.soramitsu.sora.didresolver.util;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;

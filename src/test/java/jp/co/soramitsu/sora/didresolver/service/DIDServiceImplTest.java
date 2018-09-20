@@ -1,4 +1,4 @@
-package jp.co.soramitsu.sora.service;
+package jp.co.soramitsu.sora.didresolver.service;
 
 import static java.time.Instant.now;
 import static java.time.temporal.ChronoUnit.SECONDS;
