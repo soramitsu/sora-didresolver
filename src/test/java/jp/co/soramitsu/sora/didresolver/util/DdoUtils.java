@@ -4,8 +4,6 @@ import static java.time.Instant.now;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.KeyPair;
-import jp.co.soramitsu.crypto.ed25519.Ed25519Sha3;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
 import jp.co.soramitsu.sora.sdk.did.model.dto.authentication.Ed25519Sha3Authentication;
@@ -17,7 +15,6 @@ public final class DdoUtils {
 
   public static DDO getDefaultDdo() throws ParserException, MalformedURLException {
     final DID did = DID.parse(DEFAULT_DID);
-    Ed25519Sha3 ed25519Sha3 = new Ed25519Sha3();
     return DDO.builder()
         .authentication(new Ed25519Sha3Authentication(did.withPath("keys").withFragment("keys-1")))
         .id(did)

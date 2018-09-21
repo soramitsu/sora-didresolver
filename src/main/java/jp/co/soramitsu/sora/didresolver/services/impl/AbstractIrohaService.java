@@ -42,23 +42,27 @@ import jp.co.soramitsu.crypto.ed25519.Ed25519Sha3.CryptoException;
 import jp.co.soramitsu.iroha.java.Signer;
 import jp.co.soramitsu.sora.didresolver.exceptions.IrohaTransactionCommitmentException;
 import jp.co.soramitsu.sora.didresolver.services.IrohaService;
+import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.slf4j.Logger;
 import org.slf4j.MDC;
 import org.spongycastle.jcajce.provider.digest.SHA3.Digest256;
 
+@RequiredArgsConstructor
 public abstract class AbstractIrohaService implements IrohaService {
 
   private static final String TX_HASH = "TxHash";
   private static final String FORMAT = "$.%s.%s";
-  /** Supresses exception when key in json is not present */
+  /**
+   * Supresses exception when key in json is not present
+   */
   private final Configuration suppressingExceptionConfig =
       Configuration.defaultConfiguration().addOptions(SUPPRESS_EXCEPTIONS);
 
-  private Digest256 sha3;
+  private final Digest256 sha3 = new Digest256();
   private Signer signer;
 
-  private Logger log;
+  private final Logger log;
 
   protected abstract KeyPair keyPair();
 
@@ -67,11 +71,6 @@ public abstract class AbstractIrohaService implements IrohaService {
   protected abstract String irohaAccount();
 
   protected abstract ManagedChannel irohaChannel();
-
-  public AbstractIrohaService(Logger log) {
-    this.log = log;
-    sha3 = new Digest256();
-  }
 
   @PostConstruct
   private void initialize() {
