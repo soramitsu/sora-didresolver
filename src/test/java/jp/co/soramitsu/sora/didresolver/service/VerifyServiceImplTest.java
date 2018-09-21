@@ -1,4 +1,4 @@
-package jp.co.soramitsu.sora.service;
+package jp.co.soramitsu.sora.didresolver.service;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -16,7 +16,7 @@ import jp.co.soramitsu.sora.sdk.did.model.dto.Proof;
 import jp.co.soramitsu.sora.sdk.did.model.dto.PublicKey;
 import jp.co.soramitsu.sora.sdk.did.model.dto.publickey.Ed25519Sha3VerificationKey;
 import jp.co.soramitsu.sora.sdk.did.parser.generated.ParserException;
-import jp.co.soramitsu.sora.util.DataProvider;
+import jp.co.soramitsu.sora.didresolver.util.DataProvider;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +41,7 @@ public class VerifyServiceImplTest {
   }
 
   @Test(expected = SignatureException.class)
-  public void testFailedVerifyDDOProof_incorrectSignature()
+  public void testFailedVerifyDDOProofByincorrectSignature()
       throws IOException, NoSuchFieldException, IllegalAccessException {
     DDO ddo = dataProvider.getDDOFromJson(DDO_JSON_NAME);
     Field proof = ddo.getProof().getClass().getDeclaredField("signatureValue");
@@ -51,7 +51,7 @@ public class VerifyServiceImplTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testFailedVerifyDDOProof_incorrectLengthOfTheKey()
+  public void testFailedVerifyDDOProofByincorrectLengthOfTheKey()
       throws IOException, NoSuchFieldException, IllegalAccessException {
     DDO ddo = dataProvider.getDDOFromJson(DDO_JSON_NAME);
     Ed25519Sha3VerificationKey publicKey = (Ed25519Sha3VerificationKey) ddo.getPublicKey().get(0);

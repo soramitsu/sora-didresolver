@@ -1,0 +1,15 @@
+# IROHA SETTINGS
+iroha:
+  account:
+    name: ${DIDRESOLVER_IROHA_ACCOUNT:admin@test}
+    private-key: ${DIDRESOLVER_IROHA_PRIVATE_KEY:SET_ME_EXPLICITLY}
+    public-key: ${DIDRESOLVER_IROHA_PUBLIC_KEY:SET_ME_EXPLICITLY}
+  connection:
+    port: ${DIDRESOLVER_IROHA_PORT:50051}
+    host: ${DIDRESOLVER_IROHA_HOST:localhost}
+server:
+  port: 9008
+spring:
+  jackson:
+    serialization:
+      write_dates_as_timestamp=false

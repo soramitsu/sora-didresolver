@@ -1,7 +1,6 @@
 package jp.co.soramitsu.sora.didresolver.controllers;
 
 import static jp.co.soramitsu.sora.didresolver.controllers.dto.ErrorRs.BusinessErrors.DID_DUPLICATE;
-import static jp.co.soramitsu.sora.didresolver.controllers.dto.ErrorRs.BusinessErrors.UNKNOWN;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.OK;
 

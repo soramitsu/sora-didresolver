@@ -1,4 +1,4 @@
-package jp.co.soramitsu.sora.util;
+package jp.co.soramitsu.sora.didresolver.util;
 
 import java.time.Instant;
 import java.util.List;
