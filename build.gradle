@@ -70,7 +70,6 @@ dependencies {
     compile "com.github.soramitsu:sora-sdk:${soraSDKVersion}"
     compile("com.jayway.jsonpath:json-path:$jsonPathVersion")
 
-    compile('org.springframework.boot:spring-boot-starter-data-jpa')
     compile('org.springframework.boot:spring-boot-starter-validation')
     compile('org.springframework.boot:spring-boot-starter-actuator')
     compile('org.springframework.boot:spring-boot-starter-web')
@@ -82,11 +81,6 @@ dependencies {
 
     compile("org.apache.commons:commons-lang3:${commonsLangVersion}")
     compile("com.auth0:java-jwt:$jjwtVersion")
-
-    //DB
-    compile("com.vladmihalcea:hibernate-types-52:${hibernateTypesVersion}")
-    compile("org.postgresql:postgresql")
-    compile("org.liquibase:liquibase-core:${liquibaseVersion}")
 
     // iroha
     compile "com.github.warchant:iroha-pure-java:$irohaPureVersion"

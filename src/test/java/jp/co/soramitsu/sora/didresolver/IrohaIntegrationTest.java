@@ -1,5 +1,6 @@
 package jp.co.soramitsu.sora.didresolver;
 
+import static java.lang.System.setProperty;
 import static org.testcontainers.containers.BindMode.READ_ONLY;
 
 import java.time.Duration;
@@ -53,6 +54,9 @@ public class IrohaIntegrationTest extends IntegrationTest {
   public static void setUpIrohaTest() {
     irohaPostgres.start();
     iroha.withEnv(POSTGRES_PORT, irohaPostgres.getMappedPort(5432).toString()).start();
+
+    setProperty("DIDRESOLVER_IROHA_HOST", iroha.getContainerIpAddress());
+    setProperty("DIDRESOLVER_IROHA_PORT", String.valueOf(iroha.getMappedPort(50051)));
   }
 
   @AfterAll

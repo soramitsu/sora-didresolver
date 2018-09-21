@@ -222,6 +222,6 @@ public abstract class AbstractIrohaService implements IrohaService {
   }
 
   private String getNormalizeDetailKey(String detailKey) {
-    return detailKey;
+    return detailKey.replaceAll("[ -:.@]", "_");
   }
 }

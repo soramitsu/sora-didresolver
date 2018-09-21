@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-@Profile("default")
 public class StorageServiceImpl implements StorageService {
 
   private final IrohaService irohaService;
