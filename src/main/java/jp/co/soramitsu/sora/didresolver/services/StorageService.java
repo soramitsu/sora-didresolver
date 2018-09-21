@@ -1,14 +1,14 @@
 package jp.co.soramitsu.sora.didresolver.services;
 
 import java.util.Optional;
-import jp.co.soramitsu.sora.didresolver.dto.DDO;
 import jp.co.soramitsu.sora.didresolver.exceptions.UnparseableException;
+import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 
 public interface StorageService {
 
   void createOrUpdate(String did, DDO ddo);
 
-  Optional<DDO> read(String did) throws UnparseableException;
+  Optional<DDO> findDDObyDID(String did) throws UnparseableException;
 
   /**
    * Delete DDO by DID

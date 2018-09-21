@@ -1,26 +1,26 @@
 {
-  "id" : "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf",
-  "publicKey" : [ {
-    "id" : "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf#keys-1",
-    "type" : "Ed25519Sha3VerificationKey",
-    "owner" : "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf",
-    "publicKeyValue" : "8E7FDEA0F9552128D818F558513984C30E28DD4C1A88017321AA2043252F4314"
-  }, {
-    "id" : "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf#keys-2",
-    "type" : "Ed25519Sha3VerificationKey",
-    "owner" : "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf",
-    "publicKeyValue" : "5294436285FB81F3806BA7B3FDFCEA1EC0AA275E2073348A0DF1289C64766D6E"
-  } ],
-  "authentication" : [ {
-    "type" : "Ed25519Sha3Authentication",
-    "publicKey" : "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf#keys-1"
-  } ],
-  "created" : "2018-07-04T17:00:00Z",
-  "proof" : {
-    "type" : "Ed25519Sha3Signature",
-    "created" : "2018-07-05T17:00:00Z",
-    "creator" : "did:sora:uuid:caab4570-5f3f-4050-8d61-15306dea4bcf#keys-1",
-    "nonce" : "123123123123123",
-    "signatureValue" : "8865FBF3ABD77CEAA21EA76588DAFBBFB087C7C738C3D1FB66A4279DD9ABD186AC57CD736C322BDF70E293ECAD533ED8211BE5D7F2438B1E4AE1692F71BF0202"
+  "id":"did:sora:uuid:2abdb374-3feb-49cf-a819-5b80622cb750",
+  "publicKey":[{
+    "type":"Ed25519Sha3VerificationKey",
+    "id":"did:sora:uuid:2abdb374-3feb-49cf-a819-5b80622cb750#keys-1",
+    "publicKey":"6969940dabe6a3f129260eb9d217cb9eea524a22d1ed58d11c640ceb66af5f08"
+  }],
+  "authentication":[{
+    "type":"Ed25519Sha3Authentication",
+    "publicKey":"did:sora:uuid:2abdb374-3feb-49cf-a819-5b80622cb750#keys-1"
+  }],
+  "service":[{
+    "type":"GenericService",
+    "id":"did:sora:uuid:2abdb374-3feb-49cf-a819-5b80622cb750#service-1",
+    "serviceEndpoint":"https://google.com/"
+  }],
+  "owner":"did:sora:uuid:2abdb374-3feb-49cf-a819-5b80622cb750",
+  "created":"2018-09-17T09:48:35.427829Z",
+  "proof":{
+    "type":"Ed25519Sha3Signature",
+    "created":"2018-09-17T09:48:36.364971Z",
+    "creator":"did:sora:uuid:2abdb374-3feb-49cf-a819-5b80622cb750#keys-1",
+    "nonce":"nonce",
+    "signatureValue":"be4bfe31ba664c4a66ea2eee0d4beaefb0464609479356810ccbab24f105f72bf952f1a15220c8c4e40011876e9f28b0ecb0e565ea665107ca812485acbabf03"
   }
 }

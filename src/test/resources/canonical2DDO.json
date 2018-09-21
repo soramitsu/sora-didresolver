@@ -1,0 +1,21 @@
+{
+  "id":"did:sora:username",
+  "created":"2018-09-17T09:00:08Z",
+  "publicKey":[{
+    "id":"did:sora:username#keys-1",
+    "owner":"did:sora:username",
+    "publicKey":"b8bf218fe98e6b505b9ebdff5852d9db8df38d130ee914d531b06bb7be68efe4",
+    "type":"Ed25519Sha3VerificationKey"
+  }],
+  "authentication":[{
+    "type":"Ed25519Sha3Authentication",
+    "publicKey":"did:sora:username#keys-1"
+  }],
+  "proof":{
+    "created":"2018-09-17T09:00:08Z",
+    "nonce":"0f4b051a1068041b701dc02888b159edfa1b487fc1af6851a866ab1a328b5db0",
+    "type":"Ed25519Sha3Signature",
+    "creator":"did:sora:username#keys-1",
+    "signatureValue":"9aad93ca597f8b77cec4affd6ee86021de0ac143c2f4eb67bd0deec1ee52dda3f4b79a481158e25544431158e5c77e7c7934dbc5c42bbc09fcd1aebeae3dd207"
+  }
+}

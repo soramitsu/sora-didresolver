@@ -1,28 +1,34 @@
 package jp.co.soramitsu.sora.didresolver.services;
 
 import java.util.List;
-import java.util.Optional;
-import jp.co.soramitsu.sora.didresolver.dto.DDO;
-import jp.co.soramitsu.sora.didresolver.dto.Proof;
-import jp.co.soramitsu.sora.didresolver.dto.PublicKey;
+import jp.co.soramitsu.sora.sdk.did.model.dto.Authentication;
+import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
+import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
+import jp.co.soramitsu.sora.sdk.did.model.dto.PublicKey;
 
 public interface VerifyService {
 
   /**
-   * Method for verifying proof of DDO
+   * Check that DID in the list of Public keys
    *
-   * @param ddo - valid DDO
-   * @param publicKeyBytes - public key for verifying DDO in bytes
-   * @return true if DDO proof valid, otherwise return false
+   * @param creator value of field creator of proof element
+   * @param publicKeys array of public keys from DDO
+   * @return true if public keys contains key with id equals value of creator, otherwise false
    */
-  boolean verifyDDOProof(DDO ddo, byte[] publicKeyBytes);
+  boolean isCreatorInPublicKeys(DID creator, List<PublicKey> publicKeys);
 
   /**
-   * Receiving the public key specified in the proof
+   * Check that DID in the list of Authentications
    *
-   * @param proof an element of the type of Proof for which the corresponding key will be searched
-   * @param publicKeys collection of public keys of document
-   * @return public key corresponding to the transferred proof
+   * @param creator value of field creator of proof section
+   * @param authentication array of values of authentication section.
    */
-  Optional<PublicKey> getPublicKeyByProof(Proof proof, List<PublicKey> publicKeys);
+  boolean isCreatorInAuth(DID creator, List<Authentication> authentication);
+
+  /**
+   * Verifies integrity of the DDO
+   *
+   * @param ddo - DDO that is needed to be verified
+   */
+  boolean verifyIntegrityOfDDO(DDO ddo);
 }
