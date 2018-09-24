@@ -10,6 +10,11 @@ buildscript {
     }
 }
 
+plugins {
+  id "org.sonarqube" version "2.6.2"
+  id "com.palantir.docker" version "0.20.1"
+}
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
@@ -59,6 +64,8 @@ ext {
     soraSDKVersion = '3.1'
     jjwtVersion = '3.4.0'
     springCloudVersion = 'Finchley.RELEASE'
+
+    repoUrl = 'nexus.iroha.tech:19001'
 }
 
 repositories {
@@ -117,4 +124,24 @@ dependencyManagement {
 
 task wrapper(type: Wrapper) {
     gradleVersion = '4.8'
+}
+
+docker {
+    dependsOn build
+    dockerfile new File(rootProject.rootDir, "Dockerfile")
+    name "${repoUrl}/sora-middleware/${project.name}:${version}"
+    files bootJar.archivePath
+    buildArgs(['JAR_FILE': "${bootJar.archiveName}"])
+}
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "sora:didresolver"
+        property "sonar.java.binaries", "${project.projectDir}/build/classes"
+        property "sonar.java.libraries", "${project.projectDir}/build/libs"
+        property "sonar.java.test.binaries", "${project.projectDir}/build/test-results/test/binary"
+        property "sonar.junit.reportsPaths", "${project.projectDir}/build/test-results/**/*.xml"
+        property "sonar.jacoco.reportPaths", "${project.projectDir}/build/jacoco/test.exec"
+        property "sonar.exclusions", "${project.projectDir}/**/*.txt"
+    }
 }

@@ -8,7 +8,7 @@ iroha:
     port: ${DIDRESOLVER_IROHA_PORT:50051}
     host: ${DIDRESOLVER_IROHA_HOST:localhost}
 server:
-  port: 9008
+  port: ${PORT:9008}
 spring:
   jackson:
     serialization:
