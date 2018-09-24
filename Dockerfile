@@ -1,4 +1,6 @@
-FROM gradle:jdk8
-MAINTAINER Bogdan Vaneev <bogdan@soramitsu.co.jp>
-
-RUN wget -O /opt/codacy.jar https://github.com/codacy/codacy-coverage-reporter/releases/download/4.0.1/codacy-coverage-reporter-4.0.1-assembly.jar
+FROM openjdk:8-jdk-alpine
+MAINTAINER Soramitsu Co Ltd
+VOLUME /tmp
+ARG JAR_FILE
+COPY ${JAR_FILE} app.jar
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
