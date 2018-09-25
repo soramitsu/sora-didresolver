@@ -13,3 +13,13 @@ spring:
   jackson:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
+  application:
+    name: did-resolver
+  zipkin:
+    baseUrl: ${ZIPKIN_BASEURL:http://localhost:9411}
+    service:
+      name: ${spring.application.name}
+  sleuth:
+    enabled: true
+    sampler:
+      probability: 1.0
