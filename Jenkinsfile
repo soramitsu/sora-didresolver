@@ -1,36 +1,43 @@
-pipeline {
-  environment {
-    CODECOV_TOKEN = credentials('CODECOV_TOKEN')
-    CODACY_PROJECT_TOKEN = credentials('CODACY_PROJECT_TOKEN')
+def workerLabel = 'bca-sora-standalone'
+
+node(workerLabel) {
+  stage('build') {
+    checkout scm
+    sh(script: "./gradlew clean build -x test --parallel --configure-on-demand")
   }
-  options {
-    buildDiscarder(logRotator(numToKeepStr: '20'))
+
+  stage('test') {
+    sh(script: "./gradlew test")
+    junit allowEmptyResults: true, keepLongStdio: true, testResults: '**/build/test-results/**/*.xml'
+    jacoco execPattern: '**/build/jacoco/test.exec', sourcePattern: '**/src/main/java'
   }
-  agent {
-    docker {
-      image 'warchantua/did-resolver-dev:1'
-      args '-v /var/run/docker.sock:/var/run/docker.sock'
+
+  if (env.BRANCH_NAME.contains('master')) {
+    stage('build docker') {
+      withCredentials([string(credentialsId: 'sora-repo-url', variable: 'REPO_URL')]) {
+        withCredentials([usernamePassword(credentialsId: 'sora-nexus-credentials', usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
+          sh(script: "docker login --username ${DH_USER} --password '${DH_PASS}' https://${REPO_URL}")
+        }
+        sh(script: "./gradlew dockerPush -PrepoUrl=${REPO_URL}")
+      }
     }
   }
-  stages {
-    stage('Build') {
-      steps {
-        script {
-          sh "gradle clean build -x test"
-          sh "gradle check"
-          sh "gradle jacocoTestReport"
-          sh "bash <(curl -s https://codecov.io/bash) -t ${CODECOV_TOKEN}"
-          sh "java -jar /opt/codacy.jar report -l Java -r build/reports/coverage.xml"
-        }
-      }
-      post {
-        always {
-          junit '**/build/test-results/**/*.xml'
-        }
-        cleanup {
-          script {
-            cleanWs()
-          }
+
+  if (env.CHANGE_ID != null && env.CHANGE_TARGET ==~ /(master|develop)/) {
+    stage('coverage') {
+      withCredentials([usernamePassword(credentialsId: 'sorabot-github-oauth', usernameVariable: 'GH_USER', passwordVariable: 'GH_TOKEN')]) {
+        withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
+          sh(script: "./gradlew sonarqube -x test --configure-on-demand \
+            -Dsonar.host.url=https://sonar.soramitsu.co.jp \
+            -Dsonar.login=${SONAR_TOKEN}", returnStatus: true)
+          sh(script: "./gradlew sonarqube -x test --configure-on-demand \
+            -Dsonar.links.ci=${BUILD_URL} \
+            -Dsonar.github.pullRequest=${env.CHANGE_ID} \
+            -Dsonar.github.oauth=${GH_TOKEN} \
+            -Dsonar.analysis.mode=preview \
+            -Dsonar.github.repository=soramitsu/did-resolver \
+            -Dsonar.host.url=https://sonar.soramitsu.co.jp \
+            -Dsonar.login=${SONAR_TOKEN}", returnStatus: true)
         }
       }
     }
