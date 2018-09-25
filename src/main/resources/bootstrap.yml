@@ -12,4 +12,4 @@ server:
 spring:
   jackson:
     serialization:
-      write_dates_as_timestamp=false
+      WRITE_DATES_AS_TIMESTAMPS: false
