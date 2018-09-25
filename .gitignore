@@ -27,3 +27,6 @@ hs_err_pid*
 out/
 build/
 *.iml
+.classpath
+.project
+.settings

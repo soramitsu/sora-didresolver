@@ -77,10 +77,6 @@ dependencies {
     compile "com.github.soramitsu:sora-sdk:${soraSDKVersion}"
     compile("com.jayway.jsonpath:json-path:$jsonPathVersion")
 
-    compile('org.springframework.boot:spring-boot-starter-validation')
-    compile('org.springframework.boot:spring-boot-starter-actuator')
-    compile('org.springframework.boot:spring-boot-starter-web')
-
     compile("io.springfox:springfox-swagger2:${springSwaggerVersion}")
     compile("io.springfox:springfox-swagger-ui:${springSwaggerVersion}")
 
@@ -114,6 +110,13 @@ dependencies {
     // ========== Distributed Tracing ==========
     compile "org.springframework.cloud:spring-cloud-starter-zipkin"
     compile "org.springframework.cloud:spring-cloud-starter-sleuth"
+
+    // ========== Spring Cloud ==========
+    compile('org.springframework.boot:spring-boot-starter-actuator')
+    compile('org.springframework.cloud:spring-cloud-starter')
+    compile("org.springframework.cloud:spring-cloud-starter-consul-discovery")
+    compile('org.springframework.boot:spring-boot-starter-validation')
+    compile('org.springframework.boot:spring-boot-starter-web')
 }
 
 dependencyManagement {

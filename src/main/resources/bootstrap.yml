@@ -15,6 +15,10 @@ spring:
       WRITE_DATES_AS_TIMESTAMPS: false
   application:
     name: did-resolver
+
+---
+spring:
+  profiles: with_zipkin
   zipkin:
     baseUrl: ${ZIPKIN_BASEURL:http://localhost:9411}
     service:
@@ -23,3 +27,20 @@ spring:
     enabled: true
     sampler:
       probability: 1.0
+---
+spring:
+  profiles: with_consul
+  cloud:
+    consul:
+      enabled: true
+      host: ${CONSUL_HOST:localhost}
+      port: ${CONSUL_PORT:8500}
+      discovery:
+        heartbeat:
+          enabled: true
+        instanceId: ${spring.application.name}:${random.value}
+        hostname: ${HOSTNAME:${spring.application.name}}
+        port: ${server.port}
+        healthCheckPath: ${HEALTHCHECK_PATH:http://${spring.application.name}:${server.port}/actuator/health}
+        healthCheckInterval: 15s
+        tags: ${CONSUL_DISCOVERY_TAGS}
