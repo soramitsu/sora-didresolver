@@ -23,13 +23,18 @@ node(workerLabel) {
     }
   }
 
-  if (env.CHANGE_ID != null && env.CHANGE_TARGET ==~ /(master|develop)/) {
-    stage('coverage') {
-      withCredentials([usernamePassword(credentialsId: 'sorabot-github-oauth', usernameVariable: 'GH_USER', passwordVariable: 'GH_TOKEN')]) {
-        withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
+  stage('sonarqube') {
+    withCredentials([usernamePassword(credentialsId: 'sorabot-github-user', usernameVariable: 'GH_USER', passwordVariable: 'GH_TOKEN')]) {
+      withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
+        if (env.CHANGE_TARGET ==~ /(master|develop)/) {
+          // push analysis results to sonar
           sh(script: "./gradlew sonarqube -x test --configure-on-demand \
             -Dsonar.host.url=https://sonar.soramitsu.co.jp \
             -Dsonar.login=${SONAR_TOKEN}", returnStatus: true)
+        }
+
+        if (env.CHANGE_ID != null) {
+          // if it is a PR
           sh(script: "./gradlew sonarqube -x test --configure-on-demand \
             -Dsonar.links.ci=${BUILD_URL} \
             -Dsonar.github.pullRequest=${env.CHANGE_ID} \
