@@ -5,6 +5,7 @@ import static jp.co.soramitsu.sora.didresolver.commons.URIConstants.ID_PARAM;
 import static jp.co.soramitsu.sora.didresolver.commons.URIConstants.PATH;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
 
 import io.swagger.annotations.Api;
@@ -68,8 +69,8 @@ public class DIDResolverController {
       @ApiParam(value = "url encoded DID", required = true) @DIDConstraint(isNullable = false) @PathVariable String did)
       throws UnparseableException {
     log.info("Receive DDO by DID - {}", did);
-    val ddo = storageService.findDDObyDID(did).orElseThrow(() -> new DIDNotFoundException(did));
-    return ok(ddo);
+    val ddo = storageService.findDDObyDID(did);
+    return ddo.map(ResponseEntity::ok).orElseGet(() -> notFound().build());
   }
 
   @DeleteMapping(value = ID_PARAM)
