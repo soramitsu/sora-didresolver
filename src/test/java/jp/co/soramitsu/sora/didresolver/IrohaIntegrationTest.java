@@ -16,7 +16,6 @@ import org.testcontainers.containers.wait.strategy.HostPortWaitStrategy;
 @Slf4j
 public class IrohaIntegrationTest extends IntegrationTest {
 
-  private static String irohaVersion = "1.0.0_beta-4";
   protected static final String PG_USER = "postgres";
   protected static final String PG_PASSWORD = "mysecretpassword";
   protected static final String POSTGRES_USER = "POSTGRES_USER";
@@ -35,6 +34,7 @@ public class IrohaIntegrationTest extends IntegrationTest {
               .withPassword(PG_PASSWORD)
               .withNetwork(network)
               .withNetworkAliases("some-postgres");
+  private static String irohaVersion = "1.0.0_beta-4";
   protected static FixedHostPortGenericContainer iroha =
       (FixedHostPortGenericContainer)
           new FixedHostPortGenericContainer("hyperledger/iroha:" + irohaVersion)

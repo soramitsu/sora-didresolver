@@ -15,11 +15,13 @@ import org.springframework.stereotype.Component;
 @Data
 public class IrohaProperties {
 
-  @NestedConfigurationProperty private AccountProperties account = new AccountProperties();
+  @NestedConfigurationProperty
+  private AccountProperties account = new AccountProperties();
 
   private String sharedAccountName;
 
-  @NestedConfigurationProperty private ConnectionProperties connection = new ConnectionProperties();
+  @NestedConfigurationProperty
+  private ConnectionProperties connection = new ConnectionProperties();
 
   @Data
   public static class AccountProperties {

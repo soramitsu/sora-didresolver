@@ -15,7 +15,7 @@ public class IrohaBeansConfig {
   @Bean
   public ManagedChannel irohaChannel(IrohaProperties irohaProperties) {
     return forAddress(
-            irohaProperties.getConnection().getHost(), irohaProperties.getConnection().getPort())
+        irohaProperties.getConnection().getHost(), irohaProperties.getConnection().getPort())
         .usePlaintext()
         .build();
   }

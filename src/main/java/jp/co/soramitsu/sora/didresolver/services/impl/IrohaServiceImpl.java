@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.grpc.ManagedChannel;
 import java.security.KeyPair;
 import jp.co.soramitsu.sora.didresolver.config.properties.IrohaProperties;
-import jp.co.soramitsu.sora.didresolver.services.StorageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

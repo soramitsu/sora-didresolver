@@ -36,7 +36,8 @@ public class IrohaServiceTests extends IrohaIntegrationTest {
     Optional<String> val = irohaService.getAccountDetails(ID);
 
     assertThat(
-        mapper.readValue(val.get(), new TypeReference<List<SomeClass>>() {}), is(someClasses));
+        mapper.readValue(val.get(), new TypeReference<List<SomeClass>>() {
+        }), is(someClasses));
   }
 
   @Test

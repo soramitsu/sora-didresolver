@@ -14,17 +14,19 @@ import jp.co.soramitsu.sora.didresolver.validation.ExactlyOneValidator;
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ExactlyOneConstraint {
-    String message() default "Object must include exactly one value property";
 
-    String[] group();
+  String message() default "Object must include exactly one value property";
 
-    Class<?>[] groups() default {};
+  String[] group();
 
-    Class<? extends Payload>[] payload() default {};
+  Class<?>[] groups() default {};
 
-    @Target({ElementType.TYPE})
-    @Retention(RetentionPolicy.RUNTIME)
-    @interface List {
-        ExactlyOneConstraint[] value();
-    }
+  Class<? extends Payload>[] payload() default {};
+
+  @Target({ElementType.TYPE})
+  @Retention(RetentionPolicy.RUNTIME)
+  @interface List {
+
+    ExactlyOneConstraint[] value();
+  }
 }

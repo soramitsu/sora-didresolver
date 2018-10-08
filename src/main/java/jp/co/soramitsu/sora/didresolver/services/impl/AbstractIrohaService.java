@@ -60,9 +60,8 @@ public abstract class AbstractIrohaService implements IrohaService {
       Configuration.defaultConfiguration().addOptions(SUPPRESS_EXCEPTIONS);
 
   private final Digest256 sha3 = new Digest256();
-  private Signer signer;
-
   private final Logger log;
+  private Signer signer;
 
   protected abstract KeyPair keyPair();
 

@@ -16,8 +16,8 @@ public interface IrohaService {
    *
    * @param key under which details returned
    * @return json string with details. Consider AccountDetail contains this data: '{ "key1": {
-   *     "nestedkey": "value" }, "key2": "othervalue" }'; When requested value under "key1" then {
-   *     "nestedkey": "value" } will be returned
+   * "nestedkey": "value" }, "key2": "othervalue" }'; When requested value under "key1" then {
+   * "nestedkey": "value" } will be returned
    */
   Optional<String> getAccountDetails(String key);
 
@@ -26,7 +26,7 @@ public interface IrohaService {
    *
    * @param key under which details returned
    * @param value any Jackson-serializable object (can be list, or map, or any object serializable
-   *     with Jackson)
+   * with Jackson)
    */
   void setAccountDetails(String key, Object value) throws IrohaTransactionCommitmentException;
 }
