@@ -34,13 +34,12 @@ public class IntegrationTest {
       "313a07e6384776ed95447710d15e59148473ccfc052a681317a72a69f2a49910";
   public static final String PRIVATEKEY =
       "f101537e319568c765b2cc89698325604991dca57b9716b58016b253506cab70";
+  protected static final String TOKEN = "$.token";
 
   static {
     System.setProperty("DIDRESOLVER_IROHA_PUBLIC_KEY", PUBLICKEY);
     System.setProperty("DIDRESOLVER_IROHA_PRIVATE_KEY", PRIVATEKEY);
   }
-
-  protected static final String TOKEN = "$.token";
 
   @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
