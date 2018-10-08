@@ -22,8 +22,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest(
     webEnvironment = WebEnvironment.RANDOM_PORT,
     properties = {
-      "spring.main.allow-bean-definition-overriding=true",
-      "logging.level.jp.co.soramitsu.sora=debug"
+        "spring.main.allow-bean-definition-overriding=true",
+        "logging.level.jp.co.soramitsu.sora=debug"
     },
     classes = {DIDResolverApplication.class})
 @Configuration

@@ -37,7 +37,8 @@ public class DIDValidator implements ConstraintValidator<DIDConstraint, String> 
     boolean checkResult = false;
     try {
       checkResult = identifier.matches(DIDTypeEnum.USERNAME.getRegexp());
-    } catch (NullPointerException | IllegalArgumentException ignored) {}
+    } catch (NullPointerException | IllegalArgumentException ignored) {
+    }
     return checkResult;
   }
 

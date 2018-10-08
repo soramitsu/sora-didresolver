@@ -11,6 +11,7 @@ import jp.co.soramitsu.sora.sdk.did.model.dto.service.GenericService;
 import jp.co.soramitsu.sora.sdk.did.parser.generated.ParserException;
 
 public final class DdoUtils {
+
   public static final String DEFAULT_DID = "did:sora:user123";
 
   public static DDO getDefaultDdo() throws ParserException, MalformedURLException {

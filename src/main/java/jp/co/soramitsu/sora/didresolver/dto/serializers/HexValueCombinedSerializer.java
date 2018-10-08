@@ -27,7 +27,7 @@ public class HexValueCombinedSerializer {
 
     @Override
     public byte[] deserialize(JsonParser p, DeserializationContext ctxt)
-        throws IOException{
+        throws IOException {
       return DatatypeConverter.parseHexBinary(p.getText());
     }
   }

@@ -9,6 +9,7 @@ import java.security.SignatureException;
 import java.util.List;
 import jp.co.soramitsu.sora.didresolver.services.VerifyService;
 import jp.co.soramitsu.sora.didresolver.services.impl.VerifyServiceImpl;
+import jp.co.soramitsu.sora.didresolver.util.DataProvider;
 import jp.co.soramitsu.sora.sdk.did.model.dto.Authentication;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
@@ -16,7 +17,6 @@ import jp.co.soramitsu.sora.sdk.did.model.dto.Proof;
 import jp.co.soramitsu.sora.sdk.did.model.dto.PublicKey;
 import jp.co.soramitsu.sora.sdk.did.model.dto.publickey.Ed25519Sha3VerificationKey;
 import jp.co.soramitsu.sora.sdk.did.parser.generated.ParserException;
-import jp.co.soramitsu.sora.didresolver.util.DataProvider;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,7 +30,8 @@ public class VerifyServiceImplTest {
 
   private static final String DDO_JSON_NAME = "canonicalDDO.json";
 
-  @Autowired private VerifyService verifyService;
+  @Autowired
+  private VerifyService verifyService;
 
   private DataProvider dataProvider = new DataProvider();
 
