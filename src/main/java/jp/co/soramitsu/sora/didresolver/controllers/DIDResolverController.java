@@ -1,6 +1,7 @@
 package jp.co.soramitsu.sora.didresolver.controllers;
 
 import static java.util.Objects.isNull;
+import static jp.co.soramitsu.sora.didresolver.commons.CommonsConst.MAX_IROHA_KEY_LENGTH;
 import static jp.co.soramitsu.sora.didresolver.commons.URIConstants.ID_PARAM;
 import static jp.co.soramitsu.sora.didresolver.commons.URIConstants.PATH;
 import static org.springframework.http.HttpStatus.OK;
@@ -11,6 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import jp.co.soramitsu.sora.didresolver.exceptions.DIDDuplicateException;
+import jp.co.soramitsu.sora.didresolver.exceptions.DIDIsTooLongException;
 import jp.co.soramitsu.sora.didresolver.exceptions.DIDNotFoundException;
 import jp.co.soramitsu.sora.didresolver.exceptions.IncorrectUpdateException;
 import jp.co.soramitsu.sora.didresolver.exceptions.InvalidProofException;
@@ -51,14 +53,16 @@ public class DIDResolverController {
   public ResponseEntity createDDO(
       @ApiParam(value = "url encoded DID", required = true) @Validated @RequestBody DDO ddo)
       throws UnparseableException {
-    log.info("starting creation of DDO for DID - {}", ddo.getId());
+    final String id = ddo.getId().toString();
+    log.info("starting creation of DDO for DID - {}", id);
+    if (id.length() > MAX_IROHA_KEY_LENGTH) throw new DIDIsTooLongException(id);
     verifyDDOProof(ddo);
-    val optionalDDO = storageService.findDDObyDID(ddo.getId().toString());
+    val optionalDDO = storageService.findDDObyDID(id);
     if (optionalDDO.isPresent()) {
-      throw new DIDDuplicateException(ddo.getId().toString());
+      throw new DIDDuplicateException(id);
     }
-    log.info("write to storage DDO with DID - {}", ddo.getId());
-    storageService.createOrUpdate(ddo.getId().toString(), ddo);
+    log.info("write to storage DDO with DID - {}", id);
+    storageService.createOrUpdate(id, ddo);
     return new ResponseEntity(OK);
   }
 

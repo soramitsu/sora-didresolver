@@ -127,6 +127,12 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
     postRequest(status().isOk());
   }
 
+  @Test
+  public void testCreateLongDDO() throws Exception {
+    ddo.setId(DID.parse("did:sora:very:long:did:that:is:longer:that:toyota:century"));
+    postRequest(status().isUnprocessableEntity());
+  }
+
   // TODO: 12/09/2018 implement tests for creating DDO using testRestTemplate
 
   @Test
