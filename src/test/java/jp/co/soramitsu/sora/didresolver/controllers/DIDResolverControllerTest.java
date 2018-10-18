@@ -34,6 +34,7 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
 
   private static final String URL =
       PATH + ID_PARAM;
+  private static final String DEFAULT_LONG_DID = "did:sora:very:long:did:that:is:longer:that:toyota:century";
 
   @Test
   public void testGetDDO() throws Exception {
@@ -125,6 +126,12 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
   public void testCreateDDO() throws Exception {
     given(verifyService.verifyIntegrityOfDDO(ddo)).willReturn(true);
     postRequest(status().isOk());
+  }
+
+  @Test
+  public void testCreateLongDDO() throws Exception {
+    ddo.setId(parse(DEFAULT_LONG_DID));
+    postRequest(status().isUnprocessableEntity());
   }
 
   // TODO: 12/09/2018 implement tests for creating DDO using testRestTemplate
