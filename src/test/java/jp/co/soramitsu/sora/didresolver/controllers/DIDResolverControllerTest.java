@@ -34,6 +34,7 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
 
   private static final String URL =
       PATH + ID_PARAM;
+  private static final String DEFAULT_LONG_DID = "did:sora:very:long:did:that:is:longer:that:toyota:century";
 
   @Test
   public void testGetDDO() throws Exception {
@@ -129,7 +130,7 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
 
   @Test
   public void testCreateLongDDO() throws Exception {
-    ddo.setId(DID.parse("did:sora:very:long:did:that:is:longer:that:toyota:century"));
+    ddo.setId(parse(DEFAULT_LONG_DID));
     postRequest(status().isUnprocessableEntity());
   }
 
