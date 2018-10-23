@@ -46,7 +46,7 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 
 ext {
-    irohaPureVersion = '0.4.0'
+    irohaPureVersion = '0.5.1'
     lombokVersion = '1.18.2'
     springSwaggerVersion = '2.9.2'
     commonsLangVersion = '3.8.1'
