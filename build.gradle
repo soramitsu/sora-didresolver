@@ -63,7 +63,7 @@ ext {
     jUnitPlatformVersion = '1.3.1'
     soraSDKVersion = '3.1'
     jjwtVersion = '3.4.1'
-    springCloudVersion = 'Finchley.SR1'
+    springCloudVersion = 'Finchley.SR2'
 
     repoUrl = 'nexus.iroha.tech:19001'
 }
