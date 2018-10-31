@@ -47,7 +47,7 @@ sourceCompatibility = 1.8
 
 ext {
     irohaPureVersion = '0.5.2'
-    lombokVersion = '1.18.2'
+    lombokVersion = '1.18.4'
     springSwaggerVersion = '2.9.2'
     commonsLangVersion = '3.8.1'
     aspectjVersion = '1.9.2'
