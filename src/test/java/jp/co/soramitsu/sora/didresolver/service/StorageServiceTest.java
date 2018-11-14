@@ -5,15 +5,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Optional;
-import jp.co.soramitsu.sora.didresolver.IrohaIntegrationTest;
+import jp.co.soramitsu.sora.didresolver.IntegrationTest;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Slf4j
-public class StorageServiceTest extends IrohaIntegrationTest {
+public class StorageServiceTest extends IntegrationTest {
 
   public static final String DEFAULT_DID = "did:sora:user123";
   @Autowired

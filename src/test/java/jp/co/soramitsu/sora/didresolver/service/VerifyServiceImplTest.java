@@ -1,7 +1,8 @@
 package jp.co.soramitsu.sora.didresolver.service;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -18,14 +19,14 @@ import jp.co.soramitsu.sora.sdk.did.model.dto.PublicKey;
 import jp.co.soramitsu.sora.sdk.did.model.dto.publickey.Ed25519Sha3VerificationKey;
 import jp.co.soramitsu.sora.sdk.did.parser.generated.ParserException;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class VerifyServiceImplTest {
 
   private static final String DDO_JSON_NAME = "canonicalDDO.json";
@@ -41,25 +42,25 @@ public class VerifyServiceImplTest {
     assertTrue(verifyService.verifyIntegrityOfDDO(ddo));
   }
 
-  @Test(expected = SignatureException.class)
+  @Test
   public void testFailedVerifyDDOProofByincorrectSignature()
       throws IOException, NoSuchFieldException, IllegalAccessException {
     DDO ddo = dataProvider.getDDOFromJson(DDO_JSON_NAME);
     Field proof = ddo.getProof().getClass().getDeclaredField("signatureValue");
     proof.setAccessible(true);
     proof.set(ddo.getProof(), "testSig".getBytes());
-    verifyService.verifyIntegrityOfDDO(ddo);
+    assertThrows(SignatureException.class, () -> verifyService.verifyIntegrityOfDDO(ddo));
   }
 
-  @Test(expected = IllegalArgumentException.class)
-  public void testFailedVerifyDDOProofByincorrectLengthOfTheKey()
+  @Test
+  public void testFailedVerifyDDOProofByIncorrectLengthOfTheKey()
       throws IOException, NoSuchFieldException, IllegalAccessException {
     DDO ddo = dataProvider.getDDOFromJson(DDO_JSON_NAME);
     Ed25519Sha3VerificationKey publicKey = (Ed25519Sha3VerificationKey) ddo.getPublicKey().get(0);
     Field publicKeyField = Ed25519Sha3VerificationKey.class.getDeclaredField("publicKey");
     publicKeyField.setAccessible(true);
     publicKeyField.set(publicKey, "testKey".getBytes());
-    verifyService.verifyIntegrityOfDDO(ddo);
+    assertThrows(IllegalArgumentException.class, () -> verifyService.verifyIntegrityOfDDO(ddo));
   }
 
   @Test

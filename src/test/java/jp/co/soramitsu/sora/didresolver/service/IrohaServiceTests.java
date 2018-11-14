@@ -10,17 +10,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import jp.co.soramitsu.sora.didresolver.IrohaIntegrationTest;
+import jp.co.soramitsu.sora.didresolver.IntegrationTest;
 import jp.co.soramitsu.sora.didresolver.services.IrohaService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Slf4j
-public class IrohaServiceTests extends IrohaIntegrationTest {
+public class IrohaServiceTests extends IntegrationTest {
 
   public static final String ID = "someid";
   @Autowired
@@ -42,8 +40,7 @@ public class IrohaServiceTests extends IrohaIntegrationTest {
 
   @Test
   public void canSetAndGetObject() throws IOException {
-    ObjectMapper mapper = new ObjectMapper();
-    SomeClass payloadObject = new SomeClass("someid", 1);
+    SomeClass payloadObject = new SomeClass(ID, 1);
     irohaService.setAccountDetails(ID, payloadObject);
     Optional<String> val = irohaService.getAccountDetails(ID);
 
