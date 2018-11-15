@@ -36,7 +36,7 @@ ext {
     mockitoCoreVersion = '2.23.0'
     hibernateTypesVersion = '2.3.0'
     testContainersVersion = '1.10.1'
-    testContainersIrohaVersion = '0.2.0'
+    testContainersIrohaVersion = '0.2.1'
     liquibaseVersion = '3.6.2'
     c3p0Version = '0.9.5.2'
     jUnitVersion = '5.3.1'
