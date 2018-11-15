@@ -12,7 +12,7 @@ import jp.co.soramitsu.sora.didresolver.services.StorageService;
 import jp.co.soramitsu.sora.didresolver.services.VerifyService;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 import jp.co.soramitsu.sora.sdk.did.model.dto.Proof;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -34,7 +34,7 @@ public abstract class DIDResolverControllerInitializer {
   @Autowired
   private ObjectMapper objectMapper;
 
-  @Before
+  @BeforeEach
   public void setUp() throws IOException {
     JacksonTester.initFields(this, objectMapper);
     Reader jsonReader = new BufferedReader(

@@ -6,6 +6,7 @@ import static jp.co.soramitsu.sora.didresolver.commons.URIConstants.ID_PARAM;
 import static jp.co.soramitsu.sora.didresolver.commons.URIConstants.PATH;
 import static jp.co.soramitsu.sora.sdk.did.model.dto.DID.parse;
 import static jp.co.soramitsu.sora.sdk.did.model.dto.DID.randomUUID;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
@@ -20,15 +21,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import jp.co.soramitsu.sora.didresolver.exceptions.DIDNotFoundException;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
 import jp.co.soramitsu.sora.sdk.did.parser.generated.ParserException;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.ResultMatcher;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @WebMvcTest(DIDResolverController.class)
 public class DIDResolverControllerTest extends DIDResolverControllerInitializer {
 
@@ -143,10 +144,10 @@ public class DIDResolverControllerTest extends DIDResolverControllerInitializer 
     postRequest(status().isOk());
   }
 
-  @Test(expected = ParserException.class)
+  @Test
   public void testCheckDIDOnCreateDDO() throws Exception {
-    ddo.setId(parse("sdg"));
-    postRequest(status().isBadRequest());
+    assertThrows(ParserException.class, () -> ddo.setId(parse("sdg")));
+    postRequest(status().isUnprocessableEntity());
   }
 
   @Test

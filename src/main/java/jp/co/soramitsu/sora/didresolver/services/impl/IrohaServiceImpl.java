@@ -1,8 +1,8 @@
 package jp.co.soramitsu.sora.didresolver.services.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.grpc.ManagedChannel;
 import java.security.KeyPair;
+import jp.co.soramitsu.iroha.java.IrohaAPI;
 import jp.co.soramitsu.sora.didresolver.config.properties.IrohaProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,16 +15,14 @@ public class IrohaServiceImpl extends AbstractIrohaService {
   private final KeyPair keyPair;
   private final ObjectMapper objectMapper;
   private final String irohaAccount;
-  private final ManagedChannel irohaChannel;
 
   @Autowired
   public IrohaServiceImpl(ObjectMapper objectMapper,
-      IrohaProperties irohaProperties, ManagedChannel irohaChannel) {
-    super(log);
+      IrohaProperties irohaProperties, IrohaAPI api) {
+    super(log, api);
     this.objectMapper = objectMapper;
     this.keyPair = irohaProperties.getAccount().keyPair();
     this.irohaAccount = irohaProperties.getAccount().getName();
-    this.irohaChannel = irohaChannel;
   }
 
   @Override
@@ -42,8 +40,4 @@ public class IrohaServiceImpl extends AbstractIrohaService {
     return irohaAccount;
   }
 
-  @Override
-  protected ManagedChannel irohaChannel() {
-    return irohaChannel;
-  }
 }
