@@ -136,7 +136,7 @@ sonarqube {
 test {
     maxParallelForks = 1
     useJUnitPlatform()
-    failFast = false
+    failFast = true
     testLogging {
         events "passed", "skipped", "failed"
     }
