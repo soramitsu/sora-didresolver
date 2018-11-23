@@ -23,3 +23,7 @@ spring:
     enabled: true
     sampler:
       probability: 1.0
+
+logging:
+  level:
+    jp.co.soramitsu.sora: debug

@@ -145,7 +145,7 @@ public abstract class AbstractIrohaService implements IrohaService {
   }
 
   private String getNormalizeDetailKey(String detailKey) {
-    return detailKey.replaceAll("[ -:.@]", "_");
+    return detailKey.replaceAll("[\\s-:.@]", "_");
   }
 
   private String pathForDetailWithKey(String key) {
