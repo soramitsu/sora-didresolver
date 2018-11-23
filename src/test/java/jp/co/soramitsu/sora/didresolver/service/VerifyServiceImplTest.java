@@ -29,7 +29,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 public class VerifyServiceImplTest {
 
-  private static final String DDO_JSON_NAME = "canonicalDDO.json";
+  private static final String DDO_JSON_NAME = "canonical2DDO.json";
 
   @Autowired
   private VerifyService verifyService;
