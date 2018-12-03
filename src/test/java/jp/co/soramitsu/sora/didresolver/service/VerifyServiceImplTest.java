@@ -6,8 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.security.SignatureException;
 import java.util.List;
+import jp.co.soramitsu.sora.didresolver.exceptions.ProofSignatureVerificationException;
+import jp.co.soramitsu.sora.didresolver.exceptions.PublicKeyValueNotPresentedException;
 import jp.co.soramitsu.sora.didresolver.services.VerifyService;
 import jp.co.soramitsu.sora.didresolver.services.impl.VerifyServiceImpl;
 import jp.co.soramitsu.sora.didresolver.util.DataProvider;
@@ -31,29 +32,32 @@ public class VerifyServiceImplTest {
 
   private static final String DDO_JSON_NAME = "canonical2DDO.json";
 
+  @SuppressWarnings("SpringJavaAutowiredMembersInspection")
   @Autowired
   private VerifyService verifyService;
 
   private DataProvider dataProvider = new DataProvider();
 
   @Test
-  public void testSuccessVerifyDDOProof() throws IOException {
+  void testSuccessVerifyDDOProof()
+      throws IOException, ProofSignatureVerificationException, PublicKeyValueNotPresentedException {
     DDO ddo = dataProvider.getDDOFromJson(DDO_JSON_NAME);
     assertTrue(verifyService.verifyIntegrityOfDDO(ddo));
   }
 
   @Test
-  public void testFailedVerifyDDOProofByincorrectSignature()
+  void testFailedVerifyDDOProofByincorrectSignature()
       throws IOException, NoSuchFieldException, IllegalAccessException {
     DDO ddo = dataProvider.getDDOFromJson(DDO_JSON_NAME);
     Field proof = ddo.getProof().getClass().getDeclaredField("signatureValue");
     proof.setAccessible(true);
     proof.set(ddo.getProof(), "testSig".getBytes());
-    assertThrows(SignatureException.class, () -> verifyService.verifyIntegrityOfDDO(ddo));
+    assertThrows(ProofSignatureVerificationException.class,
+        () -> verifyService.verifyIntegrityOfDDO(ddo));
   }
 
   @Test
-  public void testFailedVerifyDDOProofByIncorrectLengthOfTheKey()
+  void testFailedVerifyDDOProofByIncorrectLengthOfTheKey()
       throws IOException, NoSuchFieldException, IllegalAccessException {
     DDO ddo = dataProvider.getDDOFromJson(DDO_JSON_NAME);
     Ed25519Sha3VerificationKey publicKey = (Ed25519Sha3VerificationKey) ddo.getPublicKey().get(0);
@@ -64,14 +68,14 @@ public class VerifyServiceImplTest {
   }
 
   @Test
-  public void testSuccessIsProofCreatorInAuth() throws ParserException {
+  void testSuccessIsProofCreatorInAuth() throws ParserException {
     DID proofCreator = dataProvider.getProofForTest().getOptions().getCreator();
     assertTrue(
         verifyService.isCreatorInAuth(proofCreator, dataProvider.getAuthenticationForTest()));
   }
 
   @Test
-  public void testFailedIsProofCreatorInAuth() throws ParserException {
+  void testFailedIsProofCreatorInAuth() throws ParserException {
     Proof proof = dataProvider.getProofForTest();
     List<Authentication> authentications = dataProvider.getAuthenticationForTest();
     proof
@@ -83,7 +87,7 @@ public class VerifyServiceImplTest {
   }
 
   @Test
-  public void testSuccessIsProofInPublicKeys() throws ParserException {
+  void testSuccessIsProofInPublicKeys() throws ParserException {
     assertTrue(
         verifyService.isCreatorInPublicKeys(
             dataProvider.getProofForTest().getOptions().getCreator(),
@@ -91,7 +95,7 @@ public class VerifyServiceImplTest {
   }
 
   @Test
-  public void testFailedIsProofInPublicKeys() throws ParserException {
+  void testFailedIsProofInPublicKeys() throws ParserException {
     Proof proof = dataProvider.getProofForTest();
     List<PublicKey> publicKeys = dataProvider.getPublicKeysForTest();
     proof

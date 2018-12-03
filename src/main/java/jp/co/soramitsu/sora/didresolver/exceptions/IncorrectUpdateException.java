@@ -1,13 +1,13 @@
 package jp.co.soramitsu.sora.didresolver.exceptions;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import static jp.co.soramitsu.sora.didresolver.controllers.dto.ResponseCode.INCORRECT_UPDATE_TIME;
 
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-public class IncorrectUpdateException extends RuntimeException {
+import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
 
-  public IncorrectUpdateException(String createdTime, String updatedTime) {
+public class IncorrectUpdateException extends DIDResolverException {
+
+  public IncorrectUpdateException(DID did, String createdTime, String updatedTime) {
     super("Updated property value " + updatedTime + " MUST be with time more than created - "
-        + createdTime);
+        + createdTime + " for DDO with DID - " + did, INCORRECT_UPDATE_TIME);
   }
 }

@@ -1,14 +1,15 @@
 package jp.co.soramitsu.sora.didresolver.controllers;
 
-import static jp.co.soramitsu.sora.didresolver.controllers.dto.ErrorRs.BusinessErrors.DID_DUPLICATE;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static java.util.Optional.ofNullable;
+import static jp.co.soramitsu.sora.didresolver.controllers.dto.ResponseCode.ERROR;
+import static jp.co.soramitsu.sora.didresolver.controllers.dto.ResponseCode.INCORRECT_QUERY_PARAMS;
 import static org.springframework.http.HttpStatus.OK;
 
-import java.util.Set;
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import jp.co.soramitsu.sora.didresolver.controllers.dto.ErrorRs;
-import jp.co.soramitsu.sora.didresolver.exceptions.DIDDuplicateException;
+import jp.co.soramitsu.sora.didresolver.controllers.dto.GenericResponse;
+import jp.co.soramitsu.sora.didresolver.controllers.dto.GenericResponse.Status;
+import jp.co.soramitsu.sora.didresolver.controllers.dto.ResponseCode;
+import jp.co.soramitsu.sora.didresolver.exceptions.DIDResolverException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -21,29 +22,30 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @Slf4j
 public class ErrorHandler extends ResponseEntityExceptionHandler {
 
-  private static final String ERROR_FORMAT = "{ \"error\" : \"%s\"}\n";
-
-  @ExceptionHandler(value = {DIDDuplicateException.class})
-  protected ResponseEntity<Object> handleExceptions(
-      RuntimeException ex, WebRequest request) {
-
-    ErrorRs errorRs = null;
-
-    if (ex instanceof DIDDuplicateException) {
-      errorRs = new ErrorRs(DID_DUPLICATE.name());
-    }
-
-    return handleExceptionInternal(ex, errorRs, new HttpHeaders(), OK, request);
+  @ExceptionHandler(value = {ConstraintViolationException.class})
+  public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException e,
+      WebRequest request) {
+    return handleException(ERROR, e, request);
   }
 
-  @ExceptionHandler(value = {ConstraintViolationException.class})
-  public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException e) {
-    Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
-    StringBuilder strBuilder = new StringBuilder();
-    for (ConstraintViolation<?> violation : violations) {
-      strBuilder.append(String.format(ERROR_FORMAT, violation.getMessage()));
-    }
-    log.error(e.toString(), e);
-    return new ResponseEntity<>(strBuilder.toString(), new HttpHeaders(), BAD_REQUEST);
+  @ExceptionHandler(value = {DIDResolverException.class})
+  protected ResponseEntity<Object> handleDIDResolverExceptions(
+      DIDResolverException ex, WebRequest request) {
+    return handleException(ofNullable(ex.getResponseCode()).orElse(ERROR), ex, request);
+  }
+
+  @ExceptionHandler(value = {IllegalArgumentException.class})
+  protected ResponseEntity<Object> handleIllegalArgumentExceptions(
+      IllegalArgumentException ex, WebRequest request) {
+    return handleException(INCORRECT_QUERY_PARAMS, ex, request);
+  }
+
+  private ResponseEntity<Object> handleException(ResponseCode responseCode, Exception ex,
+      WebRequest request) {
+    log.warn(ex.getMessage(), ex);
+    return handleExceptionInternal(ex,
+        new GenericResponse(
+            new Status(responseCode, ex.getMessage())),
+        new HttpHeaders(), OK, request);
   }
 }
