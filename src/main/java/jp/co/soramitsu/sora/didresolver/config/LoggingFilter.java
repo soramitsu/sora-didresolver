@@ -27,7 +27,6 @@ public class LoggingFilter extends MDCFilter {
 
   private static final String MD_5 = "MD5";
   private static final String REQUEST = "request";
-  private static final String REQUEST_SESSION = "requestSession";
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -57,7 +56,7 @@ public class LoggingFilter extends MDCFilter {
     );
     chain.doFilter(request, response);
 
-    remove(REQUEST_SESSION);
+    remove(REQUEST);
   }
 
 }
