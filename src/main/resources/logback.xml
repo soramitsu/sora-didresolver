@@ -9,7 +9,10 @@
     <!-- encoders are assigned the type
          ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
     <encoder>
-      <pattern>%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID}){magenta} %clr([%7.7t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %clr([%marker]){magenta} %mask%n%wEx</pattern>
+      <pattern>%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID}){magenta}
+        %clr([%7.7t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %clr([%marker
+        %mdc]){magenta} %mask%n%wEx
+      </pattern>
     </encoder>
   </appender>
 
