@@ -37,12 +37,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * S4529 - Exposing Spring endpoints - warning for security auditors to check if endpoint is safe
+ * */
 @RestController
 @AllArgsConstructor
 @RequestMapping(PATH)
-@Api(value = PATH, description = "CRUD operations on DID documents")
+@Api(value = PATH)
 @Validated
 @Slf4j
+@SuppressWarnings("squid:S4529")
 public class DIDResolverController {
 
   private StorageService storageService;
@@ -55,7 +59,9 @@ public class DIDResolverController {
       throws UnparseableException {
     final String id = ddo.getId().toString();
     log.info("starting creation of DDO for DID - {}", id);
-    if (id.length() > MAX_IROHA_KEY_LENGTH) throw new DIDIsTooLongException(id);
+    if (id.length() > MAX_IROHA_KEY_LENGTH) {
+      throw new DIDIsTooLongException(id);
+    }
     verifyDDOProof(ddo);
     val optionalDDO = storageService.findDDObyDID(id);
     if (optionalDDO.isPresent()) {
@@ -96,8 +102,11 @@ public class DIDResolverController {
     if (!ddo.getUpdated().isAfter(ddo.getCreated())) {
       throw new IncorrectUpdateException(ddo.getCreated().toString(), ddo.getUpdated().toString());
     }
-    storageService.findDDObyDID(did).orElseThrow(() -> new DIDNotFoundException(did));
-    storageService.createOrUpdate(did, ddo);
+    if (storageService.findDDObyDID(did).isPresent()) {
+      storageService.createOrUpdate(did, ddo);
+    } else {
+      throw new DIDNotFoundException(did);
+    }
   }
 
   private void verifyDDOProof(DDO ddo) {
