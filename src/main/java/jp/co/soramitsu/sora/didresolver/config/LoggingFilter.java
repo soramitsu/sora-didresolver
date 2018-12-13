@@ -32,13 +32,6 @@ public class LoggingFilter extends MDCFilter {
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
       throws IOException, ServletException {
     val req = (HttpServletRequest) request;
-    val serverHost = req.getServerName();
-    val serverPort = req.getServerPort();
-    val clientHost = req.getRemoteHost();
-    val clientIp = req.getRemoteAddr();
-    val contentType = req.getContentType();
-    val encoding = req.getCharacterEncoding();
-    val contentLength = req.getContentLength();
     if (req.getSession() != null) {
       MessageDigest md;
       try {
@@ -51,7 +44,8 @@ public class LoggingFilter extends MDCFilter {
     }
     log.info("Incoming request meta: Client Host={}; "
             + "Client IP={}; Content Type={}; Encoding={}; Server Host={}; Server Port={}; Content Length={}; Method={}; URL={}; Query params={}",
-        clientHost, clientIp, contentType, encoding, serverHost, serverPort, contentLength,
+        req.getRemoteHost(), req.getRemoteAddr(), req.getContentType(), req.getCharacterEncoding(),
+        req.getServerName(), req.getServerPort(), req.getContentLength(),
         req.getMethod(), req.getRequestURI(), req.getQueryString()
     );
     chain.doFilter(request, response);
