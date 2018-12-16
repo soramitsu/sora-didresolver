@@ -86,7 +86,7 @@ public class VerifyServiceImpl implements VerifyService {
    * @return public key in bytes
    */
   private Optional<byte[]> getPublicKeyValueByDID(List<PublicKey> publicKeys, DID did) {
-    log.trace("get public key for did {}", did.toString());
+    log.trace("get public key for did {}", did);
     return publicKeys
         .stream()
         .filter(key -> key.getId().toString().equals(did.toString()))

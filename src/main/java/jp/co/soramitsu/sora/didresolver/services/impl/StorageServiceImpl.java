@@ -1,12 +1,16 @@
 package jp.co.soramitsu.sora.didresolver.services.impl;
 
+import static java.util.Optional.empty;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Optional;
+import jp.co.soramitsu.sora.didresolver.exceptions.DDOUnparseableException;
 import jp.co.soramitsu.sora.didresolver.services.IrohaService;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,10 +33,12 @@ public class StorageServiceImpl implements StorageService {
   }
 
   @Override
-  public Optional<DDO> findDDObyDID(String did) {
-    final Optional<String> accountDetails = irohaService
-        .getAccountDetails(did);
-    return accountDetails.flatMap(this::parseDdoFromIrohaResponse);
+  public Optional<DDO> findDDObyDID(String did) throws DDOUnparseableException {
+    val accountDetails = irohaService.getAccountDetails(did);
+    if (accountDetails.isPresent()) {
+      return parseDdoFromIrohaResponse(accountDetails.get());
+    }
+    return empty();
   }
 
   @Override
@@ -40,12 +46,12 @@ public class StorageServiceImpl implements StorageService {
     //  TODO: deleting DDO from Iroha
   }
 
-  private Optional<DDO> parseDdoFromIrohaResponse(String response) {
+  private Optional<DDO> parseDdoFromIrohaResponse(String response) throws DDOUnparseableException {
     try {
       DDO result = mapper.readValue(response, DDO.class);
       return Optional.of(result);
     } catch (IOException e) {
-      throw new RuntimeException("Exception while parsing ddo");
+      throw new DDOUnparseableException(e);
     }
   }
 
