@@ -85,7 +85,7 @@ dependencies {
     compileOnly "org.springframework.boot:spring-boot-configuration-processor"
 
     //tests
-    testCompile("org.mockito:mockito-core:${mockitoCoreVersion}")
+    testCompile("org.mockito:mockito-junit-jupiter:$mockitoCoreVersion")
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile("org.testcontainers:testcontainers:${testContainersVersion}")
     testCompile("org.testcontainers:postgresql:${testContainersVersion}")

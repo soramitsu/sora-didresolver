@@ -1,14 +1,10 @@
 package jp.co.soramitsu.sora.didresolver.exceptions;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static jp.co.soramitsu.sora.didresolver.controllers.dto.ResponseCode.INVALID_PROOF;
 
-import org.springframework.web.bind.annotation.ResponseStatus;
-
-@ResponseStatus(BAD_REQUEST)
-public class InvalidProofException extends RuntimeException {
+public class InvalidProofException extends DIDResolverException {
 
   public InvalidProofException(String did) {
-    super("Invalid proof in DDO with DID " + did);
+    super("Invalid proof in DDO with DID " + did, INVALID_PROOF);
   }
-
 }
