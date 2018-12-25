@@ -15,6 +15,7 @@ import io.swagger.annotations.ApiResponses;
 import jp.co.soramitsu.sora.didresolver.controllers.dto.GenericResponse;
 import jp.co.soramitsu.sora.didresolver.controllers.dto.GetDDORs;
 import jp.co.soramitsu.sora.didresolver.controllers.dto.SuccessfulResponse;
+import jp.co.soramitsu.sora.didresolver.exceptions.DDOUnparseableException;
 import jp.co.soramitsu.sora.didresolver.exceptions.DIDDuplicateException;
 import jp.co.soramitsu.sora.didresolver.exceptions.DIDIsTooLongException;
 import jp.co.soramitsu.sora.didresolver.exceptions.DIDNotFoundException;
@@ -75,7 +76,7 @@ public class DIDResolverController {
           message = "Failed. Returns when validation of received DDO has failed")})
   public ResponseEntity<GenericResponse> createDDO(
       @ApiParam(value = "url encoded DID", required = true) @Validated @RequestBody DDO ddo)
-      throws DIDIsTooLongException, DIDDuplicateException, ProofSignatureVerificationException, InvalidProofException, PublicKeyValueNotPresentedException {
+      throws DIDIsTooLongException, DIDDuplicateException, ProofSignatureVerificationException, InvalidProofException, PublicKeyValueNotPresentedException, DDOUnparseableException {
     final String id = ddo.getId().toString();
     log.info("starting creation of DDO for DID - {}", id);
     if (id.length() > MAX_IROHA_KEY_LENGTH) {
@@ -102,7 +103,7 @@ public class DIDResolverController {
           response = GetDDORs.class)})
   public ResponseEntity<GetDDORs> getDDO(
       @ApiParam(value = "url encoded DID", required = true) @DIDConstraint(isNullable = false) @PathVariable String did)
-      throws DIDNotFoundException {
+      throws DIDNotFoundException, DDOUnparseableException {
     log.info("Receive DDO by DID - {}", did);
     val ddo = storageService.findDDObyDID(did).orElseThrow(() -> new DIDNotFoundException(did));
     return ok(new GetDDORs(ddo));
@@ -137,7 +138,7 @@ public class DIDResolverController {
   public ResponseEntity<GenericResponse> updateDDO(
       @ApiParam(value = "url encoded DID", required = true) @DIDConstraint(isNullable = false) @PathVariable String did,
       @ApiParam(value = "New DDO MUST contain updated property with time > created", required = true) @Validated @RequestBody DDO ddo)
-      throws IncorrectUpdateException, DIDNotFoundException, ProofSignatureVerificationException, InvalidProofException, PublicKeyValueNotPresentedException {
+      throws IncorrectUpdateException, DIDNotFoundException, ProofSignatureVerificationException, InvalidProofException, PublicKeyValueNotPresentedException, DDOUnparseableException {
     log.info("Update DDO by DID - {}", did);
     verifyDDOProof(ddo);
     if (!ddo.getUpdated().isAfter(ddo.getCreated())) {

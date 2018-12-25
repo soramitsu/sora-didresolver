@@ -31,6 +31,7 @@ import jp.co.soramitsu.iroha.java.Utils;
 import jp.co.soramitsu.sora.didresolver.IntegrationTest;
 import jp.co.soramitsu.sora.didresolver.controllers.dto.GenericResponse;
 import jp.co.soramitsu.sora.didresolver.controllers.dto.ResponseCode;
+import jp.co.soramitsu.sora.didresolver.exceptions.DDOUnparseableException;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
 import jp.co.soramitsu.sora.sdk.crypto.common.HexdigestSaltGenerator;
 import jp.co.soramitsu.sora.sdk.crypto.common.SaltGenerator;
@@ -110,7 +111,7 @@ public class DIDResolverControllerTest extends IntegrationTest {
 
   @Test
   @DisplayName("Successfully updates DDO")
-  void updateDDO() throws IOException, SignatureException {
+  void updateDDO() throws IOException, SignatureException, DDOUnparseableException {
     storageService.createOrUpdate(ddo.getId().toString(), ddo);
     ddo.setUpdated(now());
     ddo = signDdo(ddo);
@@ -167,7 +168,7 @@ public class DIDResolverControllerTest extends IntegrationTest {
 
   @Test
   @DisplayName("Successfully creates DDO")
-  void createDdo() throws ParserException, IOException, SignatureException {
+  void createDdo() throws ParserException, IOException, SignatureException, DDOUnparseableException {
     var newDdo = createNewDdo();
     newDdo = signDdo(newDdo);
     val response = requests.createDDO(newDdo);
