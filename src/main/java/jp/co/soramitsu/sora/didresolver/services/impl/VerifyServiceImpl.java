@@ -1,9 +1,9 @@
 package jp.co.soramitsu.sora.didresolver.services.impl;
 
+import static java.util.Objects.nonNull;
 import static jp.co.soramitsu.crypto.ed25519.spec.EdDSANamedCurveTable.ED_25519;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import javax.validation.Valid;
@@ -42,7 +42,8 @@ public class VerifyServiceImpl implements VerifyService {
 
   @Override
   public boolean isCreatorInPublicKeys(@NotNull DID proofCreator, List<PublicKey> publicKeys) {
-    return publicKeys.stream().anyMatch(key -> proofCreator.equals(key.getId()));
+    return nonNull(publicKeys) && publicKeys.stream()
+        .anyMatch(key -> proofCreator.equals(key.getId()));
   }
 
   @Override
@@ -55,7 +56,8 @@ public class VerifyServiceImpl implements VerifyService {
   }
 
   @Override
-  public boolean verifyIntegrityOfDDO(DDO ddo) {
+  public boolean verifyIntegrityOfDDO(DDO ddo)
+      throws ProofSignatureVerificationException, PublicKeyValueNotPresentedException {
     log.debug("verifying integrity of DDO with DID {}", ddo.getId());
 
     byte[] publicKeyValue =
@@ -71,7 +73,7 @@ public class VerifyServiceImpl implements VerifyService {
     boolean isDDOVerified;
     try {
       isDDOVerified = suite.verify(ddo, edDSAPublicKey);
-    } catch (IOException e) {
+    } catch (Exception e) {
       throw new ProofSignatureVerificationException(ddo.getId().toString(), e);
     }
     log.debug("finishing verification of proof for DDO with DID {}", ddo.getId());
@@ -86,7 +88,7 @@ public class VerifyServiceImpl implements VerifyService {
    * @return public key in bytes
    */
   private Optional<byte[]> getPublicKeyValueByDID(List<PublicKey> publicKeys, DID did) {
-    log.trace("get public key for did {}", did.toString());
+    log.trace("get public key for did {}", did);
     return publicKeys
         .stream()
         .filter(key -> key.getId().toString().equals(did.toString()))

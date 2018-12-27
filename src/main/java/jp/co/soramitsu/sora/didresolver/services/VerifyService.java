@@ -1,6 +1,8 @@
 package jp.co.soramitsu.sora.didresolver.services;
 
 import java.util.List;
+import jp.co.soramitsu.sora.didresolver.exceptions.ProofSignatureVerificationException;
+import jp.co.soramitsu.sora.didresolver.exceptions.PublicKeyValueNotPresentedException;
 import jp.co.soramitsu.sora.sdk.did.model.dto.Authentication;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
@@ -30,5 +32,6 @@ public interface VerifyService {
    *
    * @param ddo - DDO that is needed to be verified
    */
-  boolean verifyIntegrityOfDDO(DDO ddo);
+  boolean verifyIntegrityOfDDO(DDO ddo)
+      throws ProofSignatureVerificationException, PublicKeyValueNotPresentedException;
 }

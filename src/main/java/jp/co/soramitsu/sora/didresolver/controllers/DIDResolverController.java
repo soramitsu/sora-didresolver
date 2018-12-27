@@ -4,20 +4,25 @@ import static java.util.Objects.isNull;
 import static jp.co.soramitsu.sora.didresolver.commons.CommonsConst.MAX_IROHA_KEY_LENGTH;
 import static jp.co.soramitsu.sora.didresolver.commons.URIConstants.ID_PARAM;
 import static jp.co.soramitsu.sora.didresolver.commons.URIConstants.PATH;
-import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
-import static org.springframework.http.ResponseEntity.notFound;
+import static org.springframework.http.ResponseEntity.ok;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import jp.co.soramitsu.sora.didresolver.controllers.dto.GenericResponse;
+import jp.co.soramitsu.sora.didresolver.controllers.dto.GetDDORs;
+import jp.co.soramitsu.sora.didresolver.controllers.dto.SuccessfulResponse;
+import jp.co.soramitsu.sora.didresolver.exceptions.DDOUnparseableException;
 import jp.co.soramitsu.sora.didresolver.exceptions.DIDDuplicateException;
 import jp.co.soramitsu.sora.didresolver.exceptions.DIDIsTooLongException;
 import jp.co.soramitsu.sora.didresolver.exceptions.DIDNotFoundException;
 import jp.co.soramitsu.sora.didresolver.exceptions.IncorrectUpdateException;
 import jp.co.soramitsu.sora.didresolver.exceptions.InvalidProofException;
 import jp.co.soramitsu.sora.didresolver.exceptions.ProofSignatureVerificationException;
-import jp.co.soramitsu.sora.didresolver.exceptions.UnparseableException;
+import jp.co.soramitsu.sora.didresolver.exceptions.PublicKeyValueNotPresentedException;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
 import jp.co.soramitsu.sora.didresolver.services.VerifyService;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.DIDConstraint;
@@ -37,12 +42,16 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * S4529 - Exposing Spring endpoints - warning for security auditors to check if endpoint is safe
+ */
 @RestController
 @AllArgsConstructor
 @RequestMapping(PATH)
-@Api(value = PATH, description = "CRUD operations on DID documents")
+@Api(value = PATH)
 @Validated
 @Slf4j
+@SuppressWarnings("squid:S4529")
 public class DIDResolverController {
 
   private StorageService storageService;
@@ -50,12 +59,29 @@ public class DIDResolverController {
 
   @PostMapping(consumes = {APPLICATION_JSON_UTF8_VALUE})
   @ApiOperation("This operation is used to register new DID-DDO pair in Identity System")
-  public ResponseEntity createDDO(
+  @ApiResponses({
+      @ApiResponse(
+          code = 200,
+          message = "Server returns GenericResponse which can contain next statuses:\n"
+              + "OK - Returns when DID-DDO pair successfully registered.\n"
+              + "DID_IS_TOO_LONG - Returns when DID is longer than Iroha key max size\n"
+              + "DID_DUPLICATE - Returns when DID has already registered\n"
+              + "INVALID_PROOF_SIGNATURE - Returns when proof signature verification for DDO has failed\n"
+              + "INVALID_PROOF - Returns when proof is invalid\n"
+              + "PUBLIC_KEY_VALUE_NOT_PRESENTED - Returns when pub lic key value has not found",
+          response = GenericResponse.class
+      ),
+      @ApiResponse(
+          code = 400,
+          message = "Failed. Returns when validation of received DDO has failed")})
+  public ResponseEntity<GenericResponse> createDDO(
       @ApiParam(value = "url encoded DID", required = true) @Validated @RequestBody DDO ddo)
-      throws UnparseableException {
+      throws DIDIsTooLongException, DIDDuplicateException, ProofSignatureVerificationException, InvalidProofException, PublicKeyValueNotPresentedException, DDOUnparseableException {
     final String id = ddo.getId().toString();
     log.info("starting creation of DDO for DID - {}", id);
-    if (id.length() > MAX_IROHA_KEY_LENGTH) throw new DIDIsTooLongException(id);
+    if (id.length() > MAX_IROHA_KEY_LENGTH) {
+      throw new DIDIsTooLongException(id);
+    }
     verifyDDOProof(ddo);
     val optionalDDO = storageService.findDDObyDID(id);
     if (optionalDDO.isPresent()) {
@@ -63,44 +89,72 @@ public class DIDResolverController {
     }
     log.info("write to storage DDO with DID - {}", id);
     storageService.createOrUpdate(id, ddo);
-    return new ResponseEntity(OK);
+    return ok(new SuccessfulResponse());
   }
 
   @GetMapping(value = ID_PARAM, produces = {APPLICATION_JSON_UTF8_VALUE})
   @ApiOperation(value = "This operation is used to query DDO given DID.", response = ResponseEntity.class)
-  public ResponseEntity<DDO> getDDO(
+  @ApiResponses({
+      @ApiResponse(
+          code = 200,
+          message = "Server returns GetDDORs which can contain next statuses:\n"
+              + "OK - Returns when DID-DDO pair successfully registered.\n"
+              + "DID_NOT_FOUND - Returns when DID has not found",
+          response = GetDDORs.class)})
+  public ResponseEntity<GetDDORs> getDDO(
       @ApiParam(value = "url encoded DID", required = true) @DIDConstraint(isNullable = false) @PathVariable String did)
-      throws UnparseableException {
+      throws DIDNotFoundException, DDOUnparseableException {
     log.info("Receive DDO by DID - {}", did);
-    val ddo = storageService.findDDObyDID(did);
-    return ddo.map(ResponseEntity::ok).orElseGet(() -> notFound().build());
+    val ddo = storageService.findDDObyDID(did).orElseThrow(() -> new DIDNotFoundException(did));
+    return ok(new GetDDORs(ddo));
   }
 
   @DeleteMapping(value = ID_PARAM)
   @ApiOperation(value = "This operation is used for DDO revocation or removal.")
-  public void deleteDDO(
-      @ApiParam(value = "url encoded DID", required = true) @DIDConstraint(isNullable = false) @PathVariable String did)
-      throws UnparseableException {
+  public ResponseEntity<GenericResponse> deleteDDO(
+      @ApiParam(value = "url encoded DID", required = true) @DIDConstraint(isNullable = false) @PathVariable String did) {
     log.info("Delete DDO by DID - {}", did);
     storageService.delete(did);
+    return ok(new SuccessfulResponse());
   }
 
   @PutMapping(value = ID_PARAM, consumes = {APPLICATION_JSON_UTF8_VALUE})
   @ApiOperation(value = "This operation essentially is a “Replace” operation, e.g. old DDO is replaced with new DDO given DID.")
-  public void updateDDO(
+  @ApiResponses({
+      @ApiResponse(
+          code = 200,
+          message = "Server returns GenericResponse which can contain next statuses:\n"
+              + "OK - Returns when DID-DDO pair successfully registered.\n"
+              + "DID_NOT_FOUND - Returns when DID has not found\n"
+              + "INVALID_PROOF_SIGNATURE - Returns when proof signature verification for DDO has failed\n"
+              + "INVALID_PROOF - Returns when proof is invalid\n"
+              + "INCORRECT_UPDATE_TIME - Returns when updated time less than created time\n"
+              + "PUBLIC_KEY_VALUE_NOT_PRESENTED - Returns when public key value has not found",
+          response = GenericResponse.class
+      ),
+      @ApiResponse(
+          code = 400,
+          message = "Failed. Returns when validation of received DDO has failed")})
+  public ResponseEntity<GenericResponse> updateDDO(
       @ApiParam(value = "url encoded DID", required = true) @DIDConstraint(isNullable = false) @PathVariable String did,
       @ApiParam(value = "New DDO MUST contain updated property with time > created", required = true) @Validated @RequestBody DDO ddo)
-      throws UnparseableException {
+      throws IncorrectUpdateException, DIDNotFoundException, ProofSignatureVerificationException, InvalidProofException, PublicKeyValueNotPresentedException, DDOUnparseableException {
     log.info("Update DDO by DID - {}", did);
     verifyDDOProof(ddo);
     if (!ddo.getUpdated().isAfter(ddo.getCreated())) {
-      throw new IncorrectUpdateException(ddo.getCreated().toString(), ddo.getUpdated().toString());
+      throw new IncorrectUpdateException(ddo.getId(), ddo.getCreated().toString(),
+          ddo.getUpdated().toString());
     }
-    storageService.findDDObyDID(did).orElseThrow(() -> new DIDNotFoundException(did));
-    storageService.createOrUpdate(did, ddo);
+    if (storageService.findDDObyDID(did).isPresent()) {
+      storageService.createOrUpdate(did, ddo);
+    } else {
+      throw new DIDNotFoundException(did);
+    }
+    return ok(new SuccessfulResponse());
   }
 
-  private void verifyDDOProof(DDO ddo) {
+  private void verifyDDOProof(DDO ddo)
+      throws ProofSignatureVerificationException, InvalidProofException, PublicKeyValueNotPresentedException {
     checkCreatorValidity(ddo);
 
     if (!verifyService.verifyIntegrityOfDDO(ddo)) {
@@ -110,13 +164,14 @@ public class DIDResolverController {
     log.debug("proof has been successfully verified for DDO with DID {}", ddo.getId());
   }
 
-  private void checkCreatorValidity(DDO ddo) {
+  private void checkCreatorValidity(DDO ddo)
+      throws InvalidProofException, PublicKeyValueNotPresentedException {
     if (isNull(ddo.getProof())) {
       throw new InvalidProofException(ddo.getId().toString());
     }
     DID proofCreator = ddo.getProof().getOptions().getCreator();
     if (!verifyService.isCreatorInPublicKeys(proofCreator, ddo.getPublicKey())) {
-      throw new InvalidProofException(ddo.getId().toString());
+      throw new PublicKeyValueNotPresentedException(proofCreator.toString());
     }
   }
 

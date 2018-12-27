@@ -1,12 +1,14 @@
 package jp.co.soramitsu.sora.didresolver.services.impl;
 
 import static com.fasterxml.jackson.core.util.BufferRecyclers.quoteAsJsonText;
+import static com.jayway.jsonpath.Configuration.defaultConfiguration;
 import static com.jayway.jsonpath.JsonPath.using;
 import static com.jayway.jsonpath.Option.SUPPRESS_EXCEPTIONS;
 import static java.lang.String.valueOf;
 import static java.time.Instant.now;
 import static java.util.Optional.ofNullable;
 import static javax.xml.bind.DatatypeConverter.printHexBinary;
+import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.StringUtils.isEmpty;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -36,9 +38,9 @@ public abstract class AbstractIrohaService implements IrohaService {
    * Supresses exception when key in json is not present
    */
   private final Configuration suppressingExceptionConfig =
-      Configuration.defaultConfiguration().addOptions(SUPPRESS_EXCEPTIONS);
+      defaultConfiguration().addOptions(SUPPRESS_EXCEPTIONS);
 
-  private final Logger log;
+  private final Logger log = getLogger(getClass());
 
   private final IrohaAPI api;
 
@@ -51,11 +53,12 @@ public abstract class AbstractIrohaService implements IrohaService {
   @Override
   public Optional<String> getAccountDetails(String detailKey) {
     String key = getNormalizeDetailKey(detailKey);
+    val account = irohaAccount();
     try {
       log.debug(
           "getting account details by key {} for Iroha account {} at {}",
           key,
-          irohaAccount(),
+          account,
           now());
       val queryResponse = api.query(getAccountDetailsQuery(key));
       String response = queryResponse.getAccountDetailResponse().getDetail();
@@ -75,8 +78,7 @@ public abstract class AbstractIrohaService implements IrohaService {
   }
 
   @Override
-  public void setAccountDetails(String detailKey, Object value)
-      throws IrohaTransactionCommitmentException {
+  public void setAccountDetails(String detailKey, Object value) {
     String key = getNormalizeDetailKey(detailKey);
     setAccountDetailsAsync(key, value)
         .blockingSubscribe(new Observer<ToriiResponse>() {
