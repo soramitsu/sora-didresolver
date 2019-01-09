@@ -22,7 +22,7 @@ node(workerLabel) {
       usernamePassword(credentialsId: 'sorabot-github-oauth', usernameVariable: 'GH_USER', passwordVariable: 'GH_TOKEN'),
       string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN'),
       usernamePassword(credentialsId: 'sora-nexus-credentials', usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS'),
-      string(credentialsId: 'sora-repo-url', variable: 'REPO_URL') ]) {
+      string(credentialsId: 'sora-repo-url', variable: 'DH_REPO_URL') ]) {
       if (scmVars.CHANGE_ID != null ) {
         // it is a PR
         // then do PR analysis by sorabot
@@ -52,8 +52,8 @@ node(workerLabel) {
           } // end stage
           stage('build and push docker image') {
             sh(script: "#!/bin/sh\napk update && apk add docker")
-            sh(script: "#!/bin/sh\ndocker login --username ${DH_USER} --password '${DH_PASS}' https://${REPO_URL}")
-            sh(script: "#!/bin/sh\n./gradlew dockerPush -x test -x integrationTest -PrepoUrl=${REPO_URL}")
+            sh(script: "#!/bin/sh\ndocker login --username ${DH_USER} --password '${DH_PASS}' https://${DH_REPO_URL}")
+            sh(script: "#!/bin/sh\n./gradlew dockerPush -x test -x integrationTest -PrepoUrl=${DH_REPO_URL}")
           } // end stage
         } // end docker
         stage ('deploy services') {
@@ -61,7 +61,7 @@ node(workerLabel) {
             sh "scp -o StrictHostKeyChecking=no ./deploy/update-and-deploy.sh ${deploymentHost[scmVars.GIT_LOCAL_BRANCH]}:/tmp"
             sh "ssh -o StrictHostKeyChecking=no \
               ${deploymentHost[scmVars.GIT_LOCAL_BRANCH]} 'chmod +x /tmp/update-and-deploy.sh; \
-              DH_USER=${DH_USER} DH_PASS=${DH_PASS} REPO_URL=${REPO_URL} GIT_BRANCH=${scmVars.GIT_LOCAL_BRANCH} /tmp/update-and-deploy.sh'"
+              DH_USER=${DH_USER} DH_PASS=${DH_PASS} DH_REPO_URL=${DH_REPO_URL} GIT_REPO_URL=${scmVars.GIT_URL} GIT_BRANCH=${scmVars.GIT_LOCAL_BRANCH} /tmp/update-and-deploy.sh'"
           } // end sshagent
         } // end stage
       } // end if

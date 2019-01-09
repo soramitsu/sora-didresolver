@@ -2,7 +2,7 @@ version: "2.4"
 
 x-healtcheck:
   &service-healtcheck
-  test: ["CMD-SHELL", 'echo -ne "GET /actuator/health HTTP/1.0\n\n" | nc localhost 9000 | grep "{\"status\":\"UP\"}"']
+  test: ["CMD-SHELL", 'echo -ne "GET /actuator/health HTTP/1.0\n\n" | nc localhost ${PORT:-9000} | grep "{\"status\":\"UP\"}"']
   interval: 30s
   timeout: 5s
   retries: 3
@@ -29,3 +29,10 @@ x-healtcheck:
       - traefik-net
     healthcheck: *service-healtcheck
     restart: on-failure
+
+networks:
+  sora-net:
+    name: sora-net
+  traefik-net:
+    external:
+      name: traefik-net
