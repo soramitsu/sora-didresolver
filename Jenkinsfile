@@ -9,7 +9,7 @@ def replyTo = 'buildbot@sora.org'
 node(workerLabel) {
   scmVars = checkout scm
   try {
-    docker.image("${dockerImage}").inside('-v /var/run/docker.sock:/var/run/docker.sock') {
+    docker.image("${dockerImage}").inside('-v /var/run/docker.sock:/var/run/docker.sock -v /tmp:/tmp') {
       stage('build') {
         sh(script: "./gradlew clean build -x test --parallel --configure-on-demand")
       }
@@ -30,7 +30,7 @@ node(workerLabel) {
           stage('sonarqube') {
             sh(script: "./gradlew sonarqube -x test -x integrationTest --configure-on-demand \
               -Dsonar.links.ci=${BUILD_URL} \
-              -Dsonar.github.pullRequest=${env.CHANGE_ID} \
+              -Dsonar.github.pullRequest=${scmVars.CHANGE_ID} \
               -Dsonar.github.oauth=${GH_TOKEN} \
               -Dsonar.analysis.mode=preview \
               -Dsonar.github.disableInlineComments=true \
@@ -92,5 +92,6 @@ node(workerLabel) {
       '''
       emailext body: "${emailBody}", replyTo: "${replyTo}", subject: "${emailSubject}", to: "${sendTo}"
     } //end stage
+    cleanWs()
   } // end finally
 } //end node
