@@ -32,7 +32,8 @@ x-healtcheck:
 
 networks:
   sora-net:
-    name: sora-net
+    external:
+      name: sora-net
   traefik-net:
     external:
       name: traefik-net
