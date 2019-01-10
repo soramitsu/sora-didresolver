@@ -1,0 +1,38 @@
+version: "2.4"
+
+x-healtcheck:
+  &service-healtcheck
+  test: ["CMD-SHELL", 'echo -ne "GET /actuator/health HTTP/1.0\n\n" | nc localhost ${PORT:-9000} | grep "{\"status\":\"UP\"}"']
+  interval: 30s
+  timeout: 5s
+  retries: 3
+  start_period: 300s
+
+  did-resolver:
+    image: nexus.iroha.tech:19001/sora-middleware/didresolver:0.0.1-SNAPSHOT
+    expose:
+      - 9000
+    environment:
+      PORT: 9000
+    labels:
+      - "traefik.docker.network=traefik-net"
+      - "traefik.enable=true"
+      - "traefik.backend.healthcheck.port=9000"
+      - "traefik.backend.healthcheck.path=/actuator/health"
+      - "traefik.frontend.rule=Host:${DIDRESOLVER_HOST:?DIDRESOLVER_HOST is not defined}"
+      - "traefik.port=9000"
+    mem_limit: 512m
+    env_file:
+      - .env-did-resolver
+    networks:
+      - sora-net
+      - traefik-net
+    healthcheck: *service-healtcheck
+    restart: on-failure
+
+networks:
+  sora-net:
+    name: sora-net
+  traefik-net:
+    external:
+      name: traefik-net
