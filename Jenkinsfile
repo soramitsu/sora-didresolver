@@ -28,7 +28,7 @@ node(workerLabel) {
         // then do PR analysis by sorabot
         docker.image("${dockerImage}").inside {
           stage('sonarqube') {
-            sh(script: "./gradlew sonarqube -x test -x integrationTest --configure-on-demand \
+            sh(script: "./gradlew sonarqube -x test --configure-on-demand \
               -Dsonar.links.ci=${BUILD_URL} \
               -Dsonar.github.pullRequest=${scmVars.CHANGE_ID} \
               -Dsonar.github.oauth=${GH_TOKEN} \
@@ -46,14 +46,14 @@ node(workerLabel) {
           stage('sonarqube') {
             // push analysis results to sonar
             // do not use --parallel, as sonarqube can not work in this mode
-            sh(script: "#!/bin/sh\n./gradlew sonarqube -x test -x integrationTest --configure-on-demand \
+            sh(script: "#!/bin/sh\n./gradlew sonarqube -x test --configure-on-demand \
               -Dsonar.host.url=https://sonar.soramitsu.co.jp \
               -Dsonar.login=${SONAR_TOKEN}")
           } // end stage
           stage('build and push docker image') {
             sh(script: "#!/bin/sh\napk update && apk add docker")
             sh(script: "#!/bin/sh\ndocker login --username ${DH_USER} --password '${DH_PASS}' https://${DH_REPO_URL}")
-            sh(script: "#!/bin/sh\n./gradlew dockerPush -x test -x integrationTest -PrepoUrl=${DH_REPO_URL}")
+            sh(script: "#!/bin/sh\n./gradlew dockerPush -x test -PrepoUrl=${DH_REPO_URL}")
           } // end stage
         } // end docker
         stage ('deploy services') {
