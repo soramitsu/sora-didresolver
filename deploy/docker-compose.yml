@@ -8,6 +8,7 @@ x-healtcheck:
   retries: 3
   start_period: 300s
 
+services:
   did-resolver:
     image: nexus.iroha.tech:19001/sora-middleware/didresolver:0.0.1-SNAPSHOT
     expose:
