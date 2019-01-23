@@ -46,7 +46,7 @@ ext {
     soraSDKVersion = '0.3.9'
     jjwtVersion = '3.5.0'
     springCloudVersion = 'Finchley.SR2'
-    rxjavaVersion = '2.2.5'
+    rxjavaVersion = '2.2.6'
     owaspVersion = '1.1.6'
 
     repoUrl = 'nexus.iroha.tech:19001'
