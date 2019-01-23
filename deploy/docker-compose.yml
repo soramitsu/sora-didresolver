@@ -25,7 +25,7 @@ services:
       - filebeat.module=docker
       - filebeat.fields.app=did-resolver
       - filebeat.fields.project=sora
-      - filebeat.fields.logtype=did-resolver
+      - filebeat.fields.logtype=sora-java-log
       - filebeat.multiline.pattern='^\d{4}-\d{2}-\d{2}'
       - filebeat.multiline.negate=true
       - filebeat.multiline.match=after
