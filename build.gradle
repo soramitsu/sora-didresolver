@@ -27,7 +27,7 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 
 ext {
-    irohaPureVersion = '0.6.0'
+    irohaPureVersion = 'master-SNAPSHOT'
     lombokVersion = '1.18.4'
     springSwaggerVersion = '2.9.2'
     commonsLangVersion = '3.8.1'
@@ -36,7 +36,6 @@ ext {
     mockitoCoreVersion = '2.23.4'
     hibernateTypesVersion = '2.3.0'
     testContainersVersion = '1.10.6'
-    testContainersIrohaVersion = '0.2.1'
     liquibaseVersion = '3.6.2'
     c3p0Version = '0.9.5.2'
     jUnitVersion = '5.3.2'
@@ -75,7 +74,7 @@ dependencies {
     compile "io.reactivex.rxjava2:rxjava:${rxjavaVersion}"
 
     // iroha
-    compile "com.github.warchant:iroha-pure-java:$irohaPureVersion"
+    compile "com.github.hyperledger.iroha-java:client:$irohaPureVersion"
 
     //logging
     compile("org.aspectj:aspectjrt:${aspectjVersion}")
@@ -96,7 +95,7 @@ dependencies {
     testCompile("org.junit.platform:junit-platform-launcher:${jUnitPlatformVersion}")
     compileOnly("org.projectlombok:lombok:${lombokVersion}")
     testCompileOnly("org.projectlombok:lombok:${lombokVersion}")
-    testCompile("com.github.warchant:testcontainers-iroha:$testContainersIrohaVersion") {
+    testCompile("com.github.hyperledger.iroha-java:testcontainers:$irohaPureVersion") {
         exclude module: 'slf4j-simple'
     }
 

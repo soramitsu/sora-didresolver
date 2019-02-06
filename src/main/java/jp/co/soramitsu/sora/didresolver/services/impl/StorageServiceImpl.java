@@ -43,7 +43,7 @@ public class StorageServiceImpl implements StorageService {
 
   @Override
   public void delete(String did) {
-    //  TODO: deleting DDO from Iroha
+    throw new UnsupportedOperationException("Deleting of record from Iroha is an unsupported operation");
   }
 
   private Optional<DDO> parseDdoFromIrohaResponse(String response) throws DDOUnparseableException {

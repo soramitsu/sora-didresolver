@@ -3,6 +3,7 @@ package jp.co.soramitsu.sora.didresolver.controllers;
 import static java.time.Instant.now;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
+import static jp.co.soramitsu.iroha.java.Utils.parseHexKeypair;
 import static jp.co.soramitsu.sora.didresolver.controllers.dto.ResponseCode.DID_DUPLICATE;
 import static jp.co.soramitsu.sora.didresolver.controllers.dto.ResponseCode.DID_IS_TOO_LONG;
 import static jp.co.soramitsu.sora.didresolver.controllers.dto.ResponseCode.DID_NOT_FOUND;
@@ -27,7 +28,6 @@ import java.security.KeyPair;
 import java.security.SignatureException;
 import javax.annotation.PostConstruct;
 import jp.co.soramitsu.crypto.ed25519.EdDSAPrivateKey;
-import jp.co.soramitsu.iroha.java.Utils;
 import jp.co.soramitsu.sora.didresolver.IntegrationTest;
 import jp.co.soramitsu.sora.didresolver.controllers.dto.GenericResponse;
 import jp.co.soramitsu.sora.didresolver.controllers.dto.ResponseCode;
@@ -59,7 +59,7 @@ public class DIDResolverControllerTest extends IntegrationTest {
   private Requests requests;
   private SaltGenerator hexGenerator = new HexdigestSaltGenerator();
   private JSONEd25519Sha3SignatureSuite signature = new JSONEd25519Sha3SignatureSuite();
-  private KeyPair keyPair = Utils.keyPair(PUBLICKEY, PRIVATEKEY);
+  private KeyPair keyPair = parseHexKeypair(PUBLICKEY, PRIVATEKEY);
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -77,7 +77,7 @@ public class DIDResolverControllerTest extends IntegrationTest {
     JacksonTester.initFields(this, objectMapper);
     Reader jsonReader = new BufferedReader(
         new InputStreamReader(
-            getClass().getClassLoader().getResourceAsStream("canonical2DDO.json")));
+            requireNonNull(getClass().getClassLoader().getResourceAsStream("canonical2DDO.json"))));
     ddo = json.read(jsonReader).getObject();
   }
 
@@ -168,7 +168,8 @@ public class DIDResolverControllerTest extends IntegrationTest {
 
   @Test
   @DisplayName("Successfully creates DDO")
-  void createDdo() throws ParserException, IOException, SignatureException, DDOUnparseableException {
+  void createDdo()
+      throws ParserException, IOException, SignatureException, DDOUnparseableException {
     var newDdo = createNewDdo();
     newDdo = signDdo(newDdo);
     val response = requests.createDDO(newDdo);
