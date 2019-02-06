@@ -16,6 +16,7 @@ import static jp.co.soramitsu.sora.sdk.did.model.dto.Options.builder;
 import static jp.co.soramitsu.sora.sdk.did.model.type.SignatureTypeEnum.Ed25519Sha3Signature;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.http.HttpStatus.OK;
 import static org.testcontainers.shaded.org.bouncycastle.util.encoders.Hex.decode;
 
@@ -102,11 +103,13 @@ public class DIDResolverControllerTest extends IntegrationTest {
 
   @Test
   @DisplayName("Successfully deletes DDO")
-  void deleteDdo() {
+  void deleteDdo() throws DDOUnparseableException {
     storageService.createOrUpdate(ddo.getId().toString(), ddo);
     val response = requests.deleteDDO(ddo.getId());
     assertEquals(OK, response.getStatusCode());
     assertEquals(ResponseCode.OK, getResponseCode(response));
+    val ddoFromIroha = storageService.findDDObyDID(ddo.getId().toString()).orElse(null);
+    assertNull(ddoFromIroha);
   }
 
   @Test
