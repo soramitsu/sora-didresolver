@@ -86,7 +86,7 @@ public abstract class AbstractIrohaService implements IrohaService {
         .onTransactionFailed(tx ->
             log.error("transaction {} failed with msg: {}", tx.getTxHash(), tx.getErrOrCmdName()))
         .onError(e -> {
-          log.error("Failed with exception: {}", e);
+          log.error("Transaction failed with exception", e);
           throw new IrohaTransactionCommitmentException(txKey, e);
         })
         .onTransactionCommitted(tx -> log.debug("tx {} is committed", tx.getTxHash()))
