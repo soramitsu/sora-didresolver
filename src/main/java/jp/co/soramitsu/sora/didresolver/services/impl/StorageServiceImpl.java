@@ -1,6 +1,7 @@
 package jp.co.soramitsu.sora.didresolver.services.impl;
 
 import static java.util.Optional.empty;
+import static java.util.Optional.ofNullable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
@@ -43,13 +44,13 @@ public class StorageServiceImpl implements StorageService {
 
   @Override
   public void delete(String did) {
-    //  TODO: deleting DDO from Iroha
+    irohaService.setAccountDetails(did, null);
   }
 
   private Optional<DDO> parseDdoFromIrohaResponse(String response) throws DDOUnparseableException {
     try {
       DDO result = mapper.readValue(response, DDO.class);
-      return Optional.of(result);
+      return ofNullable(result);
     } catch (IOException e) {
       throw new DDOUnparseableException(e);
     }

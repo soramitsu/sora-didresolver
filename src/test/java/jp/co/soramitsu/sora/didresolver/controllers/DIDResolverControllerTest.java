@@ -3,6 +3,7 @@ package jp.co.soramitsu.sora.didresolver.controllers;
 import static java.time.Instant.now;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
+import static jp.co.soramitsu.iroha.java.Utils.parseHexKeypair;
 import static jp.co.soramitsu.sora.didresolver.controllers.dto.ResponseCode.DID_DUPLICATE;
 import static jp.co.soramitsu.sora.didresolver.controllers.dto.ResponseCode.DID_IS_TOO_LONG;
 import static jp.co.soramitsu.sora.didresolver.controllers.dto.ResponseCode.DID_NOT_FOUND;
@@ -15,6 +16,7 @@ import static jp.co.soramitsu.sora.sdk.did.model.dto.Options.builder;
 import static jp.co.soramitsu.sora.sdk.did.model.type.SignatureTypeEnum.Ed25519Sha3Signature;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.http.HttpStatus.OK;
 import static org.testcontainers.shaded.org.bouncycastle.util.encoders.Hex.decode;
 
@@ -27,7 +29,6 @@ import java.security.KeyPair;
 import java.security.SignatureException;
 import javax.annotation.PostConstruct;
 import jp.co.soramitsu.crypto.ed25519.EdDSAPrivateKey;
-import jp.co.soramitsu.iroha.java.Utils;
 import jp.co.soramitsu.sora.didresolver.IntegrationTest;
 import jp.co.soramitsu.sora.didresolver.controllers.dto.GenericResponse;
 import jp.co.soramitsu.sora.didresolver.controllers.dto.ResponseCode;
@@ -59,7 +60,7 @@ public class DIDResolverControllerTest extends IntegrationTest {
   private Requests requests;
   private SaltGenerator hexGenerator = new HexdigestSaltGenerator();
   private JSONEd25519Sha3SignatureSuite signature = new JSONEd25519Sha3SignatureSuite();
-  private KeyPair keyPair = Utils.keyPair(PUBLICKEY, PRIVATEKEY);
+  private KeyPair keyPair = parseHexKeypair(PUBLICKEY, PRIVATEKEY);
 
   @Autowired
   private ObjectMapper objectMapper;
@@ -77,7 +78,7 @@ public class DIDResolverControllerTest extends IntegrationTest {
     JacksonTester.initFields(this, objectMapper);
     Reader jsonReader = new BufferedReader(
         new InputStreamReader(
-            getClass().getClassLoader().getResourceAsStream("canonical2DDO.json")));
+            requireNonNull(getClass().getClassLoader().getResourceAsStream("canonical2DDO.json"))));
     ddo = json.read(jsonReader).getObject();
   }
 
@@ -102,11 +103,13 @@ public class DIDResolverControllerTest extends IntegrationTest {
 
   @Test
   @DisplayName("Successfully deletes DDO")
-  void deleteDdo() {
+  void deleteDdo() throws DDOUnparseableException {
     storageService.createOrUpdate(ddo.getId().toString(), ddo);
     val response = requests.deleteDDO(ddo.getId());
     assertEquals(OK, response.getStatusCode());
     assertEquals(ResponseCode.OK, getResponseCode(response));
+    val ddoFromIroha = storageService.findDDObyDID(ddo.getId().toString()).orElse(null);
+    assertNull(ddoFromIroha);
   }
 
   @Test
@@ -168,7 +171,8 @@ public class DIDResolverControllerTest extends IntegrationTest {
 
   @Test
   @DisplayName("Successfully creates DDO")
-  void createDdo() throws ParserException, IOException, SignatureException, DDOUnparseableException {
+  void createDdo()
+      throws ParserException, IOException, SignatureException, DDOUnparseableException {
     var newDdo = createNewDdo();
     newDdo = signDdo(newDdo);
     val response = requests.createDDO(newDdo);
