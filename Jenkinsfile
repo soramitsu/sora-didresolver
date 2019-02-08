@@ -41,7 +41,7 @@ node(workerLabel) {
           } // end stage
         } // end docker
       } // end if
-      if (env.GIT_LOCAL_BRANCH ==~ /master|develop/) {
+      if (scmVars.GIT_LOCAL_BRANCH ==~ /master|develop/) {
         docker.image("${dockerImage}-alpine").inside('-v /var/run/docker.sock:/var/run/docker.sock') {
           stage('sonarqube') {
             // push analysis results to sonar
@@ -58,10 +58,10 @@ node(workerLabel) {
         } // end docker
         stage ('deploy services') {
           sshagent(['jenkins-aws-ec2']) {
-            sh "scp -o StrictHostKeyChecking=no ./deploy/update-and-deploy.sh ${deploymentHost[env.GIT_LOCAL_BRANCH]}:/tmp"
+            sh "scp -o StrictHostKeyChecking=no ./deploy/update-and-deploy.sh ${deploymentHost[scmVars.GIT_LOCAL_BRANCH]}:/tmp"
             sh "ssh -o StrictHostKeyChecking=no \
-              ${deploymentHost[env.GIT_LOCAL_BRANCH]} 'chmod +x /tmp/update-and-deploy.sh; \
-              DH_USER=${DH_USER} DH_PASS=${DH_PASS} DH_REPO_URL=${DH_REPO_URL} GIT_REPO_URL=${env.GIT_URL} GIT_BRANCH=${env.GIT_LOCAL_BRANCH} /tmp/update-and-deploy.sh'"
+              ${deploymentHost[scmVars.GIT_LOCAL_BRANCH]} 'chmod +x /tmp/update-and-deploy.sh; \
+              DH_USER=${DH_USER} DH_PASS=${DH_PASS} DH_REPO_URL=${DH_REPO_URL} GIT_REPO_URL=${scmVars.GIT_URL} GIT_BRANCH=${scmVars.GIT_LOCAL_BRANCH} /tmp/update-and-deploy.sh'"
           } // end sshagent
         } // end stage
       } // end if
