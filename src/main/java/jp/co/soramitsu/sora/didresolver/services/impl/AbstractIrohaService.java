@@ -7,16 +7,13 @@ import static com.jayway.jsonpath.Option.SUPPRESS_EXCEPTIONS;
 import static java.lang.String.valueOf;
 import static java.time.Instant.now;
 import static java.util.Optional.ofNullable;
-import static javax.xml.bind.DatatypeConverter.printHexBinary;
 import static org.slf4j.LoggerFactory.getLogger;
 import static org.springframework.util.StringUtils.isEmpty;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.Configuration;
-import io.reactivex.Observable;
 import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
 import iroha.protocol.Endpoint.ToriiResponse;
 import iroha.protocol.Queries.Query;
 import iroha.protocol.TransactionOuterClass;
@@ -24,6 +21,7 @@ import java.security.KeyPair;
 import java.util.Optional;
 import jp.co.soramitsu.crypto.ed25519.Ed25519Sha3.CryptoException;
 import jp.co.soramitsu.iroha.java.IrohaAPI;
+import jp.co.soramitsu.iroha.java.TransactionStatusObserver;
 import jp.co.soramitsu.sora.didresolver.exceptions.IrohaTransactionCommitmentException;
 import jp.co.soramitsu.sora.didresolver.services.IrohaService;
 import lombok.RequiredArgsConstructor;
@@ -80,52 +78,39 @@ public abstract class AbstractIrohaService implements IrohaService {
   @Override
   public void setAccountDetails(String detailKey, Object value) {
     String key = getNormalizeDetailKey(detailKey);
-    setAccountDetailsAsync(key, value)
-        .blockingSubscribe(new Observer<ToriiResponse>() {
-          private String txHashHex;
-
-          @Override
-          public void onSubscribe(Disposable d) {
-            log.debug("{} -- subscribed", this.getClass());
-          }
-
-          @Override
-          public void onNext(ToriiResponse toriiResponse) {
-            this.txHashHex = printHexBinary(toriiResponse.getTxHash().toByteArray());
-            log.debug(
-                "{} -- tx {} status {}",
-                this.getClass(),
-                txHashHex,
-                toriiResponse.getTxStatus()
-            );
-          }
-
-          @Override
-          public void onError(Throwable e) {
-            log.error("tx {} submission error: {}", txHashHex, e);
-            throw new IrohaTransactionCommitmentException(txHashHex, e);
-          }
-
-          @Override
-          public void onComplete() {
-            log.warn("tx {} is committed", txHashHex);
-          }
-        });
+    setAccountDetailsAsync(key, value);
   }
 
-  private Observable<ToriiResponse> setAccountDetailsAsync(String key, Object value) {
+  private Observer<? super ToriiResponse> getObserver(String txKey) {
+    return TransactionStatusObserver.builder()
+        .onTransactionFailed(tx ->
+            log.error("transaction {} failed with msg: {}", tx.getTxHash(), tx.getErrOrCmdName()))
+        .onError(e -> {
+          log.error("Transaction failed with exception", e);
+          throw new IrohaTransactionCommitmentException(txKey, e);
+        })
+        .onTransactionCommitted(tx -> log.debug("tx {} is committed", tx.getTxHash()))
+        .onRejected(
+            toriiResponse -> log
+                .warn("tx {} is rejected with reason code {}", toriiResponse.getTxHash(),
+                    toriiResponse.getFailedCmdIndex()))
+        .build();
+  }
+
+  private void setAccountDetailsAsync(String key, Object value) {
     String v;
     try {
       v = valueOf(quoteAsJsonText(objectMapper().writeValueAsString(value)));
     } catch (JsonProcessingException e) {
-      return Observable.error(e);
+      log.error("Problem with processing json {} for object with key {}", value, key);
+      throw new IrohaTransactionCommitmentException(key, e);
     }
 
     val tx = setAccountDetailsTransaction(key, v);
 
     log.debug("send transaction {} to iroha at {}", tx, api.getUri());
 
-    return api.transaction(tx);
+    api.transaction(tx).blockingSubscribe(getObserver(key));
   }
 
   private TransactionOuterClass.Transaction setAccountDetailsTransaction(String key,
@@ -142,7 +127,7 @@ public abstract class AbstractIrohaService implements IrohaService {
 
   private Query getAccountDetailsQuery(String key) {
     return jp.co.soramitsu.iroha.java.Query.builder(irohaAccount(), now(), 1)
-        .getAccountDetail(irohaAccount(), key)
+        .getAccountDetail(irohaAccount(), null, key)
         .buildSigned(keyPair());
   }
 
