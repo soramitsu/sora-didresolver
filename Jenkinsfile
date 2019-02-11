@@ -23,14 +23,14 @@ node(workerLabel) {
       string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN'),
       usernamePassword(credentialsId: 'sora-nexus-credentials', usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS'),
       string(credentialsId: 'sora-repo-url', variable: 'DH_REPO_URL') ]) {
-      if (scmVars.CHANGE_ID != null ) {
+      if (env.CHANGE_ID != null ) {
         // it is a PR
         // then do PR analysis by sorabot
         docker.image("${dockerImage}").inside {
           stage('sonarqube') {
             sh(script: "./gradlew sonarqube -x test --configure-on-demand \
               -Dsonar.links.ci=${BUILD_URL} \
-              -Dsonar.github.pullRequest=${scmVars.CHANGE_ID} \
+              -Dsonar.github.pullRequest=${env.CHANGE_ID} \
               -Dsonar.github.oauth=${GH_TOKEN} \
               -Dsonar.analysis.mode=preview \
               -Dsonar.github.disableInlineComments=true \
