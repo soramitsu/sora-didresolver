@@ -1,7 +1,7 @@
 def workerLabel = 'docker-build-agent'
 def deploymentHost = [
-  'develop': 'ubuntu@s1.dev.sora.soramitsu.co.jp',
-  'master': 'ubuntu@s1.tst.sora.soramitsu.co.jp']
+  'develop': ['ubuntu@s1.dev.sora.soramitsu.co.jp'],
+  'master': ['ubuntu@s1.tst.sora.soramitsu.co.jp','ubuntu@s4.stg1.sora.soramitsu.co.jp']]
 def dockerImage = 'openjdk:8'
 def sendTo = 'sora-ci@soramitsu.co.jp'
 def replyTo = 'buildbot@sora.org'
@@ -58,10 +58,12 @@ node(workerLabel) {
         } // end docker
         stage ('deploy services') {
           sshagent(['jenkins-aws-ec2']) {
-            sh "scp -o StrictHostKeyChecking=no ./deploy/update-and-deploy.sh ${deploymentHost[scmVars.GIT_LOCAL_BRANCH]}:/tmp"
-            sh "ssh -o StrictHostKeyChecking=no \
-              ${deploymentHost[scmVars.GIT_LOCAL_BRANCH]} 'chmod +x /tmp/update-and-deploy.sh; \
-              DH_USER=${DH_USER} DH_PASS=${DH_PASS} DH_REPO_URL=${DH_REPO_URL} GIT_REPO_URL=${scmVars.GIT_URL} GIT_BRANCH=${scmVars.GIT_LOCAL_BRANCH} /tmp/update-and-deploy.sh'"
+            for (server in deploymentHost[scmVars.GIT_LOCAL_BRANCH]) {
+              sh "scp -o StrictHostKeyChecking=no ./deploy/update-and-deploy.sh ${server}:/tmp"
+              sh "ssh -o StrictHostKeyChecking=no \
+                ${server} 'chmod +x /tmp/update-and-deploy.sh; \
+                DH_USER=${DH_USER} DH_PASS=${DH_PASS} DH_REPO_URL=${DH_REPO_URL} GIT_REPO_URL=${scmVars.GIT_URL} GIT_BRANCH=${scmVars.GIT_LOCAL_BRANCH} /tmp/update-and-deploy.sh'"
+            } // end for
           } // end sshagent
         } // end stage
       } // end if
