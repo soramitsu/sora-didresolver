@@ -42,6 +42,11 @@ node(workerLabel) {
         } // end docker
       } // end if
       if (scmVars.GIT_LOCAL_BRANCH ==~ /master|develop/) {
+        docker_push_tags = [scmVars.GIT_LOCAL_BRANCH, 'latest']
+        checkTag = sh(script: "git describe --tags --exact-match ${scmVars.GIT_COMMIT}", returnStatus: true)
+        if (checkTag == 0)
+          docker_push_tags += [sh(script: "git describe --tags --exact-match ${scmVars.GIT_COMMIT}", returnStdout: true).trim()]
+        print docker_push_tags
         docker.image("${dockerImage}-alpine").inside('-v /var/run/docker.sock:/var/run/docker.sock') {
           stage('sonarqube') {
             // push analysis results to sonar
@@ -51,9 +56,19 @@ node(workerLabel) {
               -Dsonar.login=${SONAR_TOKEN}")
           } // end stage
           stage('build and push docker image') {
-            sh(script: "#!/bin/sh\napk update && apk add docker")
-            sh(script: "#!/bin/sh\ndocker login --username ${DH_USER} --password '${DH_PASS}' https://${DH_REPO_URL}")
-            sh(script: "#!/bin/sh\n./gradlew dockerPush -x test -PrepoUrl=${DH_REPO_URL}")
+            sh """#!/bin/sh
+              apk update && apk add docker
+              docker login --username ${DH_USER} --password '${DH_PASS}' https://${DH_REPO_URL}
+              ./gradlew dockerPush -x test -PrepoUrl=${DH_REPO_URL}
+            """
+            // push git_tag
+            for ( git_tag in docker_push_tags ){
+              sh """#!/bin/sh
+                apk update && apk add docker
+                docker login --username ${DH_USER} --password '${DH_PASS}' https://${DH_REPO_URL}
+                ./gradlew dockerPush -x test -PrepoUrl=${DH_REPO_URL} -Pversion=${git_tag}
+              """
+            } //end for
           } // end stage
         } // end docker
         stage ('deploy services') {
