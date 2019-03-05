@@ -17,7 +17,7 @@ sudo docker login --username ${DH_USER} --password ${DH_PASS} ${DH_REPO_URL}
 set -x
 sudo cp ../../sora-env/.env-did-resolver .
 sudo cp ../../sora-env/.env .
-sudo echo "${VERSION}" >> .env
+echo "VERSION=${VERSION}" | sudo tee -a .env
 sudo docker network create sora-net || true
 sudo docker-compose -f docker-compose.yml pull
 sudo docker-compose -f docker-compose.yml -p sora down
