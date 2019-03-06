@@ -42,7 +42,12 @@ node(workerLabel) {
         } // end docker
       } // end if
       if (scmVars.GIT_LOCAL_BRANCH ==~ /master|develop/) {
-        docker_push_tags = [scmVars.GIT_LOCAL_BRANCH, 'latest']
+        if (scmVars.GIT_LOCAL_BRANCH == "develop")
+          docker_push_tags =  ['develop']
+        else if (scmVars.GIT_LOCAL_BRANCH == 'master')
+          docker_push_tags = ['latest']
+        else
+          docker_push_tags = []
         checkTag = sh(script: "git describe --tags --exact-match ${scmVars.GIT_COMMIT}", returnStatus: true)
         if (checkTag == 0)
           docker_push_tags += [sh(script: "git describe --tags --exact-match ${scmVars.GIT_COMMIT}", returnStdout: true).trim()]
