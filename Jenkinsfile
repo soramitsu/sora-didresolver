@@ -41,15 +41,15 @@ node(workerLabel) {
           } // end stage
         } // end docker
       } // end if
-      if (scmVars.GIT_LOCAL_BRANCH ==~ /master|develop/) {
+      checkTag = sh(script: "git describe --tags --exact-match ${scmVars.GIT_COMMIT}", returnStatus: true)
+      if (scmVars.GIT_LOCAL_BRANCH ==~ /master|develop/ || checkTag == 0 ) {
+        docker_push_tags = []
         if (scmVars.GIT_LOCAL_BRANCH == 'master')
-          docker_push_tags = ['latest']
-        else
-          docker_push_tags =  ['develop']
-        checkTag = sh(script: "git describe --tags --exact-match ${scmVars.GIT_COMMIT}", returnStatus: true)
-        if (checkTag == 0)
+          docker_push_tags += ['latest']
+        else if (scmVars.GIT_LOCAL_BRANCH == 'develop')
+          docker_push_tags +=  ['develop']
+        else if (checkTag == 0)
           docker_push_tags += [sh(script: "git describe --tags --exact-match ${scmVars.GIT_COMMIT}", returnStdout: true).trim()]
-        print docker_push_tags
         docker.image("${dockerImage}-alpine").inside('-v /var/run/docker.sock:/var/run/docker.sock') {
           stage('sonarqube') {
             // push analysis results to sonar
@@ -65,6 +65,7 @@ node(workerLabel) {
               ./gradlew dockerPush -x test -PrepoUrl=${DH_REPO_URL}
             """
             // push git_tag
+            print "Info: docker_push_tags=${docker_push_tags}"
             for ( git_tag in docker_push_tags ){
               sh """#!/bin/sh
                 apk update && apk add docker
