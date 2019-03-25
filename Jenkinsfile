@@ -1,7 +1,7 @@
 def workerLabel = 'docker-build-agent'
 def deploymentHost = [
-  'develop': 'ubuntu@test-1.sora.soramitsu.co.jp',
-  'master': 'ubuntu@srv-1.sora.soramitsu.co.jp']
+  'develop': ['ubuntu@s1.dev.sora.soramitsu.co.jp'],
+  'master': ['ubuntu@s1.tst.sora.soramitsu.co.jp','ubuntu@s4.stg1.sora.soramitsu.co.jp']]
 def dockerImage = 'openjdk:8'
 def sendTo = 'sora-ci@soramitsu.co.jp'
 def replyTo = 'buildbot@sora.org'
@@ -23,14 +23,14 @@ node(workerLabel) {
       string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN'),
       usernamePassword(credentialsId: 'sora-nexus-credentials', usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS'),
       string(credentialsId: 'sora-repo-url', variable: 'DH_REPO_URL') ]) {
-      if (scmVars.CHANGE_ID != null ) {
+      if (env.CHANGE_ID != null ) {
         // it is a PR
         // then do PR analysis by sorabot
         docker.image("${dockerImage}").inside {
           stage('sonarqube') {
             sh(script: "./gradlew sonarqube -x test --configure-on-demand \
               -Dsonar.links.ci=${BUILD_URL} \
-              -Dsonar.github.pullRequest=${scmVars.CHANGE_ID} \
+              -Dsonar.github.pullRequest=${env.CHANGE_ID} \
               -Dsonar.github.oauth=${GH_TOKEN} \
               -Dsonar.analysis.mode=preview \
               -Dsonar.github.disableInlineComments=true \
@@ -41,7 +41,15 @@ node(workerLabel) {
           } // end stage
         } // end docker
       } // end if
-      if (scmVars.GIT_LOCAL_BRANCH ==~ /master|develop/) {
+      checkTag = sh(script: "git describe --tags --exact-match ${scmVars.GIT_COMMIT}", returnStatus: true)
+      if (scmVars.GIT_LOCAL_BRANCH ==~ /master|develop/ || checkTag == 0 ) {
+        docker_push_tags = []
+        if (scmVars.GIT_LOCAL_BRANCH == 'master')
+          docker_push_tags += ['latest']
+        else if (scmVars.GIT_LOCAL_BRANCH == 'develop')
+          docker_push_tags +=  ['develop']
+        else if (checkTag == 0)
+          docker_push_tags += [sh(script: "git describe --tags --exact-match ${scmVars.GIT_COMMIT}", returnStdout: true).trim()]
         docker.image("${dockerImage}-alpine").inside('-v /var/run/docker.sock:/var/run/docker.sock') {
           stage('sonarqube') {
             // push analysis results to sonar
@@ -51,17 +59,30 @@ node(workerLabel) {
               -Dsonar.login=${SONAR_TOKEN}")
           } // end stage
           stage('build and push docker image') {
-            sh(script: "#!/bin/sh\napk update && apk add docker")
-            sh(script: "#!/bin/sh\ndocker login --username ${DH_USER} --password '${DH_PASS}' https://${DH_REPO_URL}")
-            sh(script: "#!/bin/sh\n./gradlew dockerPush -x test -PrepoUrl=${DH_REPO_URL}")
+            sh """#!/bin/sh
+              apk update && apk add docker
+              docker login --username ${DH_USER} --password '${DH_PASS}' https://${DH_REPO_URL}
+              ./gradlew dockerPush -x test -PrepoUrl=${DH_REPO_URL}
+            """
+            // push git_tag
+            print "Info: docker_push_tags=${docker_push_tags}"
+            for ( git_tag in docker_push_tags ){
+              sh """#!/bin/sh
+                apk update && apk add docker
+                docker login --username ${DH_USER} --password '${DH_PASS}' https://${DH_REPO_URL}
+                ./gradlew dockerPush -x test -PrepoUrl=${DH_REPO_URL} -Pversion=${git_tag}
+              """
+            } //end for
           } // end stage
         } // end docker
         stage ('deploy services') {
           sshagent(['jenkins-aws-ec2']) {
-            sh "scp -o StrictHostKeyChecking=no ./deploy/update-and-deploy.sh ${deploymentHost[scmVars.GIT_LOCAL_BRANCH]}:/tmp"
-            sh "ssh -o StrictHostKeyChecking=no \
-              ${deploymentHost[scmVars.GIT_LOCAL_BRANCH]} 'chmod +x /tmp/update-and-deploy.sh; \
-              DH_USER=${DH_USER} DH_PASS=${DH_PASS} DH_REPO_URL=${DH_REPO_URL} GIT_REPO_URL=${scmVars.GIT_URL} GIT_BRANCH=${scmVars.GIT_LOCAL_BRANCH} /tmp/update-and-deploy.sh'"
+            for (server in deploymentHost[scmVars.GIT_LOCAL_BRANCH]) {
+              sh "scp -o StrictHostKeyChecking=no ./deploy/update-and-deploy.sh ${server}:/tmp"
+              sh "ssh -o StrictHostKeyChecking=no \
+                ${server} 'chmod +x /tmp/update-and-deploy.sh; \
+                DH_USER=${DH_USER} DH_PASS=${DH_PASS} DH_REPO_URL=${DH_REPO_URL} GIT_REPO_URL=${scmVars.GIT_URL} GIT_BRANCH=${scmVars.GIT_LOCAL_BRANCH} /tmp/update-and-deploy.sh'"
+            } // end for
           } // end sshagent
         } // end stage
       } // end if
