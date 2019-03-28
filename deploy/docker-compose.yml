@@ -36,6 +36,7 @@ services:
     networks:
       - sora-net
       - traefik-net
+      - consul-net
     healthcheck: *service-healtcheck
     restart: on-failure
 
@@ -46,3 +47,6 @@ networks:
   traefik-net:
     external:
       name: traefik-net
+  consul-net:
+    external:
+      name: consul-net
