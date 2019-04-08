@@ -38,7 +38,7 @@ ext {
     testContainersVersion = '1.11.1'
     liquibaseVersion = '3.6.2'
     c3p0Version = '0.9.5.2'
-    jUnitVersion = '5.4.1'
+    jUnitVersion = '5.4.2'
     jacksonVersion = '2.9.8'
     jsonPathVersion = '2.4.0'
     jUnitPlatformVersion = '1.4.1'
