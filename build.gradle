@@ -30,7 +30,7 @@ ext {
     irohaPureVersion = '4.0.0'
     lombokVersion = '1.18.6'
     springSwaggerVersion = '2.9.2'
-    commonsLangVersion = '3.8.1'
+    commonsLangVersion = '3.9'
     aspectjVersion = '1.9.3'
     spongycastleVersion = '1.58.0.0'
     mockitoCoreVersion = '2.27.0'
