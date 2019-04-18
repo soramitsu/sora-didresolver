@@ -13,8 +13,6 @@ services:
     image: nexus.iroha.tech:19001/sora-middleware/didresolver:${VERSION:-0.0.1-SNAPSHOT}
     expose:
       - 9000
-    environment:
-      PORT: 9000
     labels:
       - "traefik.docker.network=traefik-net"
       - "traefik.enable=true"
@@ -31,8 +29,16 @@ services:
       - filebeat.multiline.negate=true
       - filebeat.multiline.match=after
     mem_limit: 512m
-    env_file:
-      - .env-did-resolver
+    environment:
+      - "SPRING_PROFILES_ACTIVE=cloud"
+      - "SPRING_CLOUD_VAULT_ENABLED=false"
+      - "SPRING_CLOUD_CONSUL_HOST=consul"
+      - "SPRING_CLOUD_CONSUL_PORT=8500"
+      - "SPRING_CLOUD_CONSUL_CONFIG_ACL_TOKEN=${CONSUL_ACL_TOKEN:?CONSUL_ACL_TOKEN is not defined}"
+      - "SPRING_CLOUD_CONSUL_CONFIG_PREFIX=sora"
+      - "SPRING_CLOUD_CONSUL_CONFIG_NAME=wallet"
+      - "SPRING_CLOUD_CONSUL_DISCOVERY_ENABLE=false"
+      - "SPRING_CLOUD_CONSUL_DISCOVERY_REGISTER=false"
     networks:
       - sora-net
       - traefik-net
