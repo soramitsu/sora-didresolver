@@ -10,7 +10,7 @@ x-healtcheck:
 
 services:
   did-resolver:
-    image: nexus.iroha.tech:19001/sora-middleware/didresolver:${VERSION:-0.0.1-SNAPSHOT}
+    image: nexus.iroha.tech:19001/sora-middleware/didresolver:${VERSION:-latest}
     expose:
       - 9000
     environment:

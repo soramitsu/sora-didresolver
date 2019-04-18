@@ -80,7 +80,7 @@ node(workerLabel) {
               sh "scp -o StrictHostKeyChecking=no ./deploy/update-and-deploy.sh ${server}:/tmp"
               sh "ssh -o StrictHostKeyChecking=no \
                 ${server} 'chmod +x /tmp/update-and-deploy.sh; \
-                DH_USER=${DH_USER} DH_PASS=${DH_PASS} DH_REPO_URL=${DH_REPO_URL} GIT_REPO_URL=${scmVars.GIT_URL} GIT_BRANCH=${scmVars.GIT_LOCAL_BRANCH} /tmp/update-and-deploy.sh'"
+                DH_USER=${DH_USER} DH_PASS=${DH_PASS} DH_REPO_URL=${DH_REPO_URL} GIT_REPO_URL=${scmVars.GIT_URL} GIT_BRANCH=${scmVars.GIT_LOCAL_BRANCH} VERSION=develop /tmp/update-and-deploy.sh'"
             } // end for
           } // end sshagent
         } // end stage
@@ -89,6 +89,7 @@ node(workerLabel) {
   } // end try
   catch(Exception e) {
     currentBuild.result = 'FAILURE'
+    print e
   } // end catch
   finally {
     stage('upload test artifacts') {
