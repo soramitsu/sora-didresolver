@@ -1,0 +1,27 @@
+spring:
+  cloud:
+    consul:
+      enabled: true
+      host: ${CONSUL_HOST:localhost}
+      port: ${CONSUL_PORT:8500}
+      discovery:
+        heartbeat:
+          enabled: true
+        instanceId: ${spring.application.name}:${vcap.application.instance_id:${spring.application.instance_id:${random.value}}}
+        hostname: ${HOSTNAME:${spring.application.name}}
+        port: ${server.port}
+        healthCheckPath: ${HEALTHCHECK_PATH:http://${spring.application.name}:${server.port}/actuator/health}
+        healthCheckInterval: 15s
+        tags: ${CONSUL_DISCOVERY_TAGS}
+    vault:
+      enabled: true
+      host: ${VAULT_HOST:localhost}
+      port: ${VAULT_PORT:8200}
+      scheme: http
+      connection-timeout: 5000
+      read-timeout: 15000
+      authentication: ${VAULT_AUTH_METHOD:TOKEN}
+      token: ${VAULT_AUTH_TOKEN:"token"}
+      fail-fast: true
+      kv:
+        enabled: true

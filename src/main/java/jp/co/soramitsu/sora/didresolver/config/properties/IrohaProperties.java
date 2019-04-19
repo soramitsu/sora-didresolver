@@ -8,11 +8,13 @@ import java.security.KeyPair;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Component;
 
 @ConfigurationProperties(prefix = "iroha", ignoreUnknownFields = false)
 @Component
 @Data
+@RefreshScope
 public class IrohaProperties {
 
   @NestedConfigurationProperty
