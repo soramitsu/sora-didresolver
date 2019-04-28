@@ -1,4 +1,4 @@
-version: "2.4"
+version: "3.7"
 
 x-healtcheck:
   &service-healtcheck
@@ -11,6 +11,15 @@ x-healtcheck:
 services:
   did-resolver:
     image: nexus.iroha.tech:19001/sora-middleware/didresolver:${VERSION:-latest}
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512m
+      restart_policy:
+        condition: any
+        delay: 5s
+        window: 15s
     expose:
       - 9000
     labels:
@@ -28,7 +37,6 @@ services:
       - filebeat.multiline.pattern='^\d{4}-\d{2}-\d{2}'
       - filebeat.multiline.negate=true
       - filebeat.multiline.match=after
-    mem_limit: 512m
     environment:
       - "SPRING_PROFILES_ACTIVE=cloud"
       - "SPRING_CLOUD_VAULT_ENABLED=false"
@@ -44,7 +52,6 @@ services:
       - traefik-net
       - consul-net
     healthcheck: *service-healtcheck
-    restart: on-failure
 
 networks:
   sora-net:
