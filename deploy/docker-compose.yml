@@ -9,6 +9,9 @@ x-healtcheck:
   start_period: 300s
 
 services:
+
+  # Did-resolver service
+  #
   did-resolver:
     image: nexus.iroha.tech:19001/sora-middleware/didresolver:${VERSION:-latest}
     deploy:
@@ -19,24 +22,27 @@ services:
       restart_policy:
         condition: any
         delay: 5s
-        window: 15s
-    expose:
-      - 9000
+        window: 10s
+      update_config:
+        parallelism: 1
+        failure_action: pause
+        delay: 10s
+        order: start-first
     labels:
       - "traefik.docker.network=traefik-net"
       - "traefik.enable=true"
-      - "traefik.backend.healthcheck.port=9000"
+      - "traefik.backend=did-resolver"
+      - "traefik.port=9000"
       - "traefik.backend.healthcheck.path=/actuator/health"
       - "traefik.frontend.rule=Host:${DIDRESOLVER_HOST:?DIDRESOLVER_HOST is not defined}"
-      - "traefik.port=9000"
-      - filebeat.module=docker
-      - filebeat.fields.app=did-resolver
-      - filebeat.fields.project=sora
-      - filebeat.fields.env=${ENVIRONMENT:?ENVIRONMENT is not defined}
-      - filebeat.fields.logtype=sora-java-log
-      - filebeat.multiline.pattern='^\d{4}-\d{2}-\d{2}'
-      - filebeat.multiline.negate=true
-      - filebeat.multiline.match=after
+      - "filebeat.module=docker"
+      - "filebeat.fields.app=did-resolver"
+      - "filebeat.fields.project=sora"
+      - "filebeat.fields.env=${ENVIRONMENT:?ENVIRONMENT is not defined}"
+      - "filebeat.fields.logtype=sora-java-log"
+      - 'filebeat.multiline.pattern=^\d{4}-\d{2}-\d{2}'
+      - "filebeat.multiline.negate=true"
+      - "filebeat.multiline.match=after"
     environment:
       - "SPRING_PROFILES_ACTIVE=cloud"
       - "SPRING_CLOUD_VAULT_ENABLED=false"
@@ -53,13 +59,476 @@ services:
       - consul-net
     healthcheck: *service-healtcheck
 
+  # Notification service
+  #
+  notification:
+    image: nexus.iroha.tech:19001/sora-middleware/utility.notification:${VERSION:-latest}
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512m
+      restart_policy:
+        condition: any
+        delay: 5s
+        window: 10s
+      update_config:
+        parallelism: 1
+        failure_action: pause
+        delay: 10s
+        order: start-first
+    labels:
+      - "traefik.docker.network=traefik-net"
+      - "traefik.enable=true"
+      - "traefik.backend=notification"
+      - "traefik.port=9000"
+      - "traefik.backend.healthcheck.path=/actuator/health"
+      - "traefik.frontend.rule=Host:${NOTIFICATION_HOST:?NOTIFICATION_HOST is not defined}"
+      - "filebeat.module=docker"
+      - "filebeat.fields.app=notification"
+      - "filebeat.fields.project=sora"
+      - "filebeat.fields.env=${ENVIRONMENT:?ENVIRONMENT is not defined}"
+      - "filebeat.fields.logtype=sora-java-log"
+      - 'filebeat.multiline.pattern=^\d{4}-\d{2}-\d{2}'
+      - "filebeat.multiline.negate=true"
+      - "filebeat.multiline.match=after"
+    environment:
+      - "SPRING_PROFILES_ACTIVE=cloud,with_eventdriven,with_email"
+      - "SPRING_CLOUD_VAULT_ENABLED=false"
+      - "SPRING_CLOUD_CONSUL_HOST=consul"
+      - "SPRING_CLOUD_CONSUL_PORT=8500"
+      - "SPRING_CLOUD_CONSUL_CONFIG_ACL_TOKEN=${CONSUL_ACL_TOKEN:?CONSUL_ACL_TOKEN is not defined}"
+      - "SPRING_CLOUD_CONSUL_CONFIG_PREFIX=sora"
+      - "SPRING_CLOUD_CONSUL_CONFIG_NAME=notification"
+      - "SPRING_CLOUD_CONSUL_DISCOVERY_ENABLE=false"
+      - "SPRING_CLOUD_CONSUL_DISCOVERY_REGISTER=false"
+    networks:
+      - sora-net
+      - traefik-net
+      - consul-net
+    healthcheck: *service-healtcheck
+
+  # Project service
+  #
+  project:
+    image: nexus.iroha.tech:19001/sora-middleware/domain.project:${VERSION:-latest}
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512m
+      restart_policy:
+        condition: any
+        delay: 5s
+        window: 10s
+      update_config:
+        parallelism: 1
+        failure_action: pause
+        delay: 10s
+        order: start-first
+    labels:
+      - "traefik.docker.network=traefik-net"
+      - "traefik.enable=true"
+      - "traefik.backend=project"
+      - "traefik.port=9000"
+      - "traefik.backend.healthcheck.path=/actuator/health"
+      - "traefik.backend1.frontend.rule=Host:${PROJECT_HOST:?PROJECT_HOST is not defined};Method:GET,POST"
+      - "traefik.backend1.frontend.headers.customRequestHeaders=Access-Control-Allow-Origin:*||Access-Control-Allow-Headers:DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range||Access-Control-Expose-Headers:Content-Length,Content-Range"
+      - "traefik.backend2.frontend.rule=Host:${PROJECT_HOST:?PROJECT_HOST is not defined};Method:PUT,DELETE"
+      - "filebeat.module=docker"
+      - "filebeat.fields.app=project"
+      - "filebeat.fields.project=sora"
+      - "filebeat.fields.env=${ENVIRONMENT:?ENVIRONMENT is not defined}"
+      - "filebeat.fields.logtype=sora-java-log"
+      - 'filebeat.multiline.pattern=^\d{4}-\d{2}-\d{2}'
+      - "filebeat.multiline.negate=true"
+      - "filebeat.multiline.match=after"
+    environment:
+      - "SPRING_PROFILES_ACTIVE=cloud,with_aws_image_store"
+      - "SPRING_CLOUD_VAULT_ENABLED=false"
+      - "SPRING_CLOUD_CONSUL_HOST=consul"
+      - "SPRING_CLOUD_CONSUL_PORT=8500"
+      - "SPRING_CLOUD_CONSUL_CONFIG_ACL_TOKEN=${CONSUL_ACL_TOKEN:?CONSUL_ACL_TOKEN is not defined}"
+      - "SPRING_CLOUD_CONSUL_CONFIG_PREFIX=sora"
+      - "SPRING_CLOUD_CONSUL_CONFIG_NAME=project"
+      - "SPRING_CLOUD_CONSUL_DISCOVERY_ENABLE=false"
+      - "SPRING_CLOUD_CONSUL_DISCOVERY_REGISTER=false"
+    networks:
+      - sora-net
+      - traefik-net
+      - consul-net
+    healthcheck: *service-healtcheck
+
+  # Account service
+  #
+  account:
+    image: nexus.iroha.tech:19001/sora-middleware/domain.account:${VERSION:-latest}
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512m
+      restart_policy:
+        condition: any
+        delay: 5s
+        window: 10s
+      update_config:
+        parallelism: 1
+        failure_action: pause
+        delay: 10s
+        order: start-first
+    labels:
+      - "traefik.docker.network=traefik-net"
+      - "traefik.enable=true"
+      - "traefik.backend=account"
+      - "traefik.port=9000"
+      - "traefik.backend.healthcheck.path=/actuator/health"
+      - "traefik.backend1.frontend.rule=Host:${ACCOUNT_HOST:?ACCOUNT_HOST is not defined};Method:GET,POST"
+      - "traefik.backend1.frontend.headers.customRequestHeaders=Access-Control-Allow-Origin:*||Access-Control-Allow-Headers:DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range||Access-Control-Expose-Headers:Content-Length,Content-Range"
+      - "traefik.backend2.frontend.rule=Host:${ACCOUNT_HOST:?ACCOUNT_HOST is not defined};Method:PUT,DELETE"
+      - "filebeat.module=docker"
+      - "filebeat.fields.app=account"
+      - "filebeat.fields.project=sora"
+      - "filebeat.fields.env=${ENVIRONMENT:?ENVIRONMENT is not defined}"
+      - "filebeat.fields.logtype=sora-java-log"
+      - 'filebeat.multiline.pattern=^\d{4}-\d{2}-\d{2}'
+      - "filebeat.multiline.negate=true"
+      - "filebeat.multiline.match=after"
+    environment:
+      - "SPRING_PROFILES_ACTIVE=cloud"
+      - "SPRING_CLOUD_VAULT_ENABLED=false"
+      - "SPRING_CLOUD_CONSUL_HOST=consul"
+      - "SPRING_CLOUD_CONSUL_PORT=8500"
+      - "SPRING_CLOUD_CONSUL_CONFIG_ACL_TOKEN=${CONSUL_ACL_TOKEN:?CONSUL_ACL_TOKEN is not defined}"
+      - "SPRING_CLOUD_CONSUL_CONFIG_PREFIX=sora"
+      - "SPRING_CLOUD_CONSUL_CONFIG_NAME=account"
+      - "SPRING_CLOUD_CONSUL_DISCOVERY_ENABLE=false"
+      - "SPRING_CLOUD_CONSUL_DISCOVERY_REGISTER=false"
+    networks:
+      - sora-net
+      - traefik-net
+      - consul-net
+    healthcheck: *service-healtcheck
+
+  # Authorization service
+  #
+  authorization:
+    image: nexus.iroha.tech:19001/sora-middleware/utility.authorization:${VERSION:-latest}
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512m
+      restart_policy:
+        condition: any
+        delay: 5s
+        window: 10s
+      update_config:
+        parallelism: 1
+        failure_action: pause
+        delay: 10s
+        order: start-first
+    labels:
+      - "traefik.docker.network=traefik-net"
+      - "traefik.enable=true"
+      - "traefik.backend=authorization"
+      - "traefik.port=9000"
+      - "traefik.backend.healthcheck.path=/actuator/health"
+      - "traefik.frontend.rule=Host:${AUTHORIZATION_HOST:?AUTHORIZATION_HOST is not defined}"
+      - "filebeat.module=docker"
+      - "filebeat.fields.app=authorization"
+      - "filebeat.fields.project=sora"
+      - "filebeat.fields.env=${ENVIRONMENT:?ENVIRONMENT is not defined}"
+      - "filebeat.fields.logtype=sora-java-log"
+      - 'filebeat.multiline.pattern=^\d{4}-\d{2}-\d{2}'
+      - "filebeat.multiline.negate=true"
+      - "filebeat.multiline.match=after"
+    environment:
+      - "SPRING_PROFILES_ACTIVE=cloud"
+      - "SPRING_CLOUD_VAULT_ENABLED=false"
+      - "SPRING_CLOUD_CONSUL_HOST=consul"
+      - "SPRING_CLOUD_CONSUL_PORT=8500"
+      - "SPRING_CLOUD_CONSUL_CONFIG_ACL_TOKEN=${CONSUL_ACL_TOKEN:?CONSUL_ACL_TOKEN is not defined}"
+      - "SPRING_CLOUD_CONSUL_CONFIG_PREFIX=sora"
+      - "SPRING_CLOUD_CONSUL_CONFIG_NAME=authorization"
+      - "SPRING_CLOUD_CONSUL_DISCOVERY_ENABLE=false"
+      - "SPRING_CLOUD_CONSUL_DISCOVERY_REGISTER=false"
+    networks:
+      - sora-net
+      - traefik-net
+      - consul-net
+    healthcheck: *service-healtcheck
+
+  # Reputation service
+  #
+  reputation:
+    image: nexus.iroha.tech:19001/sora-middleware/domain.reputation:${VERSION:-latest}
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512m
+      restart_policy:
+        condition: any
+        delay: 5s
+        window: 10s
+      update_config:
+        parallelism: 1
+        failure_action: pause
+        delay: 10s
+        order: start-first
+    labels:
+      - "traefik.docker.network=traefik-net"
+      - "traefik.enable=true"
+      - "traefik.backend=reputation"
+      - "traefik.port=9000"
+      - "traefik.backend.healthcheck.path=/actuator/health"
+      - "traefik.frontend.rule=Host:${REPUTATION_HOST:?REPUTATION_HOST is not defined}"
+      - "filebeat.module=docker"
+      - "filebeat.fields.app=reputation"
+      - "filebeat.fields.project=sora"
+      - "filebeat.fields.env=${ENVIRONMENT:?ENVIRONMENT is not defined}"
+      - "filebeat.fields.logtype=sora-java-log"
+      - 'filebeat.multiline.pattern=^\d{4}-\d{2}-\d{2}'
+      - "filebeat.multiline.negate=true"
+      - "filebeat.multiline.match=after"
+    environment:
+      - "SPRING_PROFILES_ACTIVE=cloud"
+      - "SPRING_CLOUD_VAULT_ENABLED=false"
+      - "SPRING_CLOUD_CONSUL_HOST=consul"
+      - "SPRING_CLOUD_CONSUL_PORT=8500"
+      - "SPRING_CLOUD_CONSUL_CONFIG_ACL_TOKEN=${CONSUL_ACL_TOKEN:?CONSUL_ACL_TOKEN is not defined}"
+      - "SPRING_CLOUD_CONSUL_CONFIG_PREFIX=sora"
+      - "SPRING_CLOUD_CONSUL_CONFIG_NAME=reputation"
+      - "SPRING_CLOUD_CONSUL_DISCOVERY_ENABLE=false"
+      - "SPRING_CLOUD_CONSUL_DISCOVERY_REGISTER=false"
+    networks:
+      - sora-net
+      - traefik-net
+      - consul-net
+    healthcheck: *service-healtcheck
+
+  # Activityfeed service
+  #
+  activityfeed:
+    image: nexus.iroha.tech:19001/sora-middleware/domain.activityfeed:${VERSION:-latest}
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512m
+      restart_policy:
+        condition: any
+        delay: 5s
+        window: 10s
+      update_config:
+        parallelism: 1
+        failure_action: pause
+        delay: 10s
+        order: start-first
+    labels:
+      - "traefik.docker.network=traefik-net"
+      - "traefik.enable=true"
+      - "traefik.backend=activityfeed"
+      - "traefik.port=9000"
+      - "traefik.backend.healthcheck.path=/actuator/health"
+      - "traefik.frontend.rule=Host:${ACTIVITYFEED_HOST:?ACTIVITYFEED_HOST is not defined}"
+      - "filebeat.module=docker"
+      - "filebeat.fields.app=activityfeed"
+      - "filebeat.fields.project=sora"
+      - "filebeat.fields.env=${ENVIRONMENT:?ENVIRONMENT is not defined}"
+      - "filebeat.fields.logtype=sora-java-log"
+      - 'filebeat.multiline.pattern=^\d{4}-\d{2}-\d{2}'
+      - "filebeat.multiline.negate=true"
+      - "filebeat.multiline.match=after"
+    environment:
+      - "SPRING_PROFILES_ACTIVE=cloud"
+      - "SPRING_CLOUD_VAULT_ENABLED=false"
+      - "SPRING_CLOUD_CONSUL_HOST=consul"
+      - "SPRING_CLOUD_CONSUL_PORT=8500"
+      - "SPRING_CLOUD_CONSUL_CONFIG_ACL_TOKEN=${CONSUL_ACL_TOKEN:?CONSUL_ACL_TOKEN is not defined}"
+      - "SPRING_CLOUD_CONSUL_CONFIG_PREFIX=sora"
+      - "SPRING_CLOUD_CONSUL_CONFIG_NAME=activityfeed"
+      - "SPRING_CLOUD_CONSUL_DISCOVERY_ENABLE=false"
+      - "SPRING_CLOUD_CONSUL_DISCOVERY_REGISTER=false"
+    networks:
+      - sora-net
+      - traefik-net
+      - consul-net
+    healthcheck: *service-healtcheck
+
+  # Information service
+  #
+  information:
+    image: nexus.iroha.tech:19001/sora-middleware/utility.information:${VERSION:-latest}
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512m
+      restart_policy:
+        condition: any
+        delay: 5s
+        window: 10s
+      update_config:
+        parallelism: 1
+        failure_action: pause
+        delay: 10s
+        order: start-first
+    labels:
+      - "traefik.docker.network=traefik-net"
+      - "traefik.enable=true"
+      - "traefik.backend=information"
+      - "traefik.port=9000"
+      - "traefik.backend.healthcheck.path=/actuator/health"
+      - "traefik.frontend.rule=Host:${INFORMATION_HOST:?INFORMATION_HOST is not defined}"
+      - "filebeat.module=docker"
+      - "filebeat.fields.app=information"
+      - "filebeat.fields.project=sora"
+      - "filebeat.fields.env=${ENVIRONMENT:?ENVIRONMENT is not defined}"
+      - "filebeat.fields.logtype=sora-java-log"
+      - 'filebeat.multiline.pattern=^\d{4}-\d{2}-\d{2}'
+      - "filebeat.multiline.negate=true"
+      - "filebeat.multiline.match=after"
+    environment:
+      - "SPRING_PROFILES_ACTIVE=cloud"
+      - "SPRING_CLOUD_VAULT_ENABLED=false"
+      - "SPRING_CLOUD_CONSUL_HOST=consul"
+      - "SPRING_CLOUD_CONSUL_PORT=8500"
+      - "SPRING_CLOUD_CONSUL_CONFIG_ACL_TOKEN=${CONSUL_ACL_TOKEN:?CONSUL_ACL_TOKEN is not defined}"
+      - "SPRING_CLOUD_CONSUL_CONFIG_PREFIX=sora"
+      - "SPRING_CLOUD_CONSUL_CONFIG_NAME=information"
+      - "SPRING_CLOUD_CONSUL_DISCOVERY_ENABLE=false"
+      - "SPRING_CLOUD_CONSUL_DISCOVERY_REGISTER=false"
+    networks:
+      - sora-net
+      - traefik-net
+      - consul-net
+    healthcheck: *service-healtcheck
+
+  # Wallet service
+  #
+  wallet:
+    image: nexus.iroha.tech:19001/sora-middleware/domain.wallet:${VERSION:-latest}
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512m
+      restart_policy:
+        condition: any
+        delay: 5s
+        window: 10s
+      update_config:
+        parallelism: 1
+        failure_action: pause
+        delay: 10s
+        order: start-first
+    labels:
+      - "traefik.docker.network=traefik-net"
+      - "traefik.enable=true"
+      - "traefik.backend=wallet"
+      - "traefik.port=9000"
+      - "traefik.backend.healthcheck.path=/actuator/health"
+      - "traefik.frontend.rule=Host:${WALLET_HOST:?WALLET_HOST is not defined}"
+      - "filebeat.module=docker"
+      - "filebeat.fields.app=wallet"
+      - "filebeat.fields.project=sora"
+      - "filebeat.fields.env=${ENVIRONMENT:?ENVIRONMENT is not defined}"
+      - "filebeat.fields.logtype=sora-java-log"
+      - 'filebeat.multiline.pattern=^\d{4}-\d{2}-\d{2}'
+      - "filebeat.multiline.negate=true"
+      - "filebeat.multiline.match=after"
+    environment:
+      - "SPRING_PROFILES_ACTIVE=cloud"
+      - "SPRING_CLOUD_VAULT_ENABLED=false"
+      - "SPRING_CLOUD_CONSUL_HOST=consul"
+      - "SPRING_CLOUD_CONSUL_PORT=8500"
+      - "SPRING_CLOUD_CONSUL_CONFIG_ACL_TOKEN=${CONSUL_ACL_TOKEN:?CONSUL_ACL_TOKEN is not defined}"
+      - "SPRING_CLOUD_CONSUL_CONFIG_PREFIX=sora"
+      - "SPRING_CLOUD_CONSUL_CONFIG_NAME=wallet"
+      - "SPRING_CLOUD_CONSUL_DISCOVERY_ENABLE=false"
+      - "SPRING_CLOUD_CONSUL_DISCOVERY_REGISTER=false"
+    networks:
+      - sora-net
+      - traefik-net
+    healthcheck: *service-healtcheck
+
+  # Airdrop service
+  #
+  airdrop:
+    image: nexus.iroha.tech:19001/sora-middleware/utility.airdrop:${VERSION:-latest}
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 512m
+      restart_policy:
+        condition: any
+        delay: 5s
+        window: 10s
+      update_config:
+        parallelism: 1
+        failure_action: pause
+        delay: 10s
+        order: start-first
+    labels:
+      - "filebeat.module=docker"
+      - "filebeat.fields.app=airdrop"
+      - "filebeat.fields.project=sora"
+      - "filebeat.fields.env=${ENVIRONMENT:?ENVIRONMENT is not defined}"
+      - "filebeat.fields.logtype=sora-java-log"
+      - 'filebeat.multiline.pattern=^\d{4}-\d{2}-\d{2}'
+      - "filebeat.multiline.negate=true"
+      - "filebeat.multiline.match=after"
+    environment:
+      - "SPRING_PROFILES_ACTIVE=cloud"
+      - "SPRING_CLOUD_VAULT_ENABLED=false"
+      - "SPRING_CLOUD_CONSUL_HOST=consul"
+      - "SPRING_CLOUD_CONSUL_PORT=8500"
+      - "SPRING_CLOUD_CONSUL_CONFIG_ACL_TOKEN=${CONSUL_ACL_TOKEN:?CONSUL_ACL_TOKEN is not defined}"
+      - "SPRING_CLOUD_CONSUL_CONFIG_PREFIX=sora"
+      - "SPRING_CLOUD_CONSUL_CONFIG_NAME=airdrop"
+      - "SPRING_CLOUD_CONSUL_DISCOVERY_ENABLE=false"
+      - "SPRING_CLOUD_CONSUL_DISCOVERY_REGISTER=false"
+    networks:
+      - sora-net
+      - consul-net
+
+  # Http_code_loop service
+  #
+  http_code_loop:
+    image: nexus.iroha.tech:19003/build-tools/http_code_loop:latest
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 128m
+      restart_policy:
+        condition: any
+        delay: 5s
+        window: 10s
+      update_config:
+        parallelism: 1
+        failure_action: pause
+        delay: 10s
+        order: start-first
+    labels:
+      - "traefik.docker.network=traefik-net"
+      - "traefik.enable=true"
+      - "traefik.backend=http_code_loop"
+      - "traefik.port=8080"
+      - "traefik.frontend.rule=Host:${PROJECT_HOST:?PROJECT_HOST is not defined},${ACCOUNT_HOST:?ACCOUNT_HOST is not defined};Method:OPTIONS;ReplacePath:/204"
+      - "traefik.frontend.headers.customResponseHeaders=Access-Control-Allow-Origin:*||Access-Control-Allow-Methods:GET, POST, PUT, OPTIONS, DELETE||Access-Control-Allow-Headers:DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization||Access-Control-Allow-Credentials:true||Access-Control-Max-Age:1728000||Content-Type:text/plain; charset=utf-8||Content-Length:0"
+    networks:
+      - traefik-net
+
 networks:
   sora-net:
-    external:
-      name: sora-net
+    name: sora-net
   traefik-net:
-    external:
-      name: traefik-net
+    name: traefik-net
+    external: true
   consul-net:
-    external:
-      name: consul-net
+    name: consul-net
+    external: true
