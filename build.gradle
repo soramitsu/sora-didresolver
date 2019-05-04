@@ -12,7 +12,7 @@ buildscript {
 
 plugins {
     id "org.sonarqube" version "2.7"
-    id "com.palantir.docker" version "0.20.1"
+    id "com.palantir.docker" version "0.22.1"
 }
 
 apply plugin: 'java'
