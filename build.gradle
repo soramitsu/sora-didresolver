@@ -27,7 +27,7 @@ version = (findProperty('version') != 'unspecified') ? version : '0.0.1-SNAPSHOT
 sourceCompatibility = 1.8
 
 ext {
-    irohaPureVersion = '4.0.0'
+    irohaPureVersion = '4.1.1'
     lombokVersion = '1.18.6'
     springSwaggerVersion = '2.9.2'
     commonsLangVersion = '3.9'
