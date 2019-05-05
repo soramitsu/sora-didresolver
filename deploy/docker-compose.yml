@@ -523,6 +523,37 @@ services:
     networks:
       - traefik-net
 
+  adminpanel:
+    image: nexus.iroha.tech:19001/sora-middleware/admin-panel:${VERSION:-develop}
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          memory: 128m
+      restart_policy:
+        condition: any
+        delay: 5s
+        window: 10s
+      update_config:
+        parallelism: 1
+        failure_action: pause
+        delay: 10s
+        order: start-first
+    volumes:
+      - /opt/docker_data/sora/adminpanel/env.json:/usr/share/nginx/html/env.json:ro
+    labels:
+      - "traefik.docker.network=traefik-net"
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:${SORAUNITADMINPANEL_HOST:?SORAUNITADMINPANEL_HOST is not defined}"
+      - "traefik.backend=adminpanel"
+      - "traefik.port=80"
+      - "filebeat.module=nginx"
+      - "filebeat.fields.app=adminpanel"
+      - "filebeat.fields.project=sora"
+      - "filebeat.fields.env=${ENVIRONMENT:?ENVIRONMENT is not defined}"
+    networks:
+      - traefik-net
+
 networks:
   sora-net:
     name: sora-net
