@@ -1,6 +1,6 @@
 def workerLabel = 'docker-build-agent'
 def deploymentHost = [
-  'develop': ['ubuntu@s1.dev.sora.soramitsu.co.jp']]
+  'develop': ['jenkins@s1.dev.sora.soramitsu.co.jp']]
 def dockerImage = 'openjdk:8'
 def sendTo = 'sora-ci@soramitsu.co.jp'
 def replyTo = 'buildbot@sora.org'
