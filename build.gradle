@@ -31,13 +31,11 @@ ext {
     lombokVersion = '1.18.8'
     springSwaggerVersion = '2.9.2'
     commonsLangVersion = '3.9'
-    aspectjVersion = '1.9.4'
     spongycastleVersion = '1.58.0.0'
     mockitoCoreVersion = '2.28.1'
     hibernateTypesVersion = '2.3.0'
     testContainersVersion = '1.11.3'
     liquibaseVersion = '3.6.2'
-    c3p0Version = '0.9.5.2'
     jUnitVersion = '5.3.2'
     jacksonVersion = '2.9.9'
     jsonPathVersion = '2.4.0'
@@ -46,7 +44,6 @@ ext {
     jjwtVersion = '3.8.1'
     springCloudVersion = 'Greenwich.SR1'
     rxjavaVersion = '2.2.8'
-    owaspVersion = '1.1.6'
 
     repoUrl = 'nexus.iroha.tech:19001'
 }
@@ -85,11 +82,6 @@ dependencies {
 
     // iroha
     compile "com.github.hyperledger.iroha-java:client:$irohaPureVersion"
-
-    //logging
-    compile("org.aspectj:aspectjrt:${aspectjVersion}")
-    compile("org.aspectj:aspectjweaver:${aspectjVersion}")
-    compile "org.owasp:security-logging-logback:$owaspVersion"
 
     compileOnly "org.springframework.boot:spring-boot-configuration-processor"
 
