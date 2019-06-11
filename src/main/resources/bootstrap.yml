@@ -9,12 +9,14 @@ iroha:
     host: ${DIDRESOLVER_IROHA_HOST:localhost}
 server:
   port: ${PORT:9008}
+  servlet:
+    context-path: /${spring.application.name}
 spring:
   jackson:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
   application:
-    name: did-resolver
+    name: didresolver
   zipkin:
     baseUrl: ${ZIPKIN_BASEURL:http://localhost:9411}
     service:
