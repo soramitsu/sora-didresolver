@@ -27,7 +27,7 @@ version = (findProperty('version') != 'unspecified') ? version : '0.0.1-SNAPSHOT
 sourceCompatibility = 1.8
 
 ext {
-    irohaPureVersion = '5.2.0'
+    irohaVersion = '5.2.3'
     lombokVersion = '1.18.8'
     springSwaggerVersion = '2.9.2'
     commonsLangVersion = '3.9'
@@ -81,9 +81,6 @@ dependencies {
     compile("com.auth0:java-jwt:$jjwtVersion")
     compile "io.reactivex.rxjava2:rxjava:${rxjavaVersion}"
 
-    // iroha
-    compile "com.github.hyperledger.iroha-java:client:$irohaPureVersion"
-
     compileOnly "org.springframework.boot:spring-boot-configuration-processor"
 
     //tests
@@ -96,11 +93,16 @@ dependencies {
     testRuntime("org.junit.jupiter:junit-jupiter-engine:${jUnitVersion}")
     testCompile("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
     testCompile("org.junit.platform:junit-platform-launcher:${jUnitPlatformVersion}")
+    testCompile("org.mockito:mockito-core:${mockitoCoreVersion}")
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('org.springframework.security:spring-security-test')
+
     compileOnly("org.projectlombok:lombok:${lombokVersion}")
     testCompileOnly("org.projectlombok:lombok:${lombokVersion}")
-    testCompile("com.github.hyperledger.iroha-java:testcontainers:$irohaPureVersion") {
-        exclude module: 'slf4j-simple'
-    }
+
+    // iroha
+    compile "com.github.hyperledger.iroha-java:client:${irohaVersion}"
+    testCompile "com.github.hyperledger.iroha-java:testcontainers:${irohaVersion}"
 
     // ========== Distributed Tracing ==========
     compile "org.springframework.cloud:spring-cloud-starter-zipkin"
@@ -134,18 +136,6 @@ sonarqube {
         property "sonar.junit.reportsPaths", "${project.projectDir}/build/test-results/**/*.xml"
         property "sonar.jacoco.reportPaths", "${project.projectDir}/build/jacoco/test.exec"
         property "sonar.exclusions", "${project.projectDir}/**/*.txt"
-    }
-}
-
-test {
-    maxParallelForks = 1
-    useJUnitPlatform()
-    failFast = true
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
-    reports {
-        junitXml.enabled = true
     }
 }
 
