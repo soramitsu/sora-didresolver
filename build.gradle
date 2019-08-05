@@ -39,7 +39,7 @@ ext {
     jUnitVersion = '5.5.0'
     jacksonVersion = '2.9.9'
     jsonPathVersion = '2.4.0'
-    jUnitPlatformVersion = '1.4.2'
+    jUnitPlatformVersion = '1.5.1'
     soraSDKVersion = '0.3.9'
     jjwtVersion = '3.8.1'
     springCloudVersion = 'Greenwich.SR2'
