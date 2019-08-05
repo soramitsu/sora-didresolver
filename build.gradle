@@ -37,7 +37,7 @@ ext {
     testContainersVersion = '1.11.4'
     liquibaseVersion = '3.6.2'
     jUnitVersion = '5.5.0'
-    jacksonVersion = '2.9.9'
+    jacksonVersion = '2.10.0.pr1'
     jsonPathVersion = '2.4.0'
     jUnitPlatformVersion = '1.4.2'
     soraSDKVersion = '0.3.9'
