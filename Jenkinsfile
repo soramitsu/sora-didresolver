@@ -29,7 +29,6 @@ node(workerLabel) {
               -Dsonar.links.ci=${BUILD_URL} \
               -Dsonar.github.pullRequest=${env.CHANGE_ID} \
               -Dsonar.github.oauth=${GH_TOKEN} \
-              -Dsonar.analysis.mode=preview \
               -Dsonar.github.disableInlineComments=true \
               -Dsonar.github.repository=soramitsu/did-resolver \
               -Dsonar.host.url=https://sonar.soramitsu.co.jp \
