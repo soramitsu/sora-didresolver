@@ -59,8 +59,9 @@ dependencies {
     compile("com.jayway.jsonpath:json-path:$jsonPathVersion")
 
     compile('org.springframework.boot:spring-boot-starter-validation')
-    compile('org.springframework.boot:spring-boot-starter-actuator')
     compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-actuator')
+    compile "io.micrometer:micrometer-registry-prometheus:latest.release"
 
     // consul auto configuration
     compile("org.springframework.cloud:spring-cloud-starter-consul-config")
