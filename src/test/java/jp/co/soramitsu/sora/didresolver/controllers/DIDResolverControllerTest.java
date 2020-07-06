@@ -14,6 +14,7 @@ import static jp.co.soramitsu.sora.didresolver.controllers.dto.ResponseCode.PUBL
 import static jp.co.soramitsu.sora.sdk.did.model.dto.DID.parse;
 import static jp.co.soramitsu.sora.sdk.did.model.dto.Options.builder;
 import static jp.co.soramitsu.sora.sdk.did.model.type.SignatureTypeEnum.Ed25519Sha3Signature;
+import static jp.co.soramitsu.sora.sdk.did.validation.ISO8601DateTimeFormatter.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -116,7 +117,7 @@ public class DIDResolverControllerTest extends IntegrationTest {
   @DisplayName("Successfully updates DDO")
   void updateDDO() throws IOException, SignatureException, DDOUnparseableException {
     storageService.createOrUpdate(ddo.getId().toString(), ddo);
-    ddo.setUpdated(now());
+    ddo.setUpdated(format(now()));
     ddo = signDdo(ddo);
     val response = requests.updateDDO(ddo.getId(), ddo);
     assertEquals(OK, response.getStatusCode());
@@ -128,7 +129,7 @@ public class DIDResolverControllerTest extends IntegrationTest {
   @Test
   @DisplayName("When trying to update DDO which not in Iroha it returns status DID_NOT_FOUND")
   void updateDdoDIDNotFound() throws IOException, SignatureException, ParserException {
-    ddo.setUpdated(now());
+    ddo.setUpdated(format(now()));
     ddo = signDdo(ddo);
     val response = requests.updateDDO(parse("did:sora:wrongkey"), ddo);
     assertEquals(OK, response.getStatusCode());
@@ -140,7 +141,7 @@ public class DIDResolverControllerTest extends IntegrationTest {
   void updateDdoCheckPublicKey() {
     storageService.createOrUpdate(ddo.getId().toString(), ddo);
     ddo.setPublicKey(null);
-    ddo.setUpdated(now());
+    ddo.setUpdated(format(now()));
     val response = requests.updateDDO(ddo.getId(), ddo);
     assertEquals(OK, response.getStatusCode());
     assertEquals(PUBLIC_KEY_VALUE_NOT_PRESENTED, getResponseCode(response));
@@ -151,7 +152,7 @@ public class DIDResolverControllerTest extends IntegrationTest {
   void updateDdoCheckProof() {
     storageService.createOrUpdate(ddo.getId().toString(), ddo);
     ddo.setProof(null);
-    ddo.setUpdated(now());
+    ddo.setUpdated(format(now()));
     val response = requests.updateDDO(ddo.getId(), ddo);
     assertEquals(OK, response.getStatusCode());
     assertEquals(INVALID_PROOF, getResponseCode(response));
@@ -162,7 +163,7 @@ public class DIDResolverControllerTest extends IntegrationTest {
   void updateDdoWrongUpdateDate() throws IOException, SignatureException {
     storageService.createOrUpdate(ddo.getId().toString(), ddo);
     ddo.setUpdated(ddo.getCreated());
-    ddo.setCreated(now());
+    ddo.setCreated(format(now()));
     ddo = signDdo(ddo);
     val response = requests.updateDDO(ddo.getId(), ddo);
     assertEquals(OK, response.getStatusCode());
