@@ -2,14 +2,15 @@ package jp.co.soramitsu.sora.didresolver.util;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;
+import static java.time.Instant.now;
 import static jp.co.soramitsu.sora.sdk.did.model.dto.DID.parse;
 import static jp.co.soramitsu.sora.sdk.did.model.type.SignatureTypeEnum.Ed25519Sha3Signature;
+import static jp.co.soramitsu.sora.sdk.did.validation.ISO8601DateTimeFormatter.format;
 import static org.spongycastle.util.encoders.Hex.decode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.IOException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -46,7 +47,7 @@ public class DataProvider {
   public Proof getProofForTest() {
     try {
       Options options = new Options(
-          Ed25519Sha3Signature, Instant.now(),
+          Ed25519Sha3Signature, format(now()),
           parse(ID_BASE + 2),
           "23532",
           "test");

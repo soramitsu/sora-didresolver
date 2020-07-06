@@ -1,5 +1,6 @@
 package jp.co.soramitsu.sora.didresolver.controllers;
 
+import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static java.util.Objects.isNull;
 import static jp.co.soramitsu.sora.didresolver.commons.CommonsConst.MAX_IROHA_KEY_LENGTH;
 import static jp.co.soramitsu.sora.didresolver.commons.URIConstants.ID_PARAM;
@@ -12,6 +13,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.function.Function;
 import jp.co.soramitsu.sora.didresolver.controllers.dto.GenericResponse;
 import jp.co.soramitsu.sora.didresolver.controllers.dto.GetDDORs;
 import jp.co.soramitsu.sora.didresolver.controllers.dto.SuccessfulResponse;
@@ -56,6 +60,8 @@ public class DIDResolverController {
 
   private StorageService storageService;
   private VerifyService verifyService;
+
+  private static final Function<String, LocalDateTime> DATE_TIME_MAPPER = iso8601String -> LocalDateTime.parse(iso8601String, ISO_DATE_TIME);
 
   @PostMapping(consumes = {APPLICATION_JSON_UTF8_VALUE})
   @ApiOperation("This operation is used to register new DID-DDO pair in Identity System")
@@ -128,7 +134,7 @@ public class DIDResolverController {
               + "DID_NOT_FOUND - Returns when DID has not found\n"
               + "INVALID_PROOF_SIGNATURE - Returns when proof signature verification for DDO has failed\n"
               + "INVALID_PROOF - Returns when proof is invalid\n"
-              + "INCORRECT_UPDATE_TIME - Returns when updated time less than created time\n"
+              + "INCORRECT_UPDATE_TIME - Returns when updated time less than created time or not set\n"
               + "PUBLIC_KEY_VALUE_NOT_PRESENTED - Returns when public key value has not found",
           response = GenericResponse.class
       ),
@@ -141,9 +147,8 @@ public class DIDResolverController {
       throws IncorrectUpdateException, DIDNotFoundException, ProofSignatureVerificationException, InvalidProofException, PublicKeyValueNotPresentedException, DDOUnparseableException {
     log.info("Update DDO by DID - {}", did);
     verifyDDOProof(ddo);
-    if (!ddo.getUpdated().isAfter(ddo.getCreated())) {
-      throw new IncorrectUpdateException(ddo.getId(), ddo.getCreated().toString(),
-          ddo.getUpdated().toString());
+    if (!checkUpdatedTimeAfterCreatedTime(ddo)) {
+      throw new IncorrectUpdateException(ddo.getId(), ddo.getCreated(), ddo.getUpdated());
     }
     if (storageService.findDDObyDID(did).isPresent()) {
       storageService.createOrUpdate(did, ddo);
@@ -173,6 +178,13 @@ public class DIDResolverController {
     if (!verifyService.isCreatorInPublicKeys(proofCreator, ddo.getPublicKey())) {
       throw new PublicKeyValueNotPresentedException(proofCreator.toString());
     }
+  }
+
+  private boolean checkUpdatedTimeAfterCreatedTime(DDO ddo) {
+    return Optional.ofNullable(ddo.getUpdated())
+        .map(DATE_TIME_MAPPER)
+        .map(updated -> updated.isAfter(DATE_TIME_MAPPER.apply(ddo.getCreated())))
+        .orElse(false);
   }
 
 }
