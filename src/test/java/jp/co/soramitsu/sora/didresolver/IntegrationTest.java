@@ -7,9 +7,11 @@ import static jp.co.soramitsu.iroha.testcontainers.PeerConfig.builder;
 import static jp.co.soramitsu.iroha.testcontainers.detail.GenesisBlockBuilder.defaultKeyPair;
 import static org.bouncycastle.util.encoders.Hex.decode;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jp.co.soramitsu.iroha.java.Transaction;
 import jp.co.soramitsu.iroha.testcontainers.IrohaContainer;
 import jp.co.soramitsu.iroha.testcontainers.detail.GenesisBlockBuilder;
+import jp.co.soramitsu.sora.sdk.json.JsonUtil;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -58,4 +60,6 @@ public abstract class IntegrationTest {
   @SuppressWarnings("SpringJavaAutowiringInspection")
   @Autowired
   protected TestRestTemplate testRestTemplate;
+
+  protected ObjectMapper mapper = JsonUtil.buildMapper();
 }

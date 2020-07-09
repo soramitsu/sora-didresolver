@@ -10,9 +10,10 @@
     "publicKey":"did:sora:uuid:2abdb374-3feb-49cf-a819-5b80622cb750#keys-1"
   }],
   "service":[{
-    "type":"GenericService",
+    "type":"TransferService",
     "id":"did:sora:uuid:2abdb374-3feb-49cf-a819-5b80622cb750#service-1",
-    "serviceEndpoint":"https://google.com/"
+    "serviceEndpoint":"https://google.com/",
+    "owner" : "Alice"
   }],
   "owner":"did:sora:uuid:2abdb374-3feb-49cf-a819-5b80622cb750",
   "created":"2018-09-17T09:48:35.427829Z",

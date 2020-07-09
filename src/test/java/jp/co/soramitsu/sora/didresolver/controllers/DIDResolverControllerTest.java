@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.http.HttpStatus.OK;
 import static org.testcontainers.shaded.org.bouncycastle.util.encoders.Hex.decode;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -85,13 +86,13 @@ public class DIDResolverControllerTest extends IntegrationTest {
 
   @Test
   @DisplayName("Successfully gets DDO")
-  void getDdo() {
+  void getDdo() throws JsonProcessingException {
     storageService.createOrUpdate(ddo.getId().toString(), ddo);
     val response = requests.getDDO(ddo.getId());
     assertEquals(OK, response.getStatusCode());
     assertEquals(ResponseCode.OK, getResponseCode(response));
     assertNotNull(response.getBody());
-    assertEquals(ddo, response.getBody().getDdo());
+    assertEquals(mapper.writeValueAsString(ddo), response.getBody().getDdo());
   }
 
   @Test
@@ -123,7 +124,7 @@ public class DIDResolverControllerTest extends IntegrationTest {
     assertEquals(OK, response.getStatusCode());
     assertEquals(ResponseCode.OK, getResponseCode(response));
     val ddoFromIroha = storageService.findDDObyDID(ddo.getId().toString()).orElse(null);
-    assertEquals(ddo, ddoFromIroha);
+    assertEquals(mapper.writeValueAsString(ddo), ddoFromIroha);
   }
 
   @Test
@@ -180,7 +181,7 @@ public class DIDResolverControllerTest extends IntegrationTest {
     assertEquals(OK, response.getStatusCode());
     assertEquals(ResponseCode.OK, getResponseCode(response));
     val ddoFromIroha = storageService.findDDObyDID(newDdo.getId().toString()).orElse(null);
-    assertEquals(newDdo, ddoFromIroha);
+    assertEquals(mapper.writeValueAsString(newDdo), ddoFromIroha);
   }
 
   @Test
