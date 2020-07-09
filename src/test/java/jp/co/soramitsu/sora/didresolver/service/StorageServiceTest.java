@@ -21,10 +21,10 @@ public class StorageServiceTest extends IntegrationTest {
   public void canSetAndGetObject() throws Exception {
     DDO targetDdo = getDefaultDdo();
     storageService.createOrUpdate(DEFAULT_DID, targetDdo);
-    final Optional<DDO> ddo = storageService
+    final Optional<String> ddo = storageService
         .findDDObyDID(DEFAULT_DID);
 
     assertTrue(ddo.isPresent());
-    assertEquals(targetDdo, ddo.get());
+    assertEquals(mapper.writeValueAsString(targetDdo), ddo.get());
   }
 }

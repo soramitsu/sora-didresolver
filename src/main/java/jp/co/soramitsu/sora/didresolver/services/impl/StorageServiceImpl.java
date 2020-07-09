@@ -1,6 +1,5 @@
 package jp.co.soramitsu.sora.didresolver.services.impl;
 
-import static java.util.Optional.empty;
 import static java.util.Optional.ofNullable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,36 +9,32 @@ import jp.co.soramitsu.sora.didresolver.exceptions.DDOUnparseableException;
 import jp.co.soramitsu.sora.didresolver.services.IrohaService;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
+import jp.co.soramitsu.sora.sdk.json.JsonUtil;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@AllArgsConstructor
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class StorageServiceImpl implements StorageService {
 
   private final IrohaService irohaService;
-  private final ObjectMapper mapper;
-
-  @Autowired
-  public StorageServiceImpl(ObjectMapper mapper, IrohaService irohaService) {
-    this.irohaService = irohaService;
-    this.mapper = mapper;
-  }
+  private ObjectMapper mapper = JsonUtil.buildMapper();
 
   @Override
-  public void createOrUpdate(String did, DDO ddo) {
+  public void createOrUpdate(String did, Object ddo) {
     irohaService.setAccountDetails(did, ddo);
   }
 
   @Override
-  public Optional<DDO> findDDObyDID(String did) throws DDOUnparseableException {
-    val accountDetails = irohaService.getAccountDetails(did);
-    if (accountDetails.isPresent()) {
-      return parseDdoFromIrohaResponse(accountDetails.get());
-    }
-    return empty();
+  public Optional<String> findDDObyDID(String did) throws DDOUnparseableException {
+    return irohaService.getAccountDetails(did)
+        .filter(ddo -> parseDdoFromIrohaResponse(ddo).isPresent());
   }
 
   @Override
@@ -47,7 +42,8 @@ public class StorageServiceImpl implements StorageService {
     irohaService.setAccountDetails(did, null);
   }
 
-  private Optional<DDO> parseDdoFromIrohaResponse(String response) throws DDOUnparseableException {
+  @SneakyThrows(DDOUnparseableException.class)
+  private Optional<DDO> parseDdoFromIrohaResponse(String response) {
     try {
       DDO result = mapper.readValue(response, DDO.class);
       return ofNullable(result);

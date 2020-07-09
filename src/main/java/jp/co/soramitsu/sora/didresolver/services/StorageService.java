@@ -6,9 +6,9 @@ import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 
 public interface StorageService {
 
-  void createOrUpdate(String did, DDO ddo);
+  void createOrUpdate(String did, Object ddo);
 
-  Optional<DDO> findDDObyDID(String did) throws DDOUnparseableException;
+  Optional<String> findDDObyDID(String did) throws DDOUnparseableException;
 
   /**
    * Delete DDO by DID

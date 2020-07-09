@@ -8,14 +8,18 @@ import static jp.co.soramitsu.sora.didresolver.commons.URIConstants.PATH;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.http.ResponseEntity.ok;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.function.Function;
+import javax.validation.ValidationException;
+import javax.validation.Validator;
 import jp.co.soramitsu.sora.didresolver.controllers.dto.GenericResponse;
 import jp.co.soramitsu.sora.didresolver.controllers.dto.GetDDORs;
 import jp.co.soramitsu.sora.didresolver.controllers.dto.SuccessfulResponse;
@@ -32,11 +36,11 @@ import jp.co.soramitsu.sora.didresolver.services.VerifyService;
 import jp.co.soramitsu.sora.didresolver.validation.constrains.DIDConstraint;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
+import jp.co.soramitsu.sora.sdk.json.JsonUtil;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -53,15 +57,18 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 @RequestMapping(PATH)
 @Api(value = PATH)
-@Validated
 @Slf4j
 @SuppressWarnings("squid:S4529")
 public class DIDResolverController {
 
   private StorageService storageService;
   private VerifyService verifyService;
+  private Validator validator;
 
-  private static final Function<String, LocalDateTime> DATE_TIME_MAPPER = iso8601String -> LocalDateTime.parse(iso8601String, ISO_DATE_TIME);
+  private ObjectMapper mapper = JsonUtil.buildMapper();
+
+  private static final Function<String, LocalDateTime> DATE_TIME_MAPPER = iso8601String ->
+      LocalDateTime.parse(iso8601String, ISO_DATE_TIME);
 
   @PostMapping(consumes = {APPLICATION_JSON_UTF8_VALUE})
   @ApiOperation("This operation is used to register new DID-DDO pair in Identity System")
@@ -74,15 +81,16 @@ public class DIDResolverController {
               + "DID_DUPLICATE - Returns when DID has already registered\n"
               + "INVALID_PROOF_SIGNATURE - Returns when proof signature verification for DDO has failed\n"
               + "INVALID_PROOF - Returns when proof is invalid\n"
-              + "PUBLIC_KEY_VALUE_NOT_PRESENTED - Returns when pub lic key value has not found",
+              + "PUBLIC_KEY_VALUE_NOT_PRESENTED - Returns when public key value has not found",
           response = GenericResponse.class
       ),
       @ApiResponse(
           code = 400,
           message = "Failed. Returns when validation of received DDO has failed")})
   public ResponseEntity<GenericResponse> createDDO(
-      @ApiParam(value = "url encoded DID", required = true) @Validated @RequestBody DDO ddo)
+      @ApiParam(value = "url encoded DID", required = true) @RequestBody String ddoJson)
       throws DIDIsTooLongException, DIDDuplicateException, ProofSignatureVerificationException, InvalidProofException, PublicKeyValueNotPresentedException, DDOUnparseableException {
+    DDO ddo = deserialize(ddoJson);
     final String id = ddo.getId().toString();
     log.info("starting creation of DDO for DID - {}", id);
     if (id.length() > MAX_IROHA_KEY_LENGTH) {
@@ -94,7 +102,7 @@ public class DIDResolverController {
       throw new DIDDuplicateException(id);
     }
     log.info("write to storage DDO with DID - {}", id);
-    storageService.createOrUpdate(id, ddo);
+    storageService.createOrUpdate(id, ddoJson);
     return ok(new SuccessfulResponse());
   }
 
@@ -143,15 +151,16 @@ public class DIDResolverController {
           message = "Failed. Returns when validation of received DDO has failed")})
   public ResponseEntity<GenericResponse> updateDDO(
       @ApiParam(value = "url encoded DID", required = true) @DIDConstraint(isNullable = false) @PathVariable String did,
-      @ApiParam(value = "New DDO MUST contain updated property with time > created", required = true) @Validated @RequestBody DDO ddo)
+      @ApiParam(value = "New DDO MUST contain updated property with time > created", required = true) @RequestBody String ddoJson)
       throws IncorrectUpdateException, DIDNotFoundException, ProofSignatureVerificationException, InvalidProofException, PublicKeyValueNotPresentedException, DDOUnparseableException {
     log.info("Update DDO by DID - {}", did);
+    DDO ddo = deserialize(ddoJson);
     verifyDDOProof(ddo);
     if (!checkUpdatedTimeAfterCreatedTime(ddo)) {
       throw new IncorrectUpdateException(ddo.getId(), ddo.getCreated(), ddo.getUpdated());
     }
     if (storageService.findDDObyDID(did).isPresent()) {
-      storageService.createOrUpdate(did, ddo);
+      storageService.createOrUpdate(did, ddoJson);
     } else {
       throw new DIDNotFoundException(did);
     }
@@ -187,4 +196,20 @@ public class DIDResolverController {
         .orElse(false);
   }
 
+  public DDO deserialize(String json) throws DDOUnparseableException {
+    try {
+      val ddo = mapper.readValue(json, DDO.class);
+      if (ddo == null) {
+        throw new ValidationException("DDO is null");
+      }
+      val errors = validator.validate(ddo);
+      if (!errors.isEmpty()) {
+        throw new ValidationException("DDO violates constraints:" + errors);
+      }
+      return ddo;
+    } catch (IOException | ValidationException e) {
+      log.error("Could not handle DDO", e);
+      throw new DDOUnparseableException(e);
+    }
+  }
 }

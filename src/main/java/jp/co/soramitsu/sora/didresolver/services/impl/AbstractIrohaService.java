@@ -76,9 +76,22 @@ public abstract class AbstractIrohaService implements IrohaService {
   }
 
   @Override
-  public void setAccountDetails(String detailKey, Object value) {
+  public void setAccountDetails(String detailKey, Object detailValue) {
     String key = getNormalizeDetailKey(detailKey);
-    setAccountDetailsAsync(key, value);
+    try {
+      String v;
+      if (detailValue instanceof String) {
+        v = detailValue.toString();
+      } else {
+        v = objectMapper().writeValueAsString(detailValue);
+      }
+      val tx = setAccountDetailsTransaction(key, valueOf(quoteAsJsonText(v)));
+      log.debug("send transaction {} to iroha at {}", tx, api.getUri());
+      api.transaction(tx).blockingSubscribe(getObserver(key));
+    } catch (JsonProcessingException e) {
+      log.error("Problem with processing json {} for object with key {}", detailValue, key);
+      throw new IrohaTransactionCommitmentException(key, e);
+    }
   }
 
   private Observer<? super ToriiResponse> getObserver(String txKey) {
@@ -95,22 +108,6 @@ public abstract class AbstractIrohaService implements IrohaService {
                 .warn("tx {} is rejected with reason code {}", toriiResponse.getTxHash(),
                     toriiResponse.getFailedCmdIndex()))
         .build();
-  }
-
-  private void setAccountDetailsAsync(String key, Object value) {
-    String v;
-    try {
-      v = valueOf(quoteAsJsonText(objectMapper().writeValueAsString(value)));
-    } catch (JsonProcessingException e) {
-      log.error("Problem with processing json {} for object with key {}", value, key);
-      throw new IrohaTransactionCommitmentException(key, e);
-    }
-
-    val tx = setAccountDetailsTransaction(key, v);
-
-    log.debug("send transaction {} to iroha at {}", tx, api.getUri());
-
-    api.transaction(tx).blockingSubscribe(getObserver(key));
   }
 
   private TransactionOuterClass.Transaction setAccountDetailsTransaction(String key,
