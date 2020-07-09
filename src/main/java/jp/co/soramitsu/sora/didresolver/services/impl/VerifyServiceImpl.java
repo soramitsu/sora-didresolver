@@ -3,6 +3,7 @@ package jp.co.soramitsu.sora.didresolver.services.impl;
 import static java.util.Objects.nonNull;
 import static jp.co.soramitsu.crypto.ed25519.spec.EdDSANamedCurveTable.ED_25519;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Optional;
@@ -56,7 +57,7 @@ public class VerifyServiceImpl implements VerifyService {
   }
 
   @Override
-  public boolean verifyIntegrityOfDDO(DDO ddo)
+  public boolean verifyIntegrityOfDDO(DDO ddo, JsonNode jsonDDO)
       throws ProofSignatureVerificationException, PublicKeyValueNotPresentedException {
     log.debug("verifying integrity of DDO with DID {}", ddo.getId());
 
@@ -72,7 +73,7 @@ public class VerifyServiceImpl implements VerifyService {
 
     boolean isDDOVerified;
     try {
-      isDDOVerified = suite.verify(ddo, edDSAPublicKey);
+      isDDOVerified = suite.verify(jsonDDO, edDSAPublicKey);
     } catch (Exception e) {
       throw new ProofSignatureVerificationException(ddo.getId().toString(), e);
     }

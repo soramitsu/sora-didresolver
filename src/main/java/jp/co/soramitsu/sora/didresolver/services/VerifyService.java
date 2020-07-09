@@ -1,5 +1,6 @@
 package jp.co.soramitsu.sora.didresolver.services;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.List;
 import jp.co.soramitsu.sora.didresolver.exceptions.ProofSignatureVerificationException;
 import jp.co.soramitsu.sora.didresolver.exceptions.PublicKeyValueNotPresentedException;
@@ -31,7 +32,8 @@ public interface VerifyService {
    * Verifies integrity of the DDO
    *
    * @param ddo - DDO that is needed to be verified
+   * @param jsonDDO - JSON representation of the ddo. Not necessary fully match to {@code ddo}
    */
-  boolean verifyIntegrityOfDDO(DDO ddo)
+  boolean verifyIntegrityOfDDO(DDO ddo, JsonNode jsonDDO)
       throws ProofSignatureVerificationException, PublicKeyValueNotPresentedException;
 }
