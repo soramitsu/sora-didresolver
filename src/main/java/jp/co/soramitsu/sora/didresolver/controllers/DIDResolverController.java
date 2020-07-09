@@ -38,6 +38,7 @@ import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
 import jp.co.soramitsu.sora.sdk.json.JsonUtil;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.http.ResponseEntity;
@@ -96,7 +97,7 @@ public class DIDResolverController {
     if (id.length() > MAX_IROHA_KEY_LENGTH) {
       throw new DIDIsTooLongException(id);
     }
-    verifyDDOProof(ddo);
+    verifyDDOProof(ddo, ddoJson);
     val optionalDDO = storageService.findDDObyDID(id);
     if (optionalDDO.isPresent()) {
       throw new DIDDuplicateException(id);
@@ -155,7 +156,7 @@ public class DIDResolverController {
       throws IncorrectUpdateException, DIDNotFoundException, ProofSignatureVerificationException, InvalidProofException, PublicKeyValueNotPresentedException, DDOUnparseableException {
     log.info("Update DDO by DID - {}", did);
     DDO ddo = deserialize(ddoJson);
-    verifyDDOProof(ddo);
+    verifyDDOProof(ddo, ddoJson);
     if (!checkUpdatedTimeAfterCreatedTime(ddo)) {
       throw new IncorrectUpdateException(ddo.getId(), ddo.getCreated(), ddo.getUpdated());
     }
@@ -167,11 +168,12 @@ public class DIDResolverController {
     return ok(new SuccessfulResponse());
   }
 
-  private void verifyDDOProof(DDO ddo)
+  @SneakyThrows(IOException.class)
+  private void verifyDDOProof(DDO ddo, String ddoJson)
       throws ProofSignatureVerificationException, InvalidProofException, PublicKeyValueNotPresentedException {
     checkCreatorValidity(ddo);
 
-    if (!verifyService.verifyIntegrityOfDDO(ddo)) {
+    if (!verifyService.verifyIntegrityOfDDO(ddo, mapper.readTree(ddoJson))) {
       throw new ProofSignatureVerificationException(ddo.getId().toString());
     }
 
