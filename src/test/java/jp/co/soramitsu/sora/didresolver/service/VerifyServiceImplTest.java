@@ -1,11 +1,11 @@
 package jp.co.soramitsu.sora.didresolver.service;
 
-import static jp.co.soramitsu.sora.sdk.json.JsonUtil.buildMapper;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -45,21 +45,23 @@ public class VerifyServiceImplTest {
 
   private static JsonNode ddoJson;
 
+  private static ObjectMapper mapper = JsonUtil.buildMapper();
+
   @BeforeAll
   static void setUp() throws Exception {
-    ddoJson = buildMapper().readTree(VerifyServiceImplTest.class.getClassLoader().getResourceAsStream(DDO_JSON_NAME));
+    ddoJson = mapper.readTree(VerifyServiceImplTest.class.getClassLoader().getResourceAsStream(DDO_JSON_NAME));
   }
 
   @Test
   void testSuccessVerifyDDOProof()
       throws IOException, ProofSignatureVerificationException, PublicKeyValueNotPresentedException {
-    DDO ddo = buildMapper().readValue(ddoJson.toString(), DDO.class);
+    DDO ddo = mapper.treeToValue(ddoJson, DDO.class);
     assertTrue(verifyService.verifyIntegrityOfDDO(ddo, ddoJson));
   }
 
   @Test
   void testFailedVerifyDDOProofByincorrectSignature() throws IOException {
-    DDO ddo = buildMapper().readValue(ddoJson.toString(), DDO.class);
+    DDO ddo = mapper.treeToValue(ddoJson, DDO.class);
     ObjectNode jsonNode = (ObjectNode) JsonUtil.deepClone(ddoJson, JsonNode.class);
     jsonNode.put("proof", "testSig");
     assertThrows(ProofSignatureVerificationException.class,
@@ -69,7 +71,7 @@ public class VerifyServiceImplTest {
   @Test
   void testFailedVerifyDDOProofByIncorrectLengthOfTheKey()
       throws IOException, NoSuchFieldException, IllegalAccessException {
-    DDO ddo = buildMapper().readValue(ddoJson.toString(), DDO.class);
+    DDO ddo = mapper.treeToValue(ddoJson, DDO.class);
     Ed25519Sha3VerificationKey publicKey = (Ed25519Sha3VerificationKey) ddo.getPublicKey().get(0);
     Field publicKeyField = Ed25519Sha3VerificationKey.class.getDeclaredField("publicKey");
     publicKeyField.setAccessible(true);

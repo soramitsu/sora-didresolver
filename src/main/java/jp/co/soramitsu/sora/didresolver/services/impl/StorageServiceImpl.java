@@ -1,14 +1,12 @@
 package jp.co.soramitsu.sora.didresolver.services.impl;
 
-import static java.util.Optional.ofNullable;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Optional;
 import jp.co.soramitsu.sora.didresolver.exceptions.DDOUnparseableException;
 import jp.co.soramitsu.sora.didresolver.services.IrohaService;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
-import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 import jp.co.soramitsu.sora.sdk.json.JsonUtil;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -32,9 +30,10 @@ public class StorageServiceImpl implements StorageService {
   }
 
   @Override
-  public Optional<String> findDDObyDID(String did) throws DDOUnparseableException {
+  public Optional<JsonNode> findDDObyDID(String did) throws DDOUnparseableException {
     return irohaService.getAccountDetails(did)
-        .filter(ddo -> parseDdoFromIrohaResponse(ddo).isPresent());
+        .map(this::parseDdoFromIrohaResponse)
+        .filter(jsonNode -> !jsonNode.isNull());
   }
 
   @Override
@@ -43,10 +42,9 @@ public class StorageServiceImpl implements StorageService {
   }
 
   @SneakyThrows(DDOUnparseableException.class)
-  private Optional<DDO> parseDdoFromIrohaResponse(String response) {
+  private JsonNode parseDdoFromIrohaResponse(String response) {
     try {
-      DDO result = mapper.readValue(response, DDO.class);
-      return ofNullable(result);
+      return mapper.readTree(response);
     } catch (IOException e) {
       throw new DDOUnparseableException(e);
     }
