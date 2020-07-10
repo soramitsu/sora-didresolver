@@ -8,6 +8,7 @@ import static jp.co.soramitsu.sora.didresolver.commons.URIConstants.PATH;
 import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
 import static org.springframework.http.ResponseEntity.ok;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -38,7 +39,6 @@ import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
 import jp.co.soramitsu.sora.sdk.json.JsonUtil;
 import lombok.AllArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.springframework.http.ResponseEntity;
@@ -89,7 +89,7 @@ public class DIDResolverController {
           code = 400,
           message = "Failed. Returns when validation of received DDO has failed")})
   public ResponseEntity<GenericResponse> createDDO(
-      @ApiParam(value = "url encoded DID", required = true) @RequestBody String ddoJson)
+      @ApiParam(value = "url encoded DID", required = true) @RequestBody JsonNode ddoJson)
       throws DIDIsTooLongException, DIDDuplicateException, ProofSignatureVerificationException, InvalidProofException, PublicKeyValueNotPresentedException, DDOUnparseableException {
     DDO ddo = deserialize(ddoJson);
     final String id = ddo.getId().toString();
@@ -152,7 +152,7 @@ public class DIDResolverController {
           message = "Failed. Returns when validation of received DDO has failed")})
   public ResponseEntity<GenericResponse> updateDDO(
       @ApiParam(value = "url encoded DID", required = true) @DIDConstraint(isNullable = false) @PathVariable String did,
-      @ApiParam(value = "New DDO MUST contain updated property with time > created", required = true) @RequestBody String ddoJson)
+      @ApiParam(value = "New DDO MUST contain updated property with time > created", required = true) @RequestBody JsonNode ddoJson)
       throws IncorrectUpdateException, DIDNotFoundException, ProofSignatureVerificationException, InvalidProofException, PublicKeyValueNotPresentedException, DDOUnparseableException {
     log.info("Update DDO by DID - {}", did);
     DDO ddo = deserialize(ddoJson);
@@ -168,12 +168,11 @@ public class DIDResolverController {
     return ok(new SuccessfulResponse());
   }
 
-  @SneakyThrows(IOException.class)
-  private void verifyDDOProof(DDO ddo, String ddoJson)
+  private void verifyDDOProof(DDO ddo, JsonNode ddoJson)
       throws ProofSignatureVerificationException, InvalidProofException, PublicKeyValueNotPresentedException {
     checkCreatorValidity(ddo);
 
-    if (!verifyService.verifyIntegrityOfDDO(ddo, mapper.readTree(ddoJson))) {
+    if (!verifyService.verifyIntegrityOfDDO(ddo, ddoJson)) {
       throw new ProofSignatureVerificationException(ddo.getId().toString());
     }
 
@@ -198,9 +197,12 @@ public class DIDResolverController {
         .orElse(false);
   }
 
-  public DDO deserialize(String json) throws DDOUnparseableException {
+  /*
+   * Note: Json representation DDO and its DDO
+   */
+  public DDO deserialize(JsonNode json) throws DDOUnparseableException {
     try {
-      val ddo = mapper.readValue(json, DDO.class);
+      val ddo = mapper.treeToValue(json, DDO.class);
       if (ddo == null) {
         throw new ValidationException("DDO is null");
       }

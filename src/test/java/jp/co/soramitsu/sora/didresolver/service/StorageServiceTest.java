@@ -4,6 +4,7 @@ import static jp.co.soramitsu.sora.didresolver.util.DdoUtils.getDefaultDdo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.util.Optional;
 import jp.co.soramitsu.sora.didresolver.IntegrationTest;
 import jp.co.soramitsu.sora.didresolver.services.StorageService;
@@ -21,10 +22,10 @@ public class StorageServiceTest extends IntegrationTest {
   public void canSetAndGetObject() throws Exception {
     DDO targetDdo = getDefaultDdo();
     storageService.createOrUpdate(DEFAULT_DID, targetDdo);
-    final Optional<String> ddo = storageService
+    final Optional<JsonNode> ddo = storageService
         .findDDObyDID(DEFAULT_DID);
 
     assertTrue(ddo.isPresent());
-    assertEquals(mapper.writeValueAsString(targetDdo), ddo.get());
+    assertEquals(mapper.valueToTree(targetDdo), ddo.get());
   }
 }
