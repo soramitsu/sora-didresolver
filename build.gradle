@@ -13,6 +13,7 @@ buildscript {
 plugins {
     id "org.sonarqube" version "2.7.1"
     id "com.palantir.docker" version "0.22.1"
+    id "jp.co.soramitsu.sora-plugin" version "0.2.0"
 }
 
 apply plugin: 'java'
@@ -121,14 +122,6 @@ task wrapper(type: Wrapper) {
     gradleVersion = '4.8'
 }
 
-docker {
-    dependsOn build
-    dockerfile new File(rootProject.rootDir, "Dockerfile")
-    name "${repoUrl}/sora-middleware/${project.name}:${version}"
-    files bootJar.archivePath
-    buildArgs(['JAR_FILE': "${bootJar.archiveName}"])
-}
-
 sonarqube {
     properties {
         property "sonar.projectKey", "sora:didresolver"
@@ -158,4 +151,12 @@ jacocoTestReport {
     }
 
     dependsOn(test)
+}
+
+soramitsu {
+    projectGroup = 'sora'
+
+    docker {
+        jar = new File("build/libs/${project.name}-${project.version}.jar")
+    }
 }
