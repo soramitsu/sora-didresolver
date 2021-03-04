@@ -12,8 +12,7 @@ buildscript {
 
 plugins {
     id "org.sonarqube" version "2.7.1"
-    id "com.palantir.docker" version "0.22.1"
-    id "jp.co.soramitsu.sora-plugin" version "0.2.0"
+    id "jp.co.soramitsu.sora-plugin" version "0.3.0"
 }
 
 apply plugin: 'java'
@@ -118,8 +117,8 @@ dependencyManagement {
     }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.8'
+wrapper {
+    gradleVersion = '4.9'
 }
 
 sonarqube {
