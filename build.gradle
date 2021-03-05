@@ -160,9 +160,9 @@ soramitsu {
     docker {
         jar = new File("build/libs/${project.name}-${project.version}.jar")
         registry {
-            url = 'https://nexus.iroha.tech:19001'
-            username = 'bogdan'
-//            password = 'password'
+            url = System.getenv('DOCKER_REGISTRY_URL')
+            username = System.getenv('DOCKER_REGISTRY_USERNAME')
+            password = System.getenv('DOCKER_REGISTRY_PASSWORD')
         }
     }
 }
