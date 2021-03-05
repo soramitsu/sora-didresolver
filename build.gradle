@@ -26,6 +26,7 @@ apply plugin: 'application'
 group = 'jp.co.soramitsu.sora'
 version = (findProperty('version') != 'unspecified') ? version : '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
+mainClassName='jp.co.soramitsu.sora.didresolver.DIDResolverApplication'
 
 ext {
     irohaVersion = '5.2.3'
@@ -156,8 +157,12 @@ jacocoTestReport {
 
 soramitsu {
     projectGroup = 'sora'
-
     docker {
         jar = new File("build/libs/${project.name}-${project.version}.jar")
+        registry {
+            url = 'https://nexus.iroha.tech:19001'
+            username = 'bogdan'
+//            password = 'password'
+        }
     }
 }
