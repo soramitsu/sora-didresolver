@@ -158,11 +158,9 @@ jacocoTestReport {
 soramitsu {
     projectGroup = 'sora'
     docker {
+        // docker tag
+        tag = System.getenv("DOCKER_TAG")
+        // jar file that is used in the generated Dockerfile
         jar = new File("build/libs/${project.name}-${project.version}.jar")
-        registry {
-            url = System.getenv('DOCKER_REGISTRY_URL')
-            username = System.getenv('DOCKER_REGISTRY_USERNAME')
-            password = System.getenv('DOCKER_REGISTRY_PASSWORD')
-        }
     }
 }
