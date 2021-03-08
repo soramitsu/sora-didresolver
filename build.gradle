@@ -22,6 +22,15 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 apply plugin: "jacoco"
 apply plugin: 'application'
+apply plugin: 'org.sonarqube'
+
+test {
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+    finalizedBy jacocoTestReport
+}
 
 group = 'jp.co.soramitsu.sora'
 version = (findProperty('version') != 'unspecified') ? version : '0.0.1-SNAPSHOT'
@@ -142,16 +151,10 @@ jacoco {
 }
 
 jacocoTestReport {
-    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
-
     reports {
         xml.enabled true
-        xml.destination file("${buildDir}/reports/coverage.xml")
-        csv.enabled false
         html.enabled false
-        html.destination file("${buildDir}/reports/html")
     }
-
     dependsOn(test)
 }
 
