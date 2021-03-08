@@ -6,12 +6,13 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.7.1"
     }
 }
 
 plugins {
-    id "org.sonarqube" version "2.7.1"
+    id "org.sonarqube"
     id "jp.co.soramitsu.sora-plugin" version "0.3.0"
 }
 
