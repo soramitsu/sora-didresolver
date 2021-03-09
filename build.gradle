@@ -142,17 +142,12 @@ sonarqube {
 
 jacoco {
     toolVersion = "0.8.1"
-    reportsDir = file("$buildDir/customJacocoReportDir")
 }
 
 jacocoTestReport {
-    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
     reports {
         xml.enabled true
-        xml.destination file("${buildDir}/reports/coverage.xml")
-        csv.enabled false
         html.enabled false
-        html.destination file("${buildDir}/reports/html")
     }
     dependsOn test
 }
