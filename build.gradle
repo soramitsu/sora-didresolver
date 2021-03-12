@@ -47,7 +47,7 @@ ext {
     hibernateTypesVersion = '2.3.0'
     testContainersVersion = '1.11.4'
     liquibaseVersion = '3.6.2'
-    jUnitVersion = '5.5.0'
+    jUnitVersion = '5.5.2'
     jacksonVersion = '2.9.9'
     jsonPathVersion = '2.4.0'
     jUnitPlatformVersion = '1.4.2'
