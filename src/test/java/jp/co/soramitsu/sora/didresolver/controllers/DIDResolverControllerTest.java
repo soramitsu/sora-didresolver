@@ -3,6 +3,7 @@ package jp.co.soramitsu.sora.didresolver.controllers;
 import static java.time.Instant.now;
 import static java.util.Collections.singletonList;
 import static java.util.Objects.requireNonNull;
+import static javax.xml.bind.DatatypeConverter.printHexBinary;
 import static jp.co.soramitsu.iroha.java.Utils.parseHexKeypair;
 import static jp.co.soramitsu.sora.didresolver.controllers.dto.ResponseCode.DID_DUPLICATE;
 import static jp.co.soramitsu.sora.didresolver.controllers.dto.ResponseCode.DID_IS_TOO_LONG;
@@ -15,6 +16,7 @@ import static jp.co.soramitsu.sora.sdk.did.model.dto.DID.parse;
 import static jp.co.soramitsu.sora.sdk.did.model.dto.Options.builder;
 import static jp.co.soramitsu.sora.sdk.did.model.type.SignatureTypeEnum.Ed25519Sha3Signature;
 import static jp.co.soramitsu.sora.sdk.did.validation.ISO8601DateTimeFormatter.format;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -28,7 +30,14 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.security.KeyPair;
 import java.security.SignatureException;
+import java.time.Instant;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.annotation.PostConstruct;
+import jp.co.soramitsu.crypto.ed25519.Ed25519Sha3;
 import jp.co.soramitsu.crypto.ed25519.EdDSAPrivateKey;
 import jp.co.soramitsu.sora.didresolver.IntegrationTest;
 import jp.co.soramitsu.sora.didresolver.controllers.dto.GenericResponse;
@@ -39,10 +48,12 @@ import jp.co.soramitsu.sora.sdk.crypto.common.HexdigestSaltGenerator;
 import jp.co.soramitsu.sora.sdk.crypto.common.SaltGenerator;
 import jp.co.soramitsu.sora.sdk.crypto.json.JSONEd25519Sha3SignatureSuite;
 import jp.co.soramitsu.sora.sdk.did.model.dto.DDO;
+import jp.co.soramitsu.sora.sdk.did.model.dto.DID;
 import jp.co.soramitsu.sora.sdk.did.model.dto.Proof;
 import jp.co.soramitsu.sora.sdk.did.model.dto.authentication.Ed25519Sha3Authentication;
 import jp.co.soramitsu.sora.sdk.did.model.dto.publickey.Ed25519Sha3VerificationKey;
 import jp.co.soramitsu.sora.sdk.did.parser.generated.ParserException;
+import lombok.SneakyThrows;
 import lombok.val;
 import lombok.var;
 import org.junit.jupiter.api.BeforeEach;
@@ -241,6 +252,28 @@ public class DIDResolverControllerTest extends IntegrationTest {
     assertEquals(INVALID_PROOF_SIGNATURE, getResponseCode(response));
   }
 
+  @Test
+  @DisplayName("When trying to create multiple DDO at the same time every DDO created correctly")
+  void createMultipleDdoSimultaneously() throws Exception {
+    val threadPool = Executors.newWorkStealingPool();
+    val tasks = Stream.generate(this::generateDdo)
+        .limit(2)
+        .collect(Collectors.toList())
+        .parallelStream()
+        .map(ddo -> (Callable<ResponseEntity<GenericResponse>>) () ->
+            requests.createDDO(ddo)
+        ).collect(Collectors.toList());
+    val futures = threadPool.invokeAll(tasks, 30, TimeUnit.SECONDS);
+    for (val future : futures) {
+      val response = future.get();
+      assertEquals(200, response.getStatusCodeValue());
+      assertNotNull(response.getBody());
+      assertNotNull(response.getBody().getStatus());
+      assertEquals(ResponseCode.OK, response.getBody().getStatus().getCode());
+      System.err.println(response.getBody());
+    }
+  }
+
   private ResponseCode getResponseCode(ResponseEntity<? extends GenericResponse> response) {
     return requireNonNull(response.getBody()).getStatus().getCode();
   }
@@ -272,5 +305,37 @@ public class DIDResolverControllerTest extends IntegrationTest {
         .authentication(new Ed25519Sha3Authentication(publicKeyId))
         .created(now())
         .build();
+  }
+
+  @SneakyThrows({IOException.class, SignatureException.class})
+  private DDO generateDdo() {
+    val keyPair = new Ed25519Sha3().generateKeypair();
+    val pubKeyPrefix = printHexBinary(keyPair.getPublic().getEncoded())
+        .substring(0, 20)
+        .toLowerCase();
+    val did = DID.builder()
+        .identifier(pubKeyPrefix)
+        .method("sora").build();
+    val pubKeyId = did.withFragment("key-1");
+    val pubKey = new Ed25519Sha3VerificationKey(
+        pubKeyId,
+        keyPair.getPublic().getEncoded()
+    );
+    val unsignedDdo = DDO.builder()
+        .id(did)
+        .publicKey(pubKey)
+        .authentication(new Ed25519Sha3Authentication(pubKeyId))
+        .created(Instant.now())
+        .build();
+    val options = builder()
+        .created(now())
+        .creator(pubKeyId)
+        .type(Ed25519Sha3Signature)
+        .nonce(new HexdigestSaltGenerator().next())
+        .build();
+    return objectMapper.treeToValue(
+        signature.sign(unsignedDdo, ((EdDSAPrivateKey) keyPair.getPrivate()), options),
+        DDO.class
+    );
   }
 }

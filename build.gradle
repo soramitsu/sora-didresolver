@@ -43,14 +43,14 @@ ext {
     springSwaggerVersion = '2.9.2'
     commonsLangVersion = '3.9'
     spongycastleVersion = '1.58.0.0'
-    mockitoCoreVersion = '3.0.0'
+    mockitoCoreVersion = '3.4.6'
     hibernateTypesVersion = '2.3.0'
-    testContainersVersion = '1.11.4'
+    testContainersVersion = '1.14.3'
     liquibaseVersion = '3.6.2'
-    jUnitVersion = '5.5.0'
+    jUnitVersion = '5.7.2'
     jacksonVersion = '2.9.9'
     jsonPathVersion = '2.4.0'
-    jUnitPlatformVersion = '1.4.2'
+    jUnitPlatformVersion = '1.7.2'
     soraSDKVersion = '0.3.15'
     jjwtVersion = '3.8.1'
     springCloudVersion = 'Greenwich.SR2'
@@ -99,23 +99,26 @@ dependencies {
     //tests
     testCompile("org.mockito:mockito-junit-jupiter:$mockitoCoreVersion")
     testCompile('org.springframework.boot:spring-boot-starter-test')
+    testCompile('org.springframework.security:spring-security-test')
     testCompile("org.testcontainers:testcontainers:${testContainersVersion}")
     testCompile("org.testcontainers:postgresql:${testContainersVersion}")
-    testCompile("org.junit.jupiter:junit-jupiter-api:${jUnitVersion}")
-    testCompile("org.junit.jupiter:junit-jupiter-params:${jUnitVersion}")
-    testRuntime("org.junit.jupiter:junit-jupiter-engine:${jUnitVersion}")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${jUnitVersion}")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:${jUnitVersion}")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:${jUnitVersion}")
+    testImplementation("org.junit.platform:junit-platform-launcher:${jUnitPlatformVersion}")
+    testImplementation("org.junit.platform:junit-platform-engine:${jUnitPlatformVersion}")
+    testImplementation("org.junit.platform:junit-platform-commons:${jUnitPlatformVersion}")
     testCompile("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
-    testCompile("org.junit.platform:junit-platform-launcher:${jUnitPlatformVersion}")
     testCompile("org.mockito:mockito-core:${mockitoCoreVersion}")
-    testCompile('org.springframework.boot:spring-boot-starter-test')
-    testCompile('org.springframework.security:spring-security-test')
 
     compileOnly("org.projectlombok:lombok:${lombokVersion}")
     testCompileOnly("org.projectlombok:lombok:${lombokVersion}")
 
     // iroha
     compile "com.github.hyperledger.iroha-java:client:${irohaVersion}"
-    testCompile "com.github.hyperledger.iroha-java:testcontainers:${irohaVersion}"
+    testCompile ("com.github.hyperledger.iroha-java:testcontainers:${irohaVersion}") {
+        exclude module: 'slf4j-simple'
+    }
 
     // ========== Distributed Tracing ==========
     compile "org.springframework.cloud:spring-cloud-starter-zipkin"
