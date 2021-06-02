@@ -16,7 +16,6 @@ import static jp.co.soramitsu.sora.sdk.did.model.dto.DID.parse;
 import static jp.co.soramitsu.sora.sdk.did.model.dto.Options.builder;
 import static jp.co.soramitsu.sora.sdk.did.model.type.SignatureTypeEnum.Ed25519Sha3Signature;
 import static jp.co.soramitsu.sora.sdk.did.validation.ISO8601DateTimeFormatter.format;
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -255,22 +254,19 @@ public class DIDResolverControllerTest extends IntegrationTest {
   @Test
   @DisplayName("When trying to create multiple DDO at the same time every DDO created correctly")
   void createMultipleDdoSimultaneously() throws Exception {
-    val tasksCount = 10;
+    val tasksCount = 20;
     val threadPool = Executors.newWorkStealingPool();
     val tasks = Stream.generate(this::generateDdo)
         .limit(tasksCount)
-        .collect(Collectors.toList())
-        .parallelStream()
         .map(ddo -> (Callable<ResponseEntity<GenericResponse>>) () -> requests.createDDO(ddo))
         .collect(Collectors.toList());
     val futures = threadPool.invokeAll(tasks, 30, TimeUnit.SECONDS);
     for (val future : futures) {
       val response = future.get();
       assertEquals(200, response.getStatusCodeValue());
-      System.err.println(response.getBody());
-//      assertNotNull(response.getBody());
-//      assertNotNull(response.getBody().getStatus());
-//      assertEquals(ResponseCode.OK, response.getBody().getStatus().getCode());
+      assertNotNull(response.getBody());
+      assertNotNull(response.getBody().getStatus());
+      assertEquals(ResponseCode.OK, response.getBody().getStatus().getCode());
     }
   }
 
