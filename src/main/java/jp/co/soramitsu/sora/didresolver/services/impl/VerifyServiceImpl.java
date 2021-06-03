@@ -26,6 +26,7 @@ import jp.co.soramitsu.sora.sdk.did.model.dto.PublicKey;
 import jp.co.soramitsu.sora.sdk.json.JsonUtil;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.springframework.stereotype.Service;
 
 @NoArgsConstructor
@@ -36,10 +37,8 @@ public class VerifyServiceImpl implements VerifyService {
   private static final ObjectMapper mapper = JsonUtil.buildMapper();
 
   private static final EdDSAParameterSpec parameterSpec = EdDSANamedCurveTable.getByName(ED_25519);
-
-  private static final JSONEd25519Sha3SignatureSuite suite =
-      new JSONEd25519Sha3SignatureSuite(
-          new SecurityProvider(), new JSONCanonizerWithOneCoding(), mapper);
+  private static final SecurityProvider secProvider = new SecurityProvider();
+  private static final JSONCanonizerWithOneCoding canonizer = new JSONCanonizerWithOneCoding();
 
   @Override
   public boolean isCreatorInPublicKeys(@NotNull DID proofCreator, List<PublicKey> publicKeys) {
@@ -73,6 +72,7 @@ public class VerifyServiceImpl implements VerifyService {
 
     boolean isDDOVerified;
     try {
+      val suite = new JSONEd25519Sha3SignatureSuite(secProvider, canonizer, mapper);
       isDDOVerified = suite.verify(jsonDDO, edDSAPublicKey);
     } catch (Exception e) {
       throw new ProofSignatureVerificationException(ddo.getId().toString(), e);
