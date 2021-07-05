@@ -38,7 +38,7 @@ sourceCompatibility = 1.8
 mainClassName='jp.co.soramitsu.sora.didresolver.DIDResolverApplication'
 
 ext {
-    irohaVersion = '5.2.3'
+    irohaVersion = '6.1.0'
     lombokVersion = '1.18.8'
     springSwaggerVersion = '2.9.2'
     commonsLangVersion = '3.9'
